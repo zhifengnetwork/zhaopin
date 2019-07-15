@@ -1,0 +1,80 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+.table > thead>tr> th{
+   text-align: center;
+}
+</style>
+{/block}
+
+{block name="content"}
+<div class="ibox">
+    <div class="ibox-content">
+            <div class="row">
+                        <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label class="control-label" for="status">　</label>
+                                    <div>
+                                        <a class="btn btn-primary" href="{:url('distribution/distribution_grade_add')}"><i class="fa fa-edit"></i>添加新等级</a>
+                                    </div>
+                                </div>
+                        </div>
+                </div>
+            </div>
+       </form>
+
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table  table-bordered table-hover text-center">
+                            <thead>
+                                <tr>
+                                    <th>等级ID</th>
+                                    <th>等级名称</th>
+                                    <th>等级比例</th>
+                                    <th>升级条件</th>
+                                    <th>分销权限</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead> 
+                            <tbody>
+                                {notempty name="list"}
+                                {volist name="list.data" id="vo"}
+                                <tr>
+                                    <td>{$vo.id}</td>
+                                    <td>{$vo.levelname}</td>
+                                    <td>{$vo.levelratio}</td>
+                                    <td>{if condition="$vo.autoupdate"}自动升级{else /}不自动升级{/if}</td>
+                                    <td>{$vo.authority_item}</td>
+                                    <td>
+                                        <a class='btn btn-default' href="{:url('distribution/distribution_grade_add',['id'=>$vo.id],false)}">编辑</a>
+                                        <a class='btn btn-default' onclick="del(this,{$vo.id})">删除</a>
+                                    </td>
+                                </tr>
+                                {/volist}
+                                {/notempty}
+                            </tbody>
+                        </table>
+                        {$page}
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name='script'}
+<script>
+    function del(obj,id){
+        if(window.confirm('确认删除该等级吗？')){
+            $.post("{:url('distribution/distribution_grade_del')}",{'id':id},function(data){
+                alert(data.msg);
+                if(data.code){
+                    $(obj).parents('tr').remove();
+                }
+            },'json');
+        }
+    }
+
+</script>
+{/block}

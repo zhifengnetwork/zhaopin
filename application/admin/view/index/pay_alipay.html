@@ -1,0 +1,140 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+.table>thead>tr>th {
+    text-align: center;
+}
+</style>
+{/block}
+
+{block name="content"}
+<div class="main rightlist">
+    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" >
+       
+        <div class="panel panel-default"> 
+            <div class='panel-body'>
+                <div class='alert alert-info'>在开启以下支付方式前，请设置好参数。
+                </div>
+
+                <div class="form-group form-group-s">
+                    <label class="col-xs-12 col-sm-2 control-label">支付账号名称</label>
+                    <div class="col-sm-8 col-xs-12">
+                            <input type="text" name="alipay[account_name]" class="form-control" value="{$set['alipay']['account_name']}" autocomplete="off"/>
+                       <!-- <span class="help-block"><strong class="text-danger">微信支付要求公众号为“认证服务号”，该公众号没有微信支付的权限</strong></span>  -->
+                    </div>
+                </div>
+                <div class="form-group form-group-s">
+                    <label class="col-xs-12 col-sm-2 control-label">身份标识<br />
+                        (appId)</label>
+                    <div class="col-sm-8 col-xs-12">
+                        <input type="text" class="form-control"  name = "alipay[appid]" value="{$set['alipay']['appid']}"  autocomplete="off">
+                        <span class="help-block"></div>
+                </div>
+                <div class="form-group form-group-s">
+                    <label class="col-xs-12 col-sm-2 control-label">身份公钥<br />
+                        (publicKey)</label>
+                    <div class="col-sm-8 col-xs-12">
+                        <input type="text" class="form-control" name = "alipay[public_key]"  value="{$set['alipay']['public_key']}"  autocomplete="off"/>
+                        <span class="help-block">公众平台API(参考文档API 接口部分)的权限获取所需密钥Key <a href="{:url('account/post', array('uniacid' => 3))}">请通过修改公众号信息来保存</a></span> </div>
+                </div>
+                <div class="form-group form-group-s s"  >
+                    <label class="col-xs-12 col-sm-2 control-label">身份私钥<br />
+                        (privateKey)</label>
+                        <div class="col-sm-8 col-xs-12">
+                        <input type="text" name="alipay[private_key]" class="form-control" value="{$set['alipay']['private_key']}" autocomplete="off"/>
+                       </div>
+                 </div>
+                 <div class="form-group form-group-s s"  >
+                    <label class="col-xs-12 col-sm-2 control-label">加密方式<br />
+                        (sign_type)</label>
+                        <div class="col-sm-8 col-xs-12">
+                        <input type="text" name="alipay[sign_type]" class="form-control" value="RSA2" autocomplete="off" readonly="readonly"/>
+                       </div>
+                 </div>
+                 <div class="form-group form-group-s s"  >
+                    <label class="col-xs-12 col-sm-2 control-label">异步回调地址<br />
+                        (notify_url)</label>
+                        <div class="col-sm-8 col-xs-12">
+                        <input type="text" name="alipay[notify_url]" class="form-control" value="{$set['alipay']['notify_url']}" autocomplete="off" />
+                       </div>
+                 </div>
+
+
+
+                
+                 <div class="form-group">
+                    <label class="col-sm-2 control-label">支付宝支付</label>
+                    <div class="col-sm-9">
+                        <div class="radio radio-success radio-inline">
+                            <input type="radio" value="1" name="pay[alipay]" id="alipay1" {if $set['pay']['alipay']==1}checked{/if} />
+                            <label for="alipay1">开启</label>
+                        </div>
+
+                        <div class="radio radio-danger radio-inline">
+                            <input type="radio" value="0" name="pay[alipay]" id="alipay2" {if $set['pay']['alipay']==0}checked{/if} />
+                            <label for="alipay2">关闭</label>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">余额支付</label>
+                    <div class="col-sm-9">
+                        <div class="radio radio-success radio-inline">
+                            <input type="radio" value="1" name="pay[credit]" id="credit1" {if $set['pay']['credit']==1}checked{/if}  />
+                            <label for="credit1">开启</label>
+                        </div>
+
+                        <div class="radio radio-danger radio-inline">
+                            <input type="radio" value="0" name="pay[credit]" id="credit2" {if $set['pay']['credit']==0}checked{/if}  />
+                            <label for="credit2">关闭</label>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">货到付款</label>
+                    <div class="col-sm-9">
+                        <div class="radio radio-success radio-inline">
+                            <input type="radio" value="1" name="pay[cash]" id="cash1" {if $set['pay']['cash']==1}checked{/if} />
+                            <label for="cash1">开启</label>
+                        </div>
+
+                        <div class="radio radio-danger radio-inline">
+                            <input type="radio" value="0" name="pay[cash]" id="cash2" {if $set['pay']['cash']==0}checked{/if} />
+                            <label for="cash2">关闭</label>
+                        </div>
+
+                    </div>
+                </div>
+                
+                       <div class="form-group"></div>
+            <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                    <div class="col-sm-9 col-xs-12">
+                    <button class="btn btn-primary ajax-post col-lg-1" target-form="form-horizontal" type="submit">保存</button>
+                            <!-- <input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1"  /> -->
+                     </div>
+            </div>
+
+            </div>
+        </div>     
+    </form>
+</div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript">
+   $(function () {
+                    $(":radio[name='pay[weixin]']").click(function () {
+                        if ($(this).val() == 1) {
+                            $("#certs").show();
+                        }
+                        else {
+                            $("#certs").hide();
+                        }
+                    })
+
+                })
+</script>
+{/block}

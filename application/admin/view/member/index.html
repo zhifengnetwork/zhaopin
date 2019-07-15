@@ -1,0 +1,272 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+.table>thead>tr>th {
+    text-align: center;
+}
+</style>
+{/block}
+
+{block name="content"}
+<div class="ibox">
+    <div class="ibox-content">
+            <div class="row">
+               <form  method="get" action="{:url()}">
+                         
+                            <div class="col-sm-1">
+                                    <div class="form-group">
+                                        <label class="control-label" for="order_id">ID</label>
+                                        <input type="text" placeholder="会员id" name="mid" value="{$id}" class="form-control">
+                                    </div>
+                             </div>
+                            <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label class="control-label" for="invoice_no">会员信息</label>
+                                    <input type="text" placeholder="会员信息" name="realname" value="{$kw}" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label class="control-label" for="status">是否关注</label>
+                                        <select name='followed' class='form-control' style="width:150px;">
+                                            <option value=''  {if $followed==''}selected{/if}>默认全部</option>
+                                            <option value='0' {if $followed=='0'}selected{/if}>未关注</option>
+                                            <option value='1' {if $followed=='1'}selected{/if}>已关注</option>
+                                            <option value='2' {if $followed=='2'}selected{/if}>取消关注</option>
+                                        </select>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label class="control-label" for="status">会员等级</label>
+                                            <select name='level' class='form-control' style="width:150px;">
+                                                    <option value=''>默认全部</option>
+                                                    {foreach $levels as $key => $vo}
+                                                    <option value='{$key}' {if $level==$vo['id']}selected{/if}>{$vo['levelname']}</option>
+                                                    {/foreach}
+                                             </select>
+                                </div>
+                          </div>
+                          <div class="col-sm-2">
+                            <div class="form-group">
+                                <label class="control-label" for="status">会员分组</label>
+                                <select name='groupid' class='form-control' style="width:150px;">
+                                        <option value=''>默认全部</option>
+                                        {foreach $groups as $key => $vo}
+                                        <option value='{$key}' {if $groupid==$vo['id']}selected{/if}>{$vo['groupname']}</option>
+                                        {/foreach}
+                                </select>
+                            </div>
+                         </div>
+
+                         <div class="col-sm-2">
+                            <div class="form-group">
+                                <label class="control-label" for="status">黑名单</label>
+                                <select name='isblack' class='form-control' style="width:150px;">
+                                    <option value='' {if  $isblack==''}selected{/if}>默认全部</option>
+                                    <option value='0' {if $isblack=='0'}selected{/if}>否</option>
+                                    <option value='1' {if $isblack=='1'}selected{/if}>是</option>
+                                </select>
+                            </div>
+                         </div>
+                        
+                        <div class="col-sm-1">
+                                <div class="form-group">
+                                    <label class="control-label" for="status">　</label>
+                                    <div>
+                                        <button class="btn btn-primary">查询</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="control-label">日期</label>
+                                <div class="input-daterange input-group" data-provide="datepicker">
+                                    <input class="form-control input-sm" name="begin_time" type="text" value="{$begin_time}"/>
+                                    <span class="input-group-addon">到</span>
+                                    <input class="form-control input-sm" name="end_time" type="text" value="{$end_time}"/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                            <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label" for="status">　</label>
+                                        <div>
+                                            <a class="btn btn-primary" href="{:url('member/index', $exportParam)}">导出Excel</a>
+                                        </div>
+                                    </div>
+                            </div>
+                </form>
+           </div>
+       </div>
+
+
+        <div class="ibox-content">
+            <div class="table-responsive">
+                <table class="table  table-bordered table-hover text-center">
+                    <thead>
+                        <tr>
+                            <th>会员ID</th>
+                            <th>推荐人</th>
+                            <th>粉丝</th>
+                            <th>会员姓名</th>
+                            <th>手机号码</th>
+                            <th>会员等级/分组</th>
+                            <th>注册时间</th>
+                            <th>积分</th>
+                            <th>余额</th>
+                            <th>成交订单</th>
+                            <th>成交金额</th>
+                            <th>关注</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead> 
+                    <tbody>
+                        {notempty name="list"}
+                        {volist name="list" id="vo"}
+                        <tr>
+                            <td>{$vo.id}</td>
+
+                            <td  {if !empty($vo['agentid'])}title='ID: {$vo['agentid']}'{/if}>
+                                {if empty($vo['agentid'])}
+                                    {if $vo['isagent']==1}
+                                        <label class='label label-primary'>总店</label>
+                                        {else/}
+                                        <label class='label label-default'>暂无</label>
+                                        {/if}
+                                {else/}
+                                
+                                    {if !empty($vo['agentavatar'])}
+                                    <img src='{$vo['agentavatar']}' style='width:30px;height:30px;padding1px;border:1px solid #ccc' />
+                                    {/if}
+                                    {if empty($vo['agentnickname'])}昵称{else/}{$vo['agentnickname']}{/if}
+                                {/if}
+                                        
+                            </td>
+                            
+                            <td><a href="{:url('member/member_edit',['id' => $vo['id']])}" title="会员详情" style="color: #376fd5;">
+                                {if !empty($vo['avatar'])}
+                                    <img src='{$vo['avatar']}' style='width:30px;height:30px;padding1px;border:1px solid #ccc' />
+                                {/if}
+                                {if empty($vo['nickname'])}昵称{else/}{$vo['nickname']}{/if}</a>
+                            </td>
+
+                            <td>{$vo['username']}</td>
+                            <td>{$vo['mobile']}</td>
+                            <td>{if empty($vo['levelname'])}普通会员{else/}{$vo['levelname']}{/if}
+                                <br/>{if empty($vo['groupname'])}无分组{else/}{$vo['groupname']}{/if}
+                            </td>
+                            <td>{$vo['createtime']|date="y-m-d H:i:s",###}</td>
+                            <td>
+                                {if $vo['balance'] == null}
+                                  0
+                                {else/}
+                                  {$vo['balance']}
+                                {/if}
+                            </td>
+                            <td>
+                                  {if $vo['balance1'] == null}
+                                    0
+                                  {else/}
+                                    {$vo['balance1']}
+                                  {/if}
+                            </td>
+                            <td>{$vo['ordercount']}</td>
+                            <td>{:floatval($vo['ordermoney'])}</td>
+                            
+                            <td>
+                                {if $vo['isblack']==1}
+                                <span class="label label-default" style='color:#fff;background:black'>黑名单</span>
+                                {else/}
+                                    {if !($vo.followed)}
+                                        {if empty($vo['uid'])}
+                                            <label class='label label-default'>未关注</label>
+                                        {else/}
+                                            <label class='label label-warning'>取消关注</label>
+                                        {/if}
+                                    {else/}
+                                        <label class='label label-success'>已关注</label>    
+                                    {/if}
+                                {/if}
+                            </td>
+                            
+                            <td  style="overflow:visible;">
+                                <div class="btn-group btn-group-sm" >
+                                        <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" href="javascript:;">操作 <span class="caret"></span></a>
+                                    <ul class="dropdown-menu dropdown-menu-left" role="menu" style='z-index: 9999'>
+                                        
+                                        <li><a href="{:url('member/member_edit',array('id' => $vo['id']));}" title="会员详情"><i class='fa fa-edit'></i> 会员详情</a></li>
+                                        <li><a href="{:url('order/index', array('kw'=>$vo['mobile']))}" title='会员订单'><i class='fa fa-list'></i> 会员订单</a></li>
+                                        <li><a href="{:url('finance/integral_Recharge', array('id'=>$vo['id']))}" title='充值积分'><i class='fa fa-credit-card'></i> 充值积分</a></li>
+                                        <li><a href="{:url('finance/balance_Recharge', array('id'=>$vo['id']))}" title='充值余额'><i class='fa fa-money'></i> 充值余额 </a></li>
+                                        {if $vo['isblack'] == 1}
+                                            <li><a href="javascript:void(0);" title='取消黑名单'  class="isblack" isblack ="{$vo.isblack}" uid = "{$vo['id']}"><i class='fa fa-minus-square'></i> 取消黑名单</a></li>
+                                        {else/}
+                                            <li><a href="javascript:void(0);" title='设置黑名单'  class="isblack" isblack ="{$vo.isblack}" uid = "{$vo['id']}"> <i class='fa fa-minus-circle'></i> 设置黑名单</a></li> 
+                                        {/if}
+
+                                        <li><a  href="javascript:void(0);" title='删除会员' class="delete" id = "{$vo['id']}"><i class='fa fa-remove'></i> 删除会员</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        {/volist}
+                        {/notempty}
+                    </tbody>
+                </table>
+                {$list->render()}
+        </div>
+</div>
+                
+
+
+{/block}
+{block name="script"}
+<script>
+$(function() {
+    // 删除
+    $('.delete').click(function(e) {
+        var id = this.id;
+        layer.confirm('是否确定删除', { icon: 3, title: '提示' }, function(index) {
+
+            $.post("{:url('member/member_delete')}", { id: id }, function(res) {
+                if (res.code) {
+                    layer.msg(res.msg, { icon: 6 });
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    layer.msg(res.msg, { icon: 5 });
+                }
+            });
+        });
+    });
+      // 设置黑名单
+      $('.isblack').click(function(e) {
+        var isblack     = $(this).attr('isblack');
+        var id          = $(this).attr('uid');
+        if(isblack == 1){
+            var stat = '确定取消黑名单';
+        }else{
+            var stat = '确定设置黑名单';
+        }
+        layer.confirm(stat, { icon: 3, title: '提示' }, function(index) {
+
+            $.post("{:url('member/member_isblack')}", { id: id,isblack:isblack }, function(res) {
+                if (res.code) {
+                    layer.msg(res.msg, { icon: 6 });
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    layer.msg(res.msg, { icon: 5 });
+                }
+            });
+        });
+    });
+});
+</script>
+{/block}

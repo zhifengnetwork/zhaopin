@@ -1,0 +1,223 @@
+{extend name="common:base" /}
+
+{block name="content"}
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$meta_title}</h5>
+                    <div class="pull-right" style="margin-top:-8px;">
+                            <a class="btn btn-info" href="{:url('chopper/add')}"><i class="fa fa-plus"></i> 添加砍一刀商品</a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+
+                    <div class="row">
+                    <form method="get" action="">
+
+                        <div class="col-sm-2 m-b-xs">
+                            <select name="is_show" class="input-sm form-control input-s-sm inline">
+                                <option value="">选择上架状态</option>
+                                <option {if condition="$is_show eq '1' "} selected {/if} value="1">已上架</option>
+                                <option {if condition="$is_show heq 0 "} selected {/if} value="0">未上架</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-sm-2">
+                            <div class="input-group"><input type="text" name="chopper_name" value="{$chopper_name}" placeholder="搜索团购商品名称" class="input-sm form-control"> </div>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <div class="input-group"> 
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-sm btn-primary"> 搜索</button> 
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                    </div>
+
+                    <div class="table-responsive">
+                        <form action="{:URL('Admin/delAll')}" method="post">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+
+                                <th><input class="ch_all" type="checkbox">ID</th>
+                                <th>砍一刀商品名称 </th>
+                                <th>排序 </th>
+                                <th>第一刀</th>
+                                <th>第二刀</th>
+                                <th>第三刀</th>
+                                <th>区间刀</th>  
+                                <th>砍价底价</th>
+                                <th>随机砍价次数</th>
+                                <th>随机砍价金额</th>
+                                <th>可砍金额</th>
+                                <th>开始时间</th>
+                                <th>结束时间</th>
+                                <th>砍价状态</th>
+                                <th>上架 \ 下架</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {volist name="list" id="vo"}
+                            <tr>
+                                <td><input type="checkbox" class="i-checks ch_item" name="chopper_id[]"   value="{$vo.chopper_id}">{$vo.chopper_id}</td>
+                                <td>{$vo.chopper_name}</td>
+                                <td>{$vo.sort}</td>
+                                <td>{$vo.first_amount}</td>
+                                <td>{$vo.second_amount}</td>
+                                <td>{$vo.third_amount}</td>
+                                <td>{:get_qujian($vo.chopper_id)}</td>
+                                <td>{$vo.surplus_amount}</td>
+                                <td>{$vo.end_num}</td>
+                                <td>{$vo.end_price}</td>
+                                <td>{$vo.chopper_price}</td>
+                                <td>{$vo.start_time|date="Y-m-d H:i:s",###}</td>
+                                <td>{$vo.end_time|date="Y-m-d H:i:s",###}</td>
+                                <td>
+                                    {switch $vo.status}
+                                        {case 0}终止砍价{/case}
+                                        {case 1}砍价成功{/case}
+                                        {case 2}砍价中{/case}
+                                        {case 3}砍价未满{/case}
+                                    {/switch}
+                                </td>
+                                <td>
+                                    {switch $vo.is_show}
+                                        {case 0}未上架{/case}
+                                        {case 1}已上架{/case}
+                                    {/switch}
+                                </td>
+                                <td>
+                                    <a href="{:url('chopper/edit',['chopper_id'=>$vo.chopper_id],false)}">编辑</a>
+                                    <a is_show="{$vo.is_show}" onclick="is_show(this,{$vo.chopper_id})" href="javascript:;">{if condition="$vo.is_show"}下架{else /}上架{/if}</a>
+                                    <a onclick="del(this,{$vo.chopper_id})" href="javascript:;">删除</a>
+                                </td>
+                            </tr>
+                            {/volist}
+                            </tbody>
+                        </table>
+                        </form>
+                    </div>
+                    <style>
+                        .pagination{}
+                        .pagination li{float:left;position:relative;margin-top:10px;padding:0 12px;}
+                        .pagination li{float:left;width:42px;height:28px;border:1px solid #DDD; text-align:center;line-height:30px;border-left:none;}
+                        .pagination li.active{color:#f00;}
+                        .pagination li a{float:left;width:42px;height:28px; text-align:center;line-height:30px;border-left:none;color:#3399d5;}
+                    </style>
+                    <ul class="pagination">
+                        {$page}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+{block name='script'}
+<script>
+    function del(obj,chopper_id){
+        if(window.confirm('确认删除该商品吗？')){
+            $.post("{:url('Groupon/del')}",{'chopper_id':chopper_id},function(data){
+                alert(data.msg);
+                if(data.code){
+                    $(obj).parents('tr').remove();
+                }
+            },'json');
+        }
+    }
+
+    function is_show(obj,chopper_id){
+        var is_show = $(obj).attr('is_show');
+
+        if( is_show == 1 ){
+            is_show = 0;
+            ts = '是否下架?';
+        }else{
+            is_show = 1;
+            ts = '是否上架?';
+        }
+
+        if(window.confirm(ts)){
+            $.post("{:url('chopper/is_show')}",{'chopper_id':chopper_id,'is_show':is_show},function(data){
+                if(data.code){
+                    $(obj).attr('is_show',is_show);
+                    if( is_show ){
+                        $(obj).parents('tr').find('td').eq(8).html('已上架');
+                        $(obj).html('下架');
+                        alert('上架成功！');
+                    }else{
+                        $(obj).parents('tr').find('td').eq(8).html('未上架');
+                        $(obj).html('上架');
+                        alert('下架成功！');
+                    }
+                }
+            },'json');
+        }
+    }
+
+    function is_show_all(is_show){
+
+        var chopper_id = '';
+        var flag = 0
+        $('.ch_item').each(function(k,v){
+            if( $(v).is(':checked') ){
+                flag = 1;
+                chopper_id += $(v).val() + ',';
+            }
+        });
+        if( !flag ){
+            if( is_show == 1 ){
+                alert('请勾选需要批量上架的ID！');
+            }else{
+                alert('请勾选需要批量下架的ID！');
+            }
+        }
+        chopper_id = chopper_id.substring(0, chopper_id.length - 1);  
+        
+        $.post("{:url('chopper/is_show_all')}",{'chopper_id':chopper_id,'is_show':is_show},function(data){
+            if(data.code){
+                if( is_show ){
+                    alert('批量上架成功！');
+                }else{
+                    alert('批量下架成功！');
+                }
+                location.reload();
+            }
+        },'json');
+
+    }
+
+    function del_all(obj,chopper_id){
+        var chopper_id = '';
+        var flag = 0
+        $('.ch_item').each(function(k,v){
+            if( $(v).is(':checked') ){
+                flag = 1;
+                chopper_id += $(v).val() + ',';
+            }
+        });
+        if( !flag ){
+            alert('请勾选需要批量删除的ID！');
+            return;
+        }
+        chopper_id = chopper_id.substring(0, chopper_id.length - 1);
+
+        if(window.confirm('确认批量删除商品吗？')){
+            $.post("{:url('chopper/del_all')}",{'chopper_id':chopper_id},function(data){
+                if(data.code){
+                    alert('批量删除成功！');
+                    location.reload();
+                }else{
+                    alert('批量删除失败！');
+                }
+            },'json');
+        }
+    }
+
+</script>
+{/block}

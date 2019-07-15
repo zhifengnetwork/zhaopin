@@ -1,0 +1,91 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+.table>thead>tr>th {
+    text-align: center;
+}
+</style>
+{/block}
+
+{block name="content"}
+<div class="ibox">
+    <div class="ibox-content">
+            <div class="row">
+               <form  method="get" action="{:url()}">
+                            <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label" for="status">处理状态</label>
+                                        <select name="refundstatus" class="form-control" style="width:180px;">
+                                                {foreach $refund_status as $key => $vo}
+                                                    <option value="{$key}" {$Think.get.refundstatus==$key?='selected' }>{$vo}</option>
+                                                 {/foreach}
+                                         </select>
+                                    </div>
+                             </div>
+                         
+                            <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label" for="order_id">订单号</label>
+                                        <input type="text" placeholder="订单号" name="order_id" value="{$order_id}" class="form-control">
+                                    </div>
+                             </div>
+                        
+                            <div class="col-sm-1">
+                                    <div class="form-group">
+                                        <label class="control-label" for="status">　</label>
+                                        <div>
+                                            <button class="btn btn-primary">查询</button>
+                                        </div>
+                                    </div>
+                              </div>
+                </form>
+           </div>
+       </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table  table-bordered table-hover text-center">
+                            <thead>
+                                <tr>
+                                    <th class="col-lg-2">订单编号</th>
+                                    <th>商品名称</th>
+                                    <th>退款原因</th>
+                                    <th>退款方式</th>
+                                    <th>退款金额</th>
+                                    <th>申请日期</th>
+                                    <th>退款状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead> 
+                            <tbody>
+                                {notempty name="list"}
+                                {volist name="list" id="vo"}
+                                <tr>
+                                    <td>{$vo.order_sn}</td>
+                                    <td>{:getPayBody($vo.order_id)}</td>
+                                    <td>{$refund_reason[$vo.refund_reason]}</td>
+                                    <td>
+                                        {eq name="$vo.refund_type" value="1"}
+                                            支付原路退回
+                                        {else/}
+                                            退到用户余额
+                                        {/eq}
+                                    </td>
+                                    <td>{$vo.order_amount}</td>
+                                    <td>{$vo.create_time|date="y-m-d H:i:s",###}</td>
+                                    <td>{$refund_status[$vo.refund_status]}</td>
+                                    <td>
+                                        <a class="btn btn-default" href="{:url('order/refund_edit',['id'=>$vo.id])}"><i class="fa fa-list"></i> 查看</a>
+                                        <!-- <a class="btn btn-default delete" @click.stop="del_data($event)" attr_url="{:url('index/page_delete',['id'=>$vo.order_id])}" id="{$vo.order_id}" >删除 <i class="fa fa-trash-o" attr_url="{:url('index/page_delete',['id'=>$vo.id])}"></i></a> -->
+                                    </td>
+                                </tr>
+                                {/volist}
+                                {/notempty}
+                            </tbody>
+                        </table>
+                        {$list->render()}
+                    </div>
+                </div>
+                
+
+
+{/block}

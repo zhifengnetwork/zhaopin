@@ -1,0 +1,119 @@
+{extend name="common:base" /}
+{block name="content"}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{$meta_title}</h5>
+            </div>
+            <div class="ibox-content">
+                <form method="post" class="form-horizontal" action="">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">登入标题</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="login_title" value="{:config('login_title')}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">主界面标题</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="main_title" value="{:config('main_title')}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">客服联系电话号码</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="customer_tel" value="{:config('customer_tel')}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">QQ客服联系号</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="customer_qq" value="{:config('customer_qq')}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">客服微信联系号</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="customer_wx" value="{:config('customer_wx')}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">申请代理联系微信号</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="agc_list" value="{:config('agc_list')}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">注册昵称生成方式</label>
+                        <div class="col-sm-5">
+                            <input type="number" name="registered_nickname_mode" value="{:config('registered_nickname_mode')}" class="form-control pull-rigth">
+                        </div>
+                        <span style="color:red;line-height: 30px; " class="pull-rigth">*0 - 游客 1- 游客加随机4位 2 - 随机名字 3-昵称id一样</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">修改昵称次数</label>
+                        <div class="col-sm-9">
+                            <input type="number" name="up_nickname_num" value="{:config('up_nickname_num')}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">绑定手机号赠送金币</label>
+                        <div class="col-sm-9">
+                            <input type="number" name="bind_tel_send_gold" value="{:config('bind_tel_send_gold')}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">代理分享地址</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="agent_share_url" value="{:config('agent_share_url')}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">支付宝提现税率</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="ali_withdraw_percent" value="{:config('ali_withdraw_percent')}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">银行提现税率</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="bank_withdraw_percent" value="{:config('bank_withdraw_percent')}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">代理支付宝提现手续费</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="agent_ali_withdraw_percent" value="{:config('agent_ali_withdraw_percent')}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">代理银行提现手续费</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="agent_bank_withdraw_percent" value="{:config('agent_bank_withdraw_percent')}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">支付宝提现说明</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="ali_tx_explain" value="{:config('ali_tx_explain')}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">银行提现说明</label>
+                        <div class="col-sm-9">
+                            <input type="text" name="bank_tx_explain" value="{:config('bank_tx_explain')}" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-2">
+                            <button class="btn btn-white" onclick="javascript:history.back(-1);return false;">取消</button>
+                            <button class="btn btn-primary ajax-post" target-form="form-horizontal" type="submit">保存</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

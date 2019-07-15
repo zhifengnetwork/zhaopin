@@ -1,0 +1,174 @@
+{extend name="common:base" /}
+
+{block name="content"}
+
+<div class="row page-heading">
+    <div class="col-lg-12">
+     <a href="{:url('admin/wxmenu/makemenu')}" class="btn btn-w-m btn-primary pull-right ajax-get" style="margin-right:10px;">提交菜单</a>
+     <a class="btn btn-w-m btn-success pull-right show-modal" data-toggle="modal" data-title="新增" data-url="{:url('admin/wxmenu/addmenu')}" style="margin-right:10px;">新增菜单</a>
+    </div>
+</div>
+
+<div class="ibox-content">
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>菜单名称</th>
+                    <th>链接地址</th>
+                    <th class="text-center" style="width:100px">排序</th>
+                    <th style="width:180px">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {notempty name="list"}
+                {volist name="list" id="vo" key='k'}
+                <tr>
+                    <td>
+                    <span class="pcate glyphicon glyphicon-minus" data="{$vo.id}" style="margin-right:5px;cursor:pointer"></span>
+                    {$vo.title}
+                    </td>
+                    <td align="">{$vo.url}</td>
+                    <td align="center">{$vo.msort}</td>
+                    <td>
+                        <button class="btn btn-sm btn-default show-modal" data-url="{:url('admin/wxmenu/editmenu',array('id'=>$vo['id']))}" data-toggle="modal" data-id="{$vo.id}">
+                            <i class="ace-icon fmg fmg-bianji"></i>编辑
+                        </button>
+                        <a class="btn btn-sm btn-default ajax-get confirm" href="{:url('admin/wxmenu/delmenu',array('id'=>$vo['id']))}" >
+                            <i class="ace-icon fmg fmg-shanchuqingkong"></i>删除
+                        </a>
+                    </td>
+                </tr>
+                    {notempty name="vo._child"}
+                    {foreach name="vo._child" item="vl"}
+                    <tr class="cate_{$vl.id}">
+                        <td>
+                        <p style="margin-left:50px;">{$vl.title}</p>
+                        </td>
+                        <td align="">{$vl.url}</td>
+                        <td align="center">{$vl.msort}</td>
+                        <td>
+                            <button class="btn btn-sm btn-default show-modal" data-url="{:url('admin/wxmenu/editmenu',array('id'=>$vl['id']))}" data-toggle="modal" data-title="编辑" data-id="{$vl.id}">
+                                <i class="ace-icon fmg fmg-bianji"></i>编辑
+                            </button>
+                            <a class="btn btn-sm btn-default ajax-get confirm" href="{:url('admin/wxmenu/delmenu',array('id'=>$vl['id']))}" >
+                                <i class="ace-icon fmg fmg-shanchuqingkong"></i>删除
+                            </a>
+                        </td>
+                    </tr>
+                    {/foreach}
+                    {/notempty}
+                {/volist}
+                {/notempty}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!--modal-->
+<div class="modal fade" id="config-param-modal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="addModalLabel"></h4>
+            </div>
+            <div class="modal-body">
+                <form method="post" id="param-form" class="form-horizontal" role="form">
+                    <input type="hidden" name="id" id="id" >
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 菜单名称： </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="title" id="title" class="col-xs-10 col-sm-4">
+                            <span class="help-inline col-xs-12 col-sm-8">
+                                <span class="middle"><b>一级菜单最多4个汉字，二级菜单最多7个汉字</b></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 父级菜单： </label>
+                        <div class="col-sm-10">
+                            <select class="col-sm-4" class="category1" name="pid" id="pid">
+                                {:get_wxmenu_html()}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 链接地址： </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="url" id="url" class="col-xs-10 col-sm-11">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 显示排序： </label>
+                        <div class="col-sm-10">
+                            <input type="text" name="msort" id="msort" class="col-xs-10 col-sm-3">
+                            <span class="help-inline col-xs-12 col-sm-7">
+                                <span class="middle"><b></b></span>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="clearfix form-actions">
+                <div class="col-sm-offset-3 col-md-9">
+                    <button type="submit" class="btn btn-confirm margin-right-30 submit-btn ajax-post" id="submit" target-form="form-horizontal">
+                        <i class="ace-icon fmg fmg-queding bigger-125 edit-icon"></i>
+                        <span class="icon-text">保存</span>
+                    </button>
+                    <button type="button" class="btn btn-return" data-dismiss="modal">
+                        <i class="ace-icon fmg fmg-fanhui bigger-125 edit-icon"></i>
+                        <span class="icon-text">返回</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script type="text/javascript">
+$(function(){
+    /* 子分类展开合并 */
+    $('.pcate').click(function() {
+        var pid = $(this).attr('data');
+        if ($(this).hasClass('glyphicon-plus')) {
+        	$('.cate_'+pid).fadeIn();
+        } else {
+        	$('.cate_'+pid).fadeOut();
+        }
+        $(this).toggleClass('glyphicon-plus');
+        $(this).toggleClass('glyphicon-minus');
+        return false;
+    });
+
+    //弹窗
+    $(".show-modal").on("click", function() {
+        var me = $(this);
+        $("#param-form").attr("action", me.data("url"));
+        $("#addModalLabel").text(me.data('title'));
+
+        var id = me.data('id');
+        if (typeof(id) == 'undefined') {
+            $('#title').val('');
+            $("#pid option[value='0']").prop("selected", "selected");
+            $('#url').val('');
+            $('#msort').val('');
+        } else {
+            $.get(me.data("url")).success(function(result) {
+                $('#id').val(result.id);
+                $('#title').val(result.title);
+                $("#pid option[value='"+result.pid+"']").prop("selected", "selected");
+                $('#url').val(result.url);
+                $('#msort').val(result.msort);
+            });
+        }
+
+        $("#config-param-modal").modal("show");
+
+        return false;
+    });
+});
+</script>
+{/block}

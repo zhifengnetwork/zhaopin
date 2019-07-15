@@ -1,0 +1,89 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+    .table>thead>tr>th {
+        text-align: center;
+    }
+    .yes{
+        color: #fff;
+        background: #31b906;
+        padding: 2px 13px;
+    }
+    .no{
+        color: #fff;
+        background: #b50b0a;
+        padding: 2px 13px;
+    }
+</style>
+{/block}
+
+{block name="content"}
+<div class="ibox">
+    <div class="ibox-content">
+        <div class="row">
+            <div class="ibox-content">
+                <div class="row" style="height: 50px;">
+                    <form method="get" action="">
+                        <div class="col-sm-2">
+                            <div class="input-group"><input type="text" name="realname" value="{if $realname}{$realname}{/if}" placeholder="搜索用户" class="input-sm form-control"> </div>
+                        </div>
+                        <div class="col-sm-1" style=" width: 90px;padding: 5px 14px;">
+                            <div class="input-group">
+                            参与日期
+                            </div>
+                           </div>
+                        <div class="col-sm-2">
+                            <div class="input-daterange input-group" data-provide="datepicker">
+                           <input class="form-control input-sm" name="join_time" type="text"  autocomplete="off" value="{if $join_time}{$join_time}{/if}">
+                        </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-sm btn-primary"> 搜索</button>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive">
+                    <table class="table  table-bordered table-hover text-center">
+                        <thead>
+                        <tr>
+                            <th class="col-lg-2">编号</th>
+                            <th >用户</th>
+                            <th>投入金额</th>
+                            <th>打卡天数</th>
+                            <th>瓜分金额</th>
+                            <th>是否有效</th>
+                            <th>参与时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {notempty name="list"}
+                        {volist name="list" id="vo"}
+                        <tr>
+                            <td>{$vo.id}</td>
+                            <td>{$vo.realname}</td>
+                            <td>{$vo.pay_money}</td>
+                            <td>{$vo.join_day}</td>
+                            <td>{$vo.get_money}</td>
+                            <td>{if condition="$vo.status eq 1"}<span class="yes">是</span>{else/}<span class="no">否{/if}</span></td>
+                            <td>{$vo.join_time|date="y-m-d H:i:s",###}</td>
+                            <td>
+                                <a class="btn btn-default" href="{:url('clock/user_edit',['id'=>$vo.id])}"><i class="fa fa-list"></i> 编辑</a>
+                            </td>
+                        </tr>
+                        {/volist}
+                        {/notempty}
+                        </tbody>
+                    </table>
+                    {$list->render()}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{/block}

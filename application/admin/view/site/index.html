@@ -1,0 +1,331 @@
+{extend name="common:base" /}
+{block name="content"}
+<link rel="stylesheet"  type="text/css"  href="__STATIC__/layui/build/css/layui.css"  >
+<style type="text/css">
+    .form .row dd{
+        float: left;
+        display: inline-block;
+        width: calc(100% - 85px);
+    }
+  
+    ul, ol, li {
+        list-style: none;
+    }
+    .upload_area .post_imglist li {
+        position: relative;
+        float: left;
+        padding: 0 10px 5px 0;
+        line-height: 38px;
+    }
+    .upload_area .upload_btn {
+        background: url(__STATIC__/layui/src/images/upload_btn.png) center no-repeat;
+        background-size: 60px auto;
+        float: left;
+        overflow: hidden;
+        position: relative;
+        width: 60px;
+        height: 60px;
+    }
+    .del {
+        position: absolute;
+        right: 0px;
+        top: -10px;
+        background: url(__STATIC__/layui/src/images/icon_del.png) no-repeat 15px 0;
+        background-size: 20px auto;
+        width: 40px;
+        height: 20px;
+        display: inline-block;
+    }
+    .upload_area .upload_btn input {
+        opacity: 0;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 10;
+        overflow: hidden;
+        height: 60px;
+        width: 60px;
+    }
+    #imglist li img.wh60 {
+        margin: 0 auto;
+        display: block;
+        width: 60px;
+        height: 60px;
+    }
+    #back div{
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 30%;
+      height: auto;
+      margin-left: -20%;
+  
+    }
+  </style>
+<style>    
+    .pad-mar {
+        margin: 10px 0 10px 20px;
+    }
+    
+    .panel-heading {
+        background: #E8ECEF;
+        padding: 5px 0px 5px 40px;
+        margin: 20px 0px 0 0;
+        border: 1px solid #CFCFCF;
+        border-bottom: none;
+        font-size: 16px;
+        font-weight: 200;
+    }
+    
+    .panel-body {
+        padding: 20px 0;
+        margin-bottom: 20px;
+        border: 1px solid #CFCFCF;
+        border-top: none;
+    }
+    .form-group label{
+        font-size: 12px;
+    }
+    
+    .vbox .row{
+        margin-right: -5px;
+        margin-left: -5px;
+    }
+    
+    .vbox .col-xs-12.col-md-6.col-lg-4{
+        margin-bottom: 10px;
+    }
+    
+    .form-horizontal .form-group{
+        margin-right: -15px;
+        margin-left: -15px;
+        margin-bottom: 15px;
+    }
+    
+    .form-horizontal .control-label{
+        padding-top: 7px;
+        margin-bottom: 0;
+        text-align: right;
+    }
+    
+</style>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$meta_title}</h5>
+                </div>
+                <div class="ibox-content">
+                    <form method="post" class="form-horizontal" action="">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">网站标题</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="title" value="{$info.title}" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">网站关键字</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="keywords" value="{$info.keywords}" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">网站描述</label>
+                            <div class="col-sm-9">
+                                <textarea name="description"  class="form-control" placeholder="说点什么...最少输入0个字符" datatype="*0-100" onkeyup="textarealength(this,100)">{$info.description}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">网站LOGO</label>
+                            <div class="col-sm-9">
+                                    <dd class="upload_area clearfix" style="margin: 0 auto;">
+                                        <ul id="imglist" name="logo" class="post_imglist">
+                                            {if condition="!$info.logo"}
+                                            <li><img class="wh60" id="file0" src="__STATIC__/images/default.jpg" onclick="showimg()"></li>
+                                            {else /}
+                                            <li><img class="wh60" id="file0" src="__IMAGES__/{$info.logo}" onclick="showimg()"></li>
+                                            {/if}
+                                        </ul>
+                                        <div class="upload_btn">
+                                            <input type="file" class="upload_image" value="图片上传" accept="image/jpeg,image/gif,image/png" capture="camera">
+                                        </div>
+                                    </dd>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">手机LOGO</label>
+                            <div class="col-sm-9">
+                                    <dd class="upload_area clearfix" style="margin: 0 auto;">
+                                        <ul id="imglist" name="logo_mobile" class="post_imglist">
+                                            {if condition="!$info.logo_mobile"}
+                                            <li><img class="wh60" id="file0" src="__STATIC__/images/default.jpg" onclick="showimg()"></li>
+                                            {else /}
+                                            <li><img class="wh60" id="file0" src="__IMAGES__/{$info.logo_mobile}" onclick="showimg()"></li>
+                                            {/if}
+                                        </ul>
+                                        <div class="upload_btn">
+                                            <input type="file" class="upload_image" value="图片上传" accept="image/jpeg,image/gif,image/png" capture="camera">
+                                        </div>
+                                    </dd>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">网站页脚</label>
+                            <div class="col-sm-9">
+                                <script id="editor" name="copyright" type="text/plain" style="width:100%;height:400px;">{$info.copyright}</script> 
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label"></label>
+                            <div class="col-sm-10">
+                                    <div class="panel-heading"> 联系方式 </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">客服电话</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="shop_contact[phone]" value="{if condition='isset($info.shop_contact.phone)'}{$info.shop_contact.phone}{/if}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">客服电话</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="shop_contact[address]" value="{if condition='isset($info.shop_contact.address)'}{$info.shop_contact.address}{/if}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">商城简介</label>
+                            <div class="col-sm-9">
+                                <textarea name="shop_contact[description]"  class="form-control" placeholder="说点什么...最少输入0个字符" datatype="*0-100" onkeyup="textarealength(this,100)">{if condition='isset($info.shop_contact.description)'}{$info.shop_contact.description}{/if}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label"></label>
+                            <div class="col-sm-10">
+                                    <div class="panel-heading"> 消息提醒设置 </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">公众号消息提醒</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="1" name="noticeset[uniacid]" {if condition='isset($info.noticeset.uniacid) and $info.noticeset.uniacid'} checked {/if} /> 开启
+                                </label>
+                                <label>
+                                    <input type="radio" value="0" name="noticeset[uniacid]" {if condition='(isset($info.noticeset.uniacid) and !$info.noticeset.uniacid) or !isset($info.noticeset.uniacid)'} checked {/if} /> 关闭
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">站内信消息提醒</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="1" name="noticeset[message]" {if condition='isset($info.noticeset.message) and $info.noticeset.message'} checked {/if} /> 开启
+                                </label>
+                                <label>
+                                    <input type="radio" value="0" name="noticeset[message]" {if condition='(isset($info.noticeset.message) and !$info.noticeset.message) or !isset($info.noticeset.message)'} checked {/if} /> 关闭
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">手机短信消息提醒</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="1" name="noticeset[phone]" {if condition='isset($info.noticeset.phone) and $info.noticeset.phone'} checked {/if} /> 开启
+                                </label>
+                                <label>
+                                    <input type="radio" value="0" name="noticeset[phone]" {if condition='(isset($info.noticeset.phone) and !$info.noticeset.phone) or !isset($info.noticeset.phone)'} checked {/if} /> 关闭
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <input type="hidden" name="id" value="{$info.id}" />
+                                <button class="btn btn-primary" type="submit">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{/block}
+
+{block name="script"}
+<script type="text/javascript" src="__STATIC__/ueditor/1.4.3/ueditor.config.js"></script> 
+<script type="text/javascript" src="__STATIC__/ueditor/1.4.3/ueditor.all.min.js"> </script> 
+<script type="text/javascript" src="__STATIC__/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script> 
+<script src="__STATIC__/layui/src/localResizeIMG2.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+    //实例化富文本编辑器
+    var ue = UE.getEditor('editor',{
+        initialFrameWidth:650,
+        initialFrameHeight:180,
+        toolbars: [[
+            'fullscreen', 'source', '|', 'undo', 'redo', '|', 'searchreplace' ,
+            'bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript', 'subscript', 'removeformat', 'formatmatch','pasteplain', '|', 'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc', '|',
+            'rowspacingtop', 'rowspacingbottom', 'lineheight', 'paragraph', 'fontfamily', 'fontsize', 'indent', '|',
+            'justifyleft', 'justifycenter', 'justifyright', 'justifyjustify', '|', 'touppercase', 'tolowercase', '|',
+            'link', 'unlink', 'insertimage', 'insertvideo', 'music', 'attachment', 'map', 'gmap',
+        ]]
+    });
+    
+    (function () {
+        
+        var imgurlimgurl = '';
+        var imgcount = 0;
+
+        $(document).on('click','.upload_image',function(){
+            var viewImg = $(this).parents('.form-group').find('.post_imglist');
+            var name = $(this).parents('.form-group').find('.post_imglist').attr('name');
+            var obj = $(this);
+            $(this).localResizeIMG({
+            width: 360,
+            quality: 0.8,
+                success: function (result) {
+                    var status = true;
+                    
+                    if (viewImg.find("li").length > 4) {
+                        status = false;
+                        alert("最多上传5张照片");
+                        $(".upload_btn").hide();
+                    }
+                    if (status) {
+                        viewImg.html('<li><span class="pic_time"><span class="p_img"></span><em>50%</em></span></li>');
+                        viewImg.find("li:last-child").html('<img class="wh60" id="file'
+                        + imgcount
+                        + '" onclick="showimg('+imgcount+')" src="' + result.base64 + '"/><input type="hidden" name="'+name+'" value="'
+                        + result.clearBase64 + '">');
+
+                        imgcount++;
+                    }
+                }
+            });
+            
+        })
+
+        
+    })();
+
+    $(".del").on("click",function(){
+        $(this).parent('li').remove();
+        $(".upload_image").show();
+        $(".upload_btn").show();
+    });
+</script>
+{/block}

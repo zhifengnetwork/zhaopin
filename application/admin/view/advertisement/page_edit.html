@@ -1,0 +1,51 @@
+{extend name="common:base" /}
+{block name="content"}
+<div class="ibox">
+    <div class="ibox-title">
+        <h5>{$meta_title}</h5>
+    </div>
+    <div class="ibox-content">
+        <form method="post" class="form-horizontal" action="">
+            <input type="hidden" name="id" value="{$id}">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">页面名称</label>
+                <div class="col-sm-9">
+                    <input type="text" name="page_name" value="{$get_page.page_name|default=''}" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">页面唯一标识</label>
+                <div class="col-sm-9">
+                    <input type="text" name="only_logo" value="{$get_page.only_logo|default=''}" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">状态</label>
+                <div class="col-sm-9">
+                    <input name="status" type="radio" value="0" {if $get_page['status'] == 0}checked="checked"{/if}/><label>关闭</label>
+                    <input name="status" type="radio"  value='1' {if $get_page['status'] == 1}checked="checked"{/if}/><label>正常</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+
+
+
+
+
+                <div class="form-group">
+                    <div class="col-sm-4 col-sm-offset-2">
+                        <button class="btn btn-white" onclick="javascript:history.back(-1);return false;">取消</button>
+                        <button class="btn btn-primary ajax-post" target-form="form-horizontal" type="submit">保存</button>
+                    </div>
+                </div>
+
+        </form>
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script>
+
+</script>
+{/block}

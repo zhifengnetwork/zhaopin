@@ -1,0 +1,189 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+.table>thead>tr>th {
+    text-align: center;
+}
+</style>
+{/block}
+{block name="content"}
+<div class="ibox">
+    <div class="ibox-content">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="m-b-md" style=" position:relative;">
+                    <h3>基础内容</h3>
+                    <div style=" position:absolute; right:0; top:-10px;">
+                        <a class="btn btn-sm btn-info" id="add_virtual_num" data-toggle="modal" data-target="#edit" style="margin-left: 20px;">
+                            打印订单 <i class="fa fa-edit"></i>
+                        </a>
+                    </div>
+                </div>
+                <table class="table  table-bordered" align="right">
+                    <tbody>
+                        <tr>
+                            <td class="col-lg-1 active text-right">价格小计</td>
+                            <td class="col-lg-2">{$order_info.goods_price}</td>
+                            <td class="col-lg-1 active text-right">收货地址</td>
+                            <td class="col-lg-2">{$order_info.address}</td>
+                        </tr>
+                        <tr>
+                            <td class="col-lg-1 active text-right">订单号</td>
+                            <td class="col-lg-2">{$order_info.order_sn}</td>
+                            <td class="col-lg-1 active text-right">收货人</td>
+                            <td class="col-lg-2">{$order_info.consignee}</td>
+                        </tr>
+                        <tr>
+                            <td class="col-lg-1 active text-right">订单金额</td>
+                            <td class="col-lg-2">
+                                {$order_info.total_amount}
+                            </td>
+                            <td class="col-lg-1 active text-right">手机号码</td>
+                            <td class="col-lg-2">
+                                {$order_info.mobile}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-lg-1 active text-right">状态</td>
+                            <td class="col-lg-2">
+                                {$order_info.order_status}
+                            </td>
+                            <td class="col-lg-1 active text-right">下单时间</td>
+                            <td class="col-lg-2">
+                                {$order_info.add_time}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-lg-1 active text-right">支付方式</td>
+                            <td class="col-lg-2">
+                                {$order_info.pay_name}
+                            </td>
+                            <td class="col-lg-1 active text-right">支付时间</td>
+                            <td class="col-lg-2">
+                                {$order_info.pay_time|date='Y-m-d H:i:s',###}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="m-b-md">
+                    <h3>商品信息</h3>
+                </div>
+                <table class="table  table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <th>商品编号</th>
+                            <th>商品名称</th>
+                            <th>规格属性</th>
+                            <th>购买数量</th>
+                            <th>单品价格</th>
+                            <th>单品小计</th>
+                        </tr>
+                        <thead>
+                        <tbody>
+                         {notempty name="orderGoods"}
+                         {volist name="orderGoods" id="good"}
+                                <tr>
+                                    <td>{$good.goods_id}</td>
+                                    <td>{$good.goods_name}</td>
+                                    <td>{$good.spec_key_name}</td>
+                                    <td>{$good.goods_num}</td>
+                                    <td>{$good.goods_price}</td>
+                                    <td><span style="font-size:17px;color:red">{$good.total_member_goods_price}</span></td>
+                                </tr>
+                        {/volist}
+                        {/notempty}
+                        </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="m-b-md">
+                    <h3>费用信息</h3>
+
+                </div>
+                <table class="table  table-bordered text-center">
+                        <tbody>
+                            <tr>
+                                <td>小计：{$order_info.goods_price}</td>
+                                <td>运费：+{$order_info.shipping_price}</td>
+                                <td>积分 (-{$order_info.integral})：-{$order_info.integral_money}</td>
+                                <td>余额抵扣-{$order_info.user_money}</td>
+                                <td>优惠券抵扣：-{$order_info.coupon_price}</td>
+                                <td>价格调整：减：{$order_info.discount}</td>
+                                <td>应付：<span style="font-size:17px;color:red">{$order_info.order_amount}</span></td>
+                                
+                            </tr>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+                <div class="col-lg-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h3>退款处理</h3>
+                        </div>
+                        <div class="ibox-content">
+                            <form method="post" class="form-horizontal" action="{:url('order_refund/')}">
+                                 <input type="hidden" name="order_id" value="{$order_info.order_id}">
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">审核意见</label>
+                                    <div class="col-sm-9">
+                                        <div class="radio radio-success radio-inline">
+                                            <input type="radio" value="1" name="refund_status" id="show1" {if condition="isset($info['show']) and ($info['show'] eq 1)"}checked{/if} >
+                                            <label for="show1">同意退款</label>
+                                        </div>
+        
+                                        <div class="radio radio-danger radio-inline">
+                                            <input type="radio" value="0" name="refund_status" id="show2" {if condition="isset($info['show']) and ($info['show'] neq 1)"}checked{elseif condition="!isset($info['show'])"  /}checked{/if} >
+                                            <label for="show2">拒绝退款</label>
+                                        </div>
+        
+                                    </div>
+                                </div>
+        
+                                <div class="form-group"> 
+                                    <label class="col-sm-2 control-label">退款方式</label>
+                                    <div class="col-sm-9">
+                                        <div class="radio radio-success radio-inline">
+                                            <input type="radio" value="0" name="refund_type" id="is_up1" {if condition="isset($info['is_up']) and ($info['is_up'] eq 0)"}checked{/if} >
+                                            <label for="is_up1">支付原路退回</label>
+                                        </div>
+        
+                                        <div class="radio radio-danger radio-inline">
+                                            <input type="radio" value="1" name="refund_type" id="is_up2" {if condition="isset($info['is_up']) and ($info['is_up'] eq 1)"}checked {elseif condition="!isset($info['is_up'])" /}checked{/if} >
+                                            <label for="is_up2">退到用户余额</label>
+                                        </div>
+                                          
+                                    </div>
+                                </div>
+                              
+                                {if condition="$Think.get.type neq 1"}
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">处理备注</label>
+                                    <div class="col-sm-8">
+                                        <textarea   class="form-control" name='handle_remark'></textarea>
+                                    </div>
+                                </div>
+                                {/if}
+                                <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-2">
+                                        <button class="btn btn-white" onclick="javascript:history.back(-1);return false;">取消</button>
+                                        <button class="btn btn-primary ajax-post" target-form="form-horizontal" type="submit">提交</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    </div>
+</div>
+
+{/block}

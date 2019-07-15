@@ -1,0 +1,141 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+.table>thead>tr>th {
+    text-align: center;
+}
+
+.fant {
+    font-weight: 600;
+}
+</style>
+{/block}
+{block name="content"}
+<div class="ibox-content m-b-sm border-bottom">
+    <div class="row">
+            <form  method="get" action="{:url()}">
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="control-label" for="product_name">会员信息</label>
+                <input type="text" id="realname" name="realname" value="{$kw}" placeholder="可搜索会员昵称/姓名/手机号" class="form-control">
+            </div>
+        </div>
+
+        <div class="col-sm-2">
+            <div class="form-group">
+                <label class="control-label" for="status">会员等级</label>
+                <select name='level' class='form-control' style="width:150px;">
+                    <option value=''>默认全部</option>
+                    {foreach $levels as $key => $vo}
+                    <option value='{$key}' {if $level==$vo['id']}selected{/if}>{$vo['levelname']}</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+        <div class="col-sm-2">
+            <div class="form-group">
+                <label class="control-label" for="status">会员分组</label>
+                    <select name='groupid' class='form-control' style="width:150px;">
+                        <option value=''>默认全部</option>
+                        {foreach $groups as $key => $vo}
+                        <option value='{$key}' {if $groupid==$vo['id']}selected{/if}>{$vo['groupname']}</option>
+                        {/foreach}
+                     </select>
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <div class="form-group">
+                <label class="control-label" for="status">来源方式</label>
+                <select name="source_type" id="source_type" class="form-control" style="width:150px;">
+                    <option value='' {if $source_type==''}selected{/if}>默认全部</option>
+                    <option value='7' {if $source_type=='7'}selected{/if}>微信</option>
+                    <option value='7' {if $source_type=='7'}selected{/if}>支付宝</option>
+                    <option value='7' {if $source_type=='7'}selected{/if}>后台充值</option>
+                    <option value='7' {if $source_type=='7'}selected{/if}>后台扣款</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="control-label">日期</label>
+                <div class="input-daterange input-group" data-provide="datepicker">
+                    <input class="form-control input-sm" name="begin_time" type="text" value="{$begin_time}"/>
+                     <span class="input-group-addon">到</span>
+                    <input class="form-control input-sm" name="end_time" type="text" value="{$end_time}"/>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-1">
+            <div class="form-group">
+                <label class="control-label" for="status">　</label>
+                <div>
+                    <button class="btn btn-primary">查询</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-1">
+            <div class="form-group">
+                <label class="control-label" for="status">　</label>
+                <div>
+                    <a class="btn btn-primary" href="{:url('finance/balance_logs', $exportParam)}">导出Excel</a>
+                </div>
+            </div>
+       </div>
+        
+
+    </div>
+</form>
+</div>
+
+<div class="row wrapper border-bottom white-bg page-heading">
+       
+        <div class="col-lg-2">
+
+        </div>
+
+        <div class="ibox-content">
+                <div class="table-responsive">
+                    <table class="table  table-bordered table-hover text-center">
+                        <thead>
+                            <tr><th>编号</th>
+                                <th class="col-lg-2">粉丝</th>
+                                <th>会员信息</th>
+                                <th>微信号</th>
+                                <th>会员等级</th>
+                                <th>会员分组</th>
+                                <th>剩余积分</th>
+                                <th>记录时间</th>
+                                <th>来源方式</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead> 
+                        <tbody>
+                            {notempty name="list"}
+                            {volist name="list" id="row"}
+                            <tr><td>
+                                    {$row['id']}
+                            </td>
+                                <td><a href="{:url('member/member_edit',array('id' => $row['user_id']));}" style="color: #003CB3;"><img src='{$row['avatar']}' style='width:30px;height:30px;padding1px;border:1px solid #ccc' /> {$row['nickname']}</a></td>
+                                <td>{$row['realname']}<br/>{$row['mobile']}</td>
+                                <td   class='hidden-xs'>{$row['weixin']}</td>
+                                <td   class='hidden-xs'>{if empty($row['levelname'])}普通会员{else/}{$row['levelname']}{/if}</td>
+                                <td   class='hidden-xs'>{if empty($row['groupname'])}无分组{else/}{$row['groupname']}{/if}</td>
+                                <td>{$row['balance'] - $row['old_balance']}</td>
+                                <td>{$row['create_time']|date="y-m-d H:i:s",###}</td>  
+                                <td>   <span class='label label-primary'>后台充值</span></td>
+                                <td>
+                                    <a class='btn btn-default' href="{:url('member/member_edit',array('id' => $row['mid']));}" style="background-color: #7DBAEF; color: #fff;">用户信息</a>		
+                                  
+                                </td>
+                            </tr>
+                            {/volist}
+                            {/notempty}
+                        </tbody>
+                    </table>
+                    {$list->render()}
+                </div>
+            </div>
+    </div>
+{/block}

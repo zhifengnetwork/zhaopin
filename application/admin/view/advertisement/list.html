@@ -1,0 +1,88 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+    .table>thead>tr>th {
+        text-align: center;
+    }
+</style>
+{/block}
+{block name="content"}
+<div class="ibox-title">
+    <div class="row ">
+        <div class="col-lg-12">
+            <h3  class="col-lg-4" >{$meta_title}</h3>
+            <div class="pull-right">
+                <a class="btn btn-info" href="{:url('advertisement/edit',['page_id'=>$page_id])}"><i class="fa fa-plus"></i> 添加内容</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="ibox-content">
+    <div class="table-responsive">
+        <table class="table  table-bordered table-hover text-center">
+            <thead>
+            <tr>
+                <th>编号</th>
+                <th>名称</th>
+                <th>图片</th>
+                <th>类型</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {notempty name="list"}
+            {volist name="list" id="vo"}
+            <tr>
+                <td>{$vo.id}</td>
+                <td>{$vo.title}</td>
+                <td><img src="{$vo.picture}" style="height: 150px;width: 150px;"></td>
+                <td>{eq name="vo['type']" value="1"}广告{else /}轮播{/eq}</td>
+                <td>{eq name="vo['state']" value="1"}显示{else /}不显示{/eq}</td>
+                <td>
+                    <a class="btn btn-default" onclick="update(this,{$vo.id},{$vo['state'] == 1?0:1})" href="javascript:;">
+                        <i class="fa fa-edit"></i>
+                        {$vo['state'] == 1?'不显示':'显示'}
+                    </a>
+                    <a class="btn btn-default" href="{:url('advertisement/edit',['id'=>$vo.id,'page_id'=>$vo.page_id])}"><i class="fa fa-edit"></i> 编辑</a>
+                    <a class="btn btn-default" onclick="del(this,{$vo.id},-1)" href="javascript:;">
+                        <i class="fa fa-trash-o"></i>
+                        删除
+                    </a>
+                </td>
+            </tr>
+            {/volist}
+            {/notempty}
+            </tbody>
+        </table>
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script>
+    function update(obj,id,state){
+        console.log(status,id);
+        if(window.confirm('确认修改该内容状态吗？')){
+            $.post("{:url('Advertisement/update_status')}",{'id':id,'status':state},function(data){
+                console.log(data)
+                alert(data.msg);
+                if(data.code==1){
+                    window.location.reload();
+                }
+            },'json');
+        }
+    }
+
+    function del(obj,id,state){
+        if(window.confirm('确认删除该内容吗？')){
+            $.post("{:url('Advertisement/update_status')}",{'id':id,'status':state},function(data){
+                console.log(data)
+                alert(data.msg);
+                if(data.code==1){
+                    $(obj).parents('tr').remove();
+                }
+            },'json');
+        }
+    }
+</script>
+{/block}

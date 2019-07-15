@@ -1,0 +1,210 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+.table>thead>tr>th {
+    text-align: center;
+}
+    .form .row dd{
+        float: left;
+        display: inline-block;
+        width: calc(100% - 85px);
+    }
+  
+    ul, ol, li {
+        list-style: none;
+    }
+    .upload_area .post_imglist li {
+        position: relative;
+        float: left;
+        padding: 0 10px 5px 0;
+        line-height: 38px;
+    }
+    .upload_area .upload_btn {
+        background: url(__STATIC__/layui/src/images/upload_btn.png) center no-repeat;
+        background-size: 60px auto;
+        float: left;
+        overflow: hidden;
+        position: relative;
+        width: 60px;
+        height: 60px;
+    }
+    .del {
+        position: absolute;
+        right: 0px;
+        top: -10px;
+        background: url(__STATIC__/layui/src/images/icon_del.png) no-repeat 15px 0;
+        background-size: 20px auto;
+        width: 40px;
+        height: 20px;
+        display: inline-block;
+    }
+    .del_td {
+        background: url(__STATIC__/layui/src/images/icon_del.png) no-repeat 10px 0;
+        background-size: 20px auto;
+        width: 40px;
+        height: 20px;
+        display: inline-block;
+    }
+    .upload_area .upload_btn input {
+        opacity: 0;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 10;
+        overflow: hidden;
+        height: 60px;
+        width: 60px;
+    }
+    #imglist li img.wh60 {
+        margin-left: -40px;
+        display: block;
+        width: 60px;
+        height: 60px;
+    }
+    #back div{
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 30%;
+      height: auto;
+      margin-left: -20%;
+  
+    }
+  </style>
+{/block}
+
+{block name="content"}
+<div class="main rightlist">
+    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" >
+       
+        <div class="panel panel-default"> 
+            <div class='panel-body'>
+                <div class="form-group form-group-s">
+                    <label class="col-xs-12 col-sm-2 control-label">订单编号</label>
+                    <div class="col-sm-8 col-xs-12">
+                       <span class="help-block"><strong class="text-danger">{$info.order_sn}</strong></span> 
+                    </div>
+                </div>
+                <div class="form-group form-group-s">
+                    <label class="col-xs-12 col-sm-2 control-label">用户</label>
+                      
+                    <div class="col-sm-8 col-xs-12">
+                        <span class="help-block">{$info.realname}</span> 
+
+                        </div>
+                </div>
+                <div class="form-group form-group-s">
+                    <label class="col-xs-12 col-sm-2 control-label">申请日期
+                      </label>
+                      <div class="col-sm-8 col-xs-12">
+                            <span class="help-block">{$info.create_time|date="y-m-d H:i:s",###}</span> 
+                        </div>
+                </div>
+                <div class="form-group form-group-s s"  >
+                    <label class="col-xs-12 col-sm-2 control-label">商品 </label>
+                  
+                        <div class="col-sm-8 col-xs-12">
+                                <span class="help-block">  {:getPayBody($info.order_id)}</span> 
+                       </div>
+                 </div>
+                 <div class="form-group form-group-s s"  >
+                    <label class="col-xs-12 col-sm-2 control-label">服务类型</label>
+                        <div class="col-sm-8 col-xs-12">
+                                <span class="help-block">  
+                                       {$refund_reason[$info.refund_reason]}
+                                </span> 
+                        </div>
+                 </div>
+                 <div class="form-group form-group-s s"  >
+                    <label class="col-xs-12 col-sm-2 control-label">退货原因</label>
+                        <div class="col-sm-8 col-xs-12">
+                                <span class="help-block">  
+                                        {$info.cancel_remark}
+                                 </span> 
+                       </div>
+                 </div>
+                 <div class="form-group form-group-s s"  >
+                        <label class="col-xs-12 col-sm-2 control-label">退货描述</label>
+                            <div class="col-sm-8 col-xs-12">
+                                    <span class="help-block">  
+                                            {$info.cancel_remark}
+                                     </span> 
+                         </div>
+                  </div>
+
+                  <div class="form-group form-group-s s">
+                        <label class="col-xs-12 col-sm-2 control-label">用户上传照片</label>
+                        <div class="col-sm-9">
+                                <dd class="upload_area clearfix" style="margin: 0 auto;">
+                                    <ul id="imglist" class="post_imglist">
+                                            {notempty name="$img"}
+                                            {volist name="$img" id="vo"}
+                                            <li style="" class="li_img">
+                                                <div>
+                                                    <img class="wh60" src="__IMAGES__/" onclick="showimg()">
+                                                </div>
+                                            </li>
+                                            {/volist}
+                                            {/notempty}
+                                    </ul>
+                                </dd>
+                        </div>
+                    </div>
+
+                {eq name="$info.refund_status" value="1"}
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">审核意见</label>
+                    <div class="col-sm-9">
+                        <div class="radio radio-success radio-inline">
+                            <input type="radio" value="1" name="status" id="status1" />
+                            <label for="alipay1">审核通过</label>
+                        </div>
+
+                        <div class="radio radio-danger radio-inline">
+                            <input type="radio" value="0" name="status" id="status2"  />
+                            <label for="alipay2">拒绝通过</label>
+                        </div>
+
+                    </div>
+                </div>
+                {/eq}
+                <div class="form-group form-group-s s"  >
+                        <label class="col-xs-12 col-sm-2 control-label">处理备注</label>
+                            <div class="col-sm-8 col-xs-12">
+                                 <input type="text" name="handle_remark
+                                 " value="" class="form-control">
+                         </div>
+                  </div>
+                
+                 <div class="form-group"></div>
+                 <div class="form-group">
+                        <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                        <div class="col-sm-9 col-xs-12">
+                            {eq name="$info.refund_status" value="1"}
+                            <button class="btn btn-primary ajax-post col-lg-1" target-form="form-horizontal" type="submit">保存</button>
+                            {/eq}
+                            <button class="btn btn-white" onclick="javascript:history.back(-1);return false;">返回</button>
+                        </div>
+                  </div>
+
+            </div>
+        </div>     
+    </form>
+</div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript">
+   $(function () {
+                    $(":radio[name='pay[weixin]']").click(function () {
+                        if ($(this).val() == 1) {
+                            $("#certs").show();
+                        }
+                        else {
+                            $("#certs").hide();
+                        }
+                    })
+
+                })
+</script>
+{/block}

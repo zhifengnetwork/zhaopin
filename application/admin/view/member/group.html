@@ -1,0 +1,61 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+
+.table>thead>tr>th {
+    text-align: center;
+}
+</style>
+
+{/block}
+{block name="content"}
+	
+		<!-- 管理页面-s-->
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                <div>
+                    <a class="btn btn-sm btn-info" style="margin-left: 0px;" href="{:url('member/group_add')}">
+                        添加新分组 <i class="fa fa-edit"></i>
+                    </a>
+                </div>
+            </div>
+        <div class="ibox-content">
+            <div class="table-responsive">
+                <table class="table  table-bordered table-hover text-center">
+                    <thead>
+                        <tr>
+                            <th>分组名称</th>
+                            <th>分组名称</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead> 
+                    <tbody>
+                        {notempty name="list"}
+                        {volist name="list" id="row"}
+                                <tr>
+                                        <td>{$row['groupname']}</td>
+                                        <td>{$row['membercount']}</td>
+                                        <td> <a class='btn btn-default' href="{:url('member/group_edit', array('id' => $row['id']))}" ><i class='fa fa-edit'></i></a> 
+                                          <a class='btn btn-default'  href="{:url('member/level', array('op' => 'delete', ))}" onclick="return confirm('确认删除此等级吗？');return false;"><i class='fa fa-remove'></i></a></td>
+                        </tr>
+                        {/volist}
+                        {/notempty}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+      </div>  
+    </div>
+</div>        
+
+{/block}
+{block name="script"}
+
+<script>
+      
+</script>
+
+{/block}

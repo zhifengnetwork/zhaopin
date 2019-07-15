@@ -1,0 +1,97 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+    .table>thead>tr>th {
+        text-align: center;
+    }
+    .yes{
+        color: #fff;
+        background: #31b906;
+        padding: 2px 13px;
+    }
+    .no{
+        color: #fff;
+        background: #b50b0a;
+        padding: 2px 13px;
+    }
+</style>
+{/block}
+
+{block name="content"}
+<div class="ibox">
+    <div class="ibox-content">
+        <div class="row">
+            <div class="ibox-content">
+                <div class="row" style="height: 50px;">
+                    <form method="get" action="">
+                        <div class="col-sm-2">
+                            <div class="input-group"><input type="text" name="realname" value="{if $realname}{$realname}{/if}" placeholder="搜索用户" class="input-sm form-control"> </div>
+                        </div>
+                        <div class="col-sm-1" style=" width: 90px;padding: 5px 14px;">
+                            <div class="input-group">
+                                打卡日期
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="input-daterange input-group" data-provide="datepicker">
+                                <input class="form-control input-sm" name="punch_time" type="text"  autocomplete="off" value="{if $punch_time}{$punch_time}{/if}" >
+                            </div>
+                        </div>
+                        <div class="col-sm-1" style=" width: 90px;padding: 5px 14px;">
+                            <div class="input-group">
+                                瓜分状态
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="input-daterange input-group" data-provide="datepicker">
+                                <select name="status" class="form-control" style="width:180px;">
+                                    <option value="-1"  {if condition="$status eq -1"} selected {/if}>待瓜分</option>
+                                    <option value="1"  {if condition="$status eq 1"} selected {/if}>已瓜分</option>
+                                    <option value="2" {if condition="$status eq 2"} selected {/if}>未瓜分</option>
+
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-sm btn-primary"> 搜索</button>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive">
+                    <table class="table  table-bordered table-hover text-center">
+                        <thead>
+                        <tr>
+                            <th class="col-lg-2">编号</th>
+                            <th >用户</th>
+                            <th>瓜分金额</th>
+                            <th>瓜分状态</th>
+                            <th>打卡时间</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {notempty name="list"}
+                        {volist name="list" id="vo"}
+                        <tr>
+                            <td>{$vo.id}</td>
+                            <td>{$vo.realname}</td>
+                            <td>{$vo.money}</td>
+                            <td>{if condition="$vo.status eq 1"}<span class="yes">已瓜分</span>{elseif condition="$vo.status eq 0" }<span class="no" style="background: #908e8e;">待瓜分</span>{else/}<span class="no">未瓜分{/if}</span></td>
+                            <td>{$vo.punch_time|date="y-m-d ",###}</td>
+
+                        </tr>
+                        {/volist}
+                        {/notempty}
+                        </tbody>
+                    </table>
+                    {$list->render()}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{/block}

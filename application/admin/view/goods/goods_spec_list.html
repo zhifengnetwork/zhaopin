@@ -1,0 +1,92 @@
+{extend name="common:base" /}
+
+{block name="content"}
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$meta_title}</h5>
+                    <div class="pull-right" style="margin-top:-8px;">
+                            <a class="btn btn-info" href="{:url('goods/goods_spec_add',['type_id'=>$Request.param.type_id],false)}"><i class="fa fa-plus"></i> 添加商品规格</a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+
+                    <div class="row">
+                    <form method="get" action="">
+                        
+                        <div class="col-sm-2">
+                            <input type="hidden" name="type_id" value="{$Request.param.type_id}" />
+                            <div class="input-group"><input type="text" name="spec_name" value="{$spec_name}" placeholder="搜索商品规格" class="input-sm form-control"> </div>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <div class="input-group"> 
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-sm btn-primary"> 搜索</button> 
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                    </div>
+
+
+                    <div class="table-responsive">
+                        <form action="{:URL('Admin/delAll')}" method="post">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+
+                                <th><input class="ch_all" type="checkbox">ID</th>
+                                <th>商品规格名称 </th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {volist name="list" id="vo"}
+                            <tr>
+                                <td><input type="checkbox" class="i-checks ch_item" name="spec_id[]"   value="{$vo.spec_id}">{$vo.spec_id}</td>
+                                <td>{$vo.spec_name}</td>
+                                <td>
+                                    <a href="{:url('Goods/goods_spec_val_list',['spec_id'=>$vo.spec_id],false)}">规格值</a>
+                                    <a href="{:url('Goods/goods_spec_edit',['spec_id'=>$vo.spec_id],false)}">编辑</a>
+                                    <a onclick="goods_spec_del(this,{$vo.spec_id})" href="javascript:;">删除</a>
+                                </td>
+                            </tr>
+                            {/volist}
+                            </tbody>
+                        </table>
+                        </form>
+                    </div>
+                    <style>
+                        .pagination{}
+                        .pagination li{float:left;position:relative;margin-top:10px;padding:0 12px;}
+                        .pagination li{float:left;width:42px;height:28px;border:1px solid #DDD; text-align:center;line-height:30px;border-left:none;}
+                        .pagination li.active{color:#f00;}
+                        .pagination li a{float:left;width:42px;height:28px; text-align:center;line-height:30px;border-left:none;color:#3399d5;}
+                    </style>
+                    <ul class="pagination">
+                        {$list->render()}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+{block name='script'}
+<script>
+    function goods_spec_del(obj,spec_id){
+        if(window.confirm('确认删除该商品规格吗？')){
+            $.post("{:url('Goods/goods_spec_del')}",{'spec_id':spec_id},function(data){
+                alert(data.msg);
+                if(data.code){
+                    $(obj).parents('tr').remove();
+                }
+            },'json');
+        }
+    }
+
+
+</script>
+{/block}

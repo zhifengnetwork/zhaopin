@@ -1,0 +1,151 @@
+{extend name="common:base" /}
+{block name="content"}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                <form class="form-inline" name="search-form" method="get" action="">
+                    <div class="form-group">
+                        <select name="module" class="form-control">
+                            <option value="">全部配置</option>
+                            {foreach name = "$Think.config.config_module" item="vo" key="k"}
+                            <option value="{$k}" {eq name="$k" value="$Think.get.module" } selected="selected" {/eq}>{$vo} </option> 
+                            {/foreach} 
+                        </select> 
+                    </div> 
+                    &nbsp;&nbsp;&nbsp; 
+                    <div class="form-group">
+                        <div class="col-lg-10">
+                            <button class="btn btn-primary pull-right" type="submit">
+                                搜索
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <div style=" position:absolute; right:30px; top:14px;">
+                    <a class="btn btn-sm btn-info" id="add_virtual_num" data-toggle="modal" data-target="#myModal4" style="margin-left: 20px;">
+                        新增配置 <i class="fa fa-edit"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>序号</th>
+                                <th>所属模块</th>
+                                <th>标题</th>
+                                <th>标识</th>
+                                <th>参数值</th>
+                                <th>说明</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {notempty name="list"}
+                            {volist name="list" id="vo" key="k"}
+                            <tr>
+                                <td>{$k}</td>
+                                <td>{:config('config_module.'.$vo.module)}</td>
+                                <td>{$vo.title}</td>
+                                <td>{$vo.name}</td>
+                                <td>{$vo.value}</td>
+                                <td>{$vo.remark}</td>
+                                <td>
+                                    <a class="btn btn-default editxz" data-id="{$vo.id}">编辑 <i class="fa fa-edit"></i></a>
+                                </td>
+                            </tr>
+                            {/volist}
+                            {/notempty}
+                        </tbody>
+                    </table>
+                    {$list->render()}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal inmodal" id="myModal4" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated fadeIn">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                <h5>编辑配置</h5>
+            </div>
+            <form class="form-horizontal form-add-filter" action="{:url('config/edit')}" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="id" value="0">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">配置类型 </label>
+                        <div class="col-sm-5">
+                            <select name="module" id="module" class="form-control area_region">
+                                {foreach name = "Think.config.config_module" item="vo" key="k" }
+                                <option value="{$k}">{$vo}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">标题 </label>
+                        <div class="col-sm-5">
+                            <input type="text" class="form-control" name="title" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">标识 </label>
+                        <div class="col-sm-5">
+                            <input type="text" class="form-control" name="name" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">参数值 </label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="value" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">参数值说明 </label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" name="remark" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">排序</label>
+                        <div class="col-sm-8">
+                            <input type="number" class="form-control" name="sort" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                    <button class="btn btn-primary ajax-post" target-form="form-add-filter" type="submit">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script>
+$(function() {
+    $('#add_virtual_num').click(function() {
+        $('#myModal4').find('input').val('');
+    });
+    $('.editxz').click(function() {
+        var id = $(this).data('id');
+        $.get('{:url("get_config")}', { id: id }, function(data) {
+            var data = data.data;
+            $('[name="name"]').val(data.name);
+            $('[name="title"]').val(data.title);
+            $('[name="module"]').eq(1).val(data.module);
+            $('[name="value"]').val(data.value);
+            $('[name="remark"]').val(data.remark);
+            $('[name="id"]').val(data.id);
+            $('[name="sort"]').val(data.sort);
+            $('#myModal4').modal();
+        });
+    });
+});
+</script>
+{/block}

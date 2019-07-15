@@ -1,0 +1,150 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+.table>thead>tr>th {
+    text-align: center;
+}
+</style>
+{/block}
+
+{block name="content"}
+<div class="row">
+<div class="ibox">
+      
+    <div class="ibox-content">
+            <div class="row">
+               <form  method="get" action="{:url()}">
+                            <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label" for="status">发货状态</label>
+                                        <select name="shipping_status" class="form-control" style="width:180px;">
+                                                <option value="-1" {$Think.get.shipping_status==-1?='selected' }>默认全部</option>
+                                                <option value="0" {$Think.get.shipping_status==0?='selected' }>待发货</option>
+                                                <option value="1" {$Think.get.shipping_status==1?='selected' }>已发货</option>
+                                                <option value="2" {$Think.get.shipping_status==2?='selected' }>部分发货</option>
+                                         </select>
+                                    </div>
+                             </div>
+                         
+                            <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label" for="order_sn">订单号</label>
+                                        <input type="text" placeholder="订单号" name="order_sn" value="{$order_sn}" class="form-control">
+                                    </div>
+                             </div>
+                             
+                             <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label" for="consignee">收货人</label>
+                                        <input type="text" placeholder="收货人" name="consignee" value="{$consignee}" class="form-control">
+                                    </div>
+                             </div>
+
+                             <div class="col-sm-1">
+                                    <div class="form-group">
+                                        <label class="control-label" for="status">　</label>
+                                        <div>
+                                            <button class="btn btn-primary">查询</button>
+                                        </div>
+                                    </div>
+                              </div>
+                </form>
+
+              
+           </div>
+    </div>
+    <div class="ibox-content">
+        <div class="table-responsive">
+                <div style="margin-bottom:20px;">
+                    <a class="btn btn-sm btn-info checkboxorder" style="margin-left: 0px;" >
+                         <i class="fa fa-plus"></i>批量发货
+                    </a>
+                    <a class="btn btn-sm btn-info" style="margin-left: 10px;" href="{:url('member/group_add')}">
+                        <i class="fa fa-plus"></i> 批量打印配货单
+                    </a>
+                    <a class="btn btn-sm btn-info" style="margin-left: 10px;" href="{:url('member/group_add')}">
+                       <i class="fa fa-plus"></i> 批量导出发货商品列表
+                    </a>
+                    <a class="btn btn-sm btn-info" style="margin-left: 10px;" href="{:url('member/group_add')}">
+                         <i class="fa fa-plus"></i>批量打印快递单
+                    </a>
+                </div>
+           
+            <table class="table  table-bordered table-hover text-center">
+                <thead>
+                    <tr>
+                       <th class=""></th>
+                        <th class="col-lg-2">订单编号</th>
+                        <th>下单时间</th>
+                        <th>收货人</th>
+                        <th>联系电话</th>
+                        <th>所选物流</th>	
+                        <th>物流费用</th>
+                        <th>支付时间 </th>
+                        <th>订单总价 </th>    
+                        <th>操作</th>
+                    </tr>
+                </thead> 
+                <tbody>
+                    {notempty name="list"}
+                    {volist name="list" id="vo"}
+                    <tr class="clicktr">
+                        <td>
+                            <div class="checkbox checkbox-success" >
+                                    <input  type="checkbox" order_id="{$vo.order_id}" class="checkorder" >
+                                    <label for="checkbox3"></label>
+                            </div>
+                        </td>
+                        <td>{$vo.order_sn}</td>
+                        <td>{$vo.add_time|date="y-m-d H:i:s",###}</td>
+                        <td>{$vo.consignee}</td>
+                        <td>{$vo.mobile}</td>
+                        <td>
+                            {$vo.shipping_name}
+                        </td>
+                        <td> {$vo.shipping_price}</td>
+                        <td>{$vo.pay_time|date="y-m-d H:i:s",###}</td>
+                        <td>{$vo.total_amount}</td>
+                        <td>
+                            <a class="btn btn-default" href="{:url('order/delivery_print',['id'=>$vo.order_id])}"><i class="fa fa-print"></i> 配货单</a>
+                            <a class="btn btn-default" href="{:url('order/delivery_info',['id'=>$vo.order_id])}"><i class="fa fa-send-o"></i> 去发货</a>
+                        </td>
+                    </tr>
+                    {/volist}
+                    {/notempty}
+                </tbody>
+            </table>
+            {$list->render()}
+        </div>
+    </div>
+</div>
+                
+
+
+{/block}
+{block name="script"}
+<script type="text/javascript">
+
+
+$('.checkboxorder').on('click',function(){
+        var order_id = '';
+        $(".checkorder").each(function(){
+            if($(this).is(":checked") == true){
+                order_id  += $(this).attr('order_id')+','
+            }
+        });
+        if(order_id == ''){
+            layer.alert('请选择发货订单', {icon: 2});
+            return;
+        }else{
+            location.href = "{:url('order/delivery_batch')}"+'?order_id='+order_id;
+        }
+
+       
+});
+
+
+
+
+</script>
+{/block}

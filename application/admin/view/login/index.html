@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录</title>
+    <link rel="shortcut icon" href="__IMG__/p1.jpg">
+    <link href="__INSPINIA__/css/bootstrap.min.css" rel="stylesheet">
+    <link href="__INSPINIA__/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="__INSPINIA__/css/animate.css" rel="stylesheet">
+    <link href="__INSPINIA__/css/style.css" rel="stylesheet">
+</head>
+
+<body class="gray-bg">
+    <div class="middle-box text-center loginscreen animated fadeInDown">
+        <div>
+            <div>
+                <h1 class="logo-name" style="font-size: 55px;color: #1ab394;">后台管理系统</h1>
+            </div>
+            <form id="login_form" class="m-t" action="{:url('login/index')}" method="post">
+                <div class="form-group">
+                    <input type="text" name="username" class="form-control" placeholder="用户名" required="">
+                </div>
+                <div class="form-group">
+                    <input type="password" name="password" class="form-control" placeholder="密码" required="">
+                </div>
+                <div class="form-group">
+                    <input type="text" name="captcha" class="form-control" placeholder="验证码" required="">
+                </div>
+                <div class="form-group">
+                    <img src="{:captcha_src()}" alt="captcha" onclick="this.src=this.src"/>
+                </div>
+                    <button type="button" class="btn btn-primary block full-width m-b" id="submit_btn">登录</button>
+            </form>
+        </div>
+    </div>
+    <!-- Mainly scripts -->
+    <script src="__INSPINIA__/js/jquery-2.1.1.js"></script>
+    <script src="__INSPINIA__/js/bootstrap.min.js"></script>
+    <script src="__LIB__/layer/layer.js"></script>
+    <script>
+    $(function() {
+        var login = () => {
+            var username = $('input[name=username]').val();
+            var password = $('input[name=password]').val();
+            var captcha = $('input[name=captcha]').val();
+            $.post("{:url('admin/login/index')}", { username: username, password: password, captcha: captcha }, function(res) {
+                if (res.code) {
+                    layer.msg(res.msg, { icon: 6 });
+                    location.href = res.url;
+                } else {
+                    layer.msg(res.msg, { icon: 5 });
+                }
+            });
+        };
+
+        // 登录
+        $('#submit_btn').click(function() {
+            login();
+        });
+
+        //enter登录
+        $("body").keydown(function(event) {
+            if (event.keyCode == "13") {
+                login();
+            }
+        });
+    });
+    </script>
+</body>
+
+</html>

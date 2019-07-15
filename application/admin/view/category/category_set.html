@@ -1,0 +1,166 @@
+{extend name="common:base" /}
+{block name="content"}
+<link rel="stylesheet"  type="text/css"  href="__STATIC__/layui/build/css/layui.css"  >
+<style type="text/css">
+    .form .row dd{
+        float: left;
+        display: inline-block;
+        width: calc(100% - 85px);
+    }
+  
+    ul, ol, li {
+        list-style: none;
+    }
+    .upload_area .post_imglist li {
+        position: relative;
+        float: left;
+        padding: 0 10px 5px 0;
+        line-height: 38px;
+    }
+    .upload_area .upload_btn {
+        background: url(__STATIC__/layui/src/images/upload_btn.png) center no-repeat;
+        background-size: 60px auto;
+        float: left;
+        overflow: hidden;
+        position: relative;
+        width: 60px;
+        height: 60px;
+    }
+    .del {
+        position: absolute;
+        right: 0px;
+        top: -10px;
+        background: url(__STATIC__/layui/src/images/icon_del.png) no-repeat 15px 0;
+        background-size: 20px auto;
+        width: 40px;
+        height: 20px;
+        display: inline-block;
+    }
+    .upload_area .upload_btn input {
+        opacity: 0;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 10;
+        overflow: hidden;
+        height: 60px;
+        width: 60px;
+    }
+    #imglist li img.wh60 {
+        margin: 0 auto;
+        display: block;
+        width: 60px;
+        height: 60px;
+    }
+    #back div{
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 30%;
+      height: auto;
+      margin-left: -20%;
+  
+    }
+  </style>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$meta_title}</h5>
+                </div>
+                <div class="ibox-content">
+                    <form method="post" class="form-horizontal" action="">
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">分类级别</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" {if condition="$info.level eq 2"} checked {/if} value="2" name="level" /> 二级
+                                </label>
+                                <label>
+                                    <input type="radio" {if condition="!$info.level or $info.level eq 3"} checked {/if} value="3" name="level"  /> 三级
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">分类广告</label>
+                            <div class="col-sm-9">
+                                    <dd class="upload_area clearfix" style="margin: 0 auto;">
+                                        <ul id="imglist" class="post_imglist">
+                                            {if condition="!$info.img"}
+                                            <li><img class="wh60" id="file0" src="__STATIC__/images/default.jpg" onclick="showimg()"></li>
+                                            {else /}
+                                            <li><img class="wh60" id="file0" src="__IMAGES__/{$info.img}" onclick="showimg()"></li>
+                                            {/if}
+                                        </ul>
+                                        <div class="upload_btn">
+                                            <input type="file" id="upload_image" value="图片上传" accept="image/jpeg,image/gif,image/png" capture="camera">
+                                        </div>
+                                    </dd>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <input type="hidden" name="set_id" value="{$info.set_id|default=''}" />
+                                <button class="btn btn-primary ajax-post" target-form="form-horizontal" type="submit">提交</button>
+                                <button class="btn btn-white" onclick="javascript:history.back(-1);return false;">取消</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{/block}
+
+{block name="script"}
+<script src="__STATIC__/layui/src/localResizeIMG2.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+    (function () {
+        var viewImg = $("#imglist");
+        var imgurl = '';
+        var imgcount = 0;
+        $('#upload_image').localResizeIMG({
+            width: 360,
+            quality: 0.8,
+            success: function (result) {
+            	console.log(result)
+                var status = true;
+                
+                if (viewImg.find("li").length > 4) {
+                    status = false;
+                    alert("最多上传5张照片");
+                    $(".upload_btn").hide();                    
+                }
+                if (status) {
+                    viewImg.html('<li><span class="pic_time"><span class="p_img"></span><em>50%</em></span></li>');
+                    viewImg.find("li:last-child").html('<img class="wh60" id="file'
+                    + imgcount
+                    + '" onclick="showimg('+imgcount+')" src="' + result.base64 + '"/><input type="hidden" name="img" value="'
+                    + result.clearBase64 + '">');
+
+                    $(".del").on("click",function(){
+                        $(this).parent('li').remove();
+                        $("#upload_image").show();
+                        $(".upload_btn").show();
+                    });
+                    imgcount++;
+                }
+            }
+        });
+    })();
+
+    $(".del").on("click",function(){
+        $(this).parent('li').remove();
+        $("#upload_image").show();
+        $(".upload_btn").show();
+    });
+</script>
+{/block}

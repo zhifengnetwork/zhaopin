@@ -1,0 +1,114 @@
+{extend name="common:base" /}
+
+{block name="content"}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{$meta_title}</h5>
+                <div class="pull-right" style="margin-top:-8px;">
+                    <a class="btn btn-info" href="{:url('goods/puls_goods_add')}"><i class="fa fa-plus"></i> 添加升级PULS会员商品</a>
+                </div>
+            </div>
+            <div class="ibox-content">
+
+                <div class="row">
+                    <form method="get" action="">
+
+                        <div class="col-sm-2">
+                            <div class="input-group"><input type="text" name="name" value="{$name}" placeholder="搜索商品名称" class="input-sm form-control"> </div>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-sm btn-primary"> 搜索</button>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+
+                            <th>ID </th>
+                            <th>商品名称 </th>
+                            <th>商品价格（元） </th>
+                            <th>库存 </th>
+                            <th>限时卖时间 </th>
+                            <th>商品上架 </th>
+                            <th>商品状态 </th>
+                            <th>状态 </th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {volist name="list" id="vo"}
+                        <tr>
+                            <td>{$vo.id}</td>
+                            <td>{$vo.goods_name}</td>
+                            <td>{$vo.price}</td>
+                            <td>{$vo.stock}</td>
+                            <td>{$vo['limited_start']>0?date('Y-m-d',$vo['limited_start']):''} ---
+                                {$vo['limited_end']>0?date('Y-m-d',$vo['limited_end']):''}</td>
+                            <td>{$vo['is_show'] == 1?'上架':'下架'}</td>
+                            <td>{$vo['is_del'] == 1?'已删除':'正常'}</td>
+                            <td>{$vo['status'] == 1?'启用':'关闭'}</td>
+                            <td>
+                                <a onclick="update(this,{$vo.id},{$vo['status'] == 1?0:1})" href="javascript:;" href="{:url('Goods/puls_goods_update',['id'=>$vo.id,'status'=>$vo['status'] == 1?0:1],false)}">{$vo['status'] == 1?'关闭':'启用'}</a>
+                                <a onclick="del(this,{$vo.id},-1)" href="javascript:;">删除</a>
+                            </td>
+                        </tr>
+                        {/volist}
+                        </tbody>
+                    </table>
+                </div>
+                <style>
+                    .pagination{}
+                    .pagination li{float:left;position:relative;margin-top:10px;padding:0 12px;}
+                    .pagination li{float:left;width:42px;height:28px;border:1px solid #DDD; text-align:center;line-height:30px;border-left:none;}
+                    .pagination li.active{color:#f00;}
+                    .pagination li a{float:left;width:42px;height:28px; text-align:center;line-height:30px;border-left:none;color:#3399d5;}
+                </style>
+                <ul class="pagination">
+                    {$list->render()}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name='script'}
+<script>
+    function del(obj,id,status){
+        if(window.confirm('确认删除该商品吗？')){
+            $.post("{:url('Goods/puls_goods_update')}",{'id':id,'status':status},function(data){
+                console.log(data)
+                alert(data.msg);
+                if(data.code==1){
+                    $(obj).parents('tr').remove();
+                }
+            },'json');
+        }
+    }
+
+    function update(obj,id,status){
+        console.log(status,id);
+        if(window.confirm('确认修改该商品状态吗？')){
+            $.post("{:url('Goods/puls_goods_update')}",{'id':id,'status':status},function(data){
+                console.log(data)
+                alert(data.msg);
+                if(data.code==1){
+                    window.location.reload();
+                }
+            },'json');
+        }
+    }
+
+</script>
+{/block}

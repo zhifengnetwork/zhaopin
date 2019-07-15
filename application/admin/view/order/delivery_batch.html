@@ -1,0 +1,277 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+.table>thead>tr>th {
+    text-align: center;
+}
+    
+</style>
+{/block}
+
+{block name="content"}
+<div class="ibox" >
+    <form  action="{:url('order/deliveryHandle')}"  method="post" class="form-horizontal form" enctype="multipart/form-data">
+        <input type="hidden" name="order_ids" value="{$order_ids}">
+        <input type="hidden" name="pldelivery" value="">
+     {volist name="order" id="order"}
+     <div class="ibox-content" style = "width:1000px;margin:auto;border:solid 1px #2cbca3">
+        <input type="hidden" name="order_id[{$order.order_id}]" value="{$order.order_id}">
+        <input type="hidden" id="shipping" name="shipping{$order.order_id}" value="{$order.shipping_status}">
+        <input type="hidden" id="shipping_name" name="shipping_name{$order.order_id}" value="{if condition='$order.shipping_status eq 1'}{$order.shipping_name}{else/}{$shipping_list['0']['shipping_name']}{/if}">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="m-b-md" style="position:relative;">
+                    <h3>基本信息</h3>
+                </div>
+                <table class="table  table-bordered" align="right">
+                    <tbody>
+                        <tr>
+                            <td class="col-lg-1 active text-right">订单号：</td>
+                            <td class="col-lg-2">{$order.order_sn}</td>
+                            <td class="col-lg-1 active text-right">下单时间：</td>
+                            <td class="col-lg-2">{$order.add_time|date='Y-m-d H:i',###}</td>
+                            <td class="col-lg-1 active text-right">物流公司：</td>
+                            <td class="col-lg-2">
+                                <select class="shipping_code{$order.order_id}" order_id = "{$order.order_id}" name="shipping_code[{$order.order_id}]" onchange="set_shipping_name()">
+                                    <option value="">-请选择-</option>
+                                     {volist name="shipping_list" id="shipping"}
+                                         <option {if condition="$order.shipping_code eq $shipping.shipping_code"}selected{/if} value="{$shipping.shipping_code}" >{$shipping.shipping_name}</option>
+                                     {/volist}
+                                 </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="col-lg-1 active text-right">配送费用： </td>
+                            <td class="col-lg-2">{$order.shipping_price}</td>
+                            <td class="col-lg-1 active text-right">发货方式：</td>
+                            <td class="col-lg-2">
+                                <select class="send_type{$order.order_id}"  order_id = "{$order.order_id}" name="send_type[{$order.order_id}]" onchange="change_send();">
+                                    <option value="0">手填物流单号</option>
+                                    {if condition="($order['shipping_status'] eq 0) && ($express_switch eq 1)"}
+                                    <option value="1">在线预约发货</option>
+                                    <option value="2">电子面单发货</option>
+                                    {/if}
+                                    <option value="3">无需物流</option>
+                                </select>
+                            </td>
+                            <td class="col-lg-1 active text-right invoice">配送单号：</td>
+                            <td class="col-lg-2 invoice{$order.order_id}">
+                                <input class="input-txt invoice_no{$order.order_id}" name="invoice_no[{$order.order_id}]" id="invoice_no" value="{$order.invoice_no}" onkeyup="this.value=this.value.replace(/[^\d]/g,'')">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="m-b-md">
+                    <h3>收货信息</h3>
+                </div>
+                <table class="table  table-bordered text-center">
+                        <tbody>
+                           <tr>
+                            <td class="col-lg-1 active text-right">收货人：</td>
+                            <td class="col-lg-2">{$order.consignee}</td>
+                            <td class="col-lg-1 active text-right">电子邮件：</td>
+                            <td class="col-lg-2">{$order.email}</td>
+                            <td class="col-lg-1 active text-right">收货地址：</td>
+                            <td class="col-lg-1 active text-right">{$order.address}</td>
+                            <td class="col-lg-1 active text-right">邮编：</td>
+                            <td class="col-lg-1 active text-right">{if condition="$order.zipcode neq ''"} {$order.zipcode}{else/}N{/if}</td>
+                           </tr>
+                           <tr>
+                            <td class="col-lg-1 active text-right">电话：</td>
+                            <td class="col-lg-2">{$order.mobile}</td>
+                            <td class="col-lg-1 active text-right">发票抬头：</td>
+                            <td class="col-lg-2">{$order.invoice_title}</td>
+                            <td class="col-lg-1 active text-right">纳税人识别号：</td>
+                            <td class="col-lg-1 active text-right">{$order.taxpayer}</td>
+                            <td class="col-lg-1 active text-right">用户备注：</td>
+                            <td class="col-lg-1 active text-right">{$order.user_note}</td>
+                           </tr>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="m-b-md">
+                    <h3>商品信息</h3>
+                </div>
+                <table class="table  table-bordered text-center">
+                        <thead>
+                                <tr>
+                                  <th colspan="2">商品</th>
+                                  <th>规格属性</th>
+                                  <th>购买数量</th>
+                                  <th>商品单价</th>
+                                  <th>选择发货</th>
+                                </tr>
+                              </thead>
+                        <tbody>
+                                {volist name="orderGoods" id="good"}
+                                        <tr>
+                                         <td class="w30"><div class="goods-thumb"><a href="{:url('Goods/addEditGoods',array('id'=>$good['goods_id']))}" target="_blank"><img alt="" src="{$good['goods_id']}" /> </a></div></td>
+                                         <td style="text-align: left;"><a href="{:url('Goods/addEditGoods',array('id'=>$good['goods_id']))}" target="_blank">{$good.goods_name}</a><br/></td>
+                                         <td class="w80">{$good.spec_key_name}</td>
+                                         <td class="w60">{$good.goods_num}</td>
+                                         <td class="w100">{$good.goods_price}</td>
+                                         <td class="w60">
+                                             {if condition="$good['is_send'] eq 1"}
+                                                     已发货
+                                                     {else /}
+                                                 <input type="checkbox" name="goods[]" value="{$good.rec_id}" checked="checked">
+                                                 {/if}
+                                         </td>
+                                       </tr>
+                                {/volist}
+                        </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+                <div class="col-lg-12">
+                    <div class="m-b-md">
+                        <h3>发货单备注</h3>
+                    </div>
+                    <div class="form-group form-group-s s"  >
+                            <label class="col-xs-12 col-sm-2 control-label">发货单备注</label>
+                                <div class="col-sm-10 col-xs-12">
+                                   <textarea id="note" name="note[{$order.order_id}]" style="width:400px" rows="4" maxlength="200" placeholder="请输入操作备注" class="tarea" id="note"></textarea>
+                               </div>
+                    </div>
+                    <div class="form-group form-group-s s"  >
+                            <label class="col-xs-12 col-sm-2 control-label">可执行操作</label>
+                                <div class="col-sm-8 col-xs-12">
+                                        {if condition="$order['shipping_status'] neq 1"}
+                                             <button class="btn btn-primary ajax-post col-lg-2" target-form="form-horizontal" type="submit" >确认发货</button>
+                                        {/if}
+
+                                         {if condition="$order['shipping_status'] eq 1"}
+                                             <!-- <button class="btn btn-primary ajax-post col-lg-2" target-form="form-horizontal" type="submit" >修改</button> -->
+                                         {/if}
+                                       
+                             </div>
+                      </div>
+
+                </div>
+        </div>
+        <div class="row" >
+                <div class="col-lg-12">
+                    <div class="m-b-md">
+                        <h3>发货单备注</h3>
+                    </div>
+                    <div class="table-responsive">
+                    <table class="table  table-bordered table-hover text-center">
+                            <thead>
+                              <tr>
+                                <th>操作者</th>
+                                <th>发货时间</th>
+                                <th>发货单号</th>
+                                <th>收货人</th>
+                                <th>快递公司</th>
+                                <th>备注</th>
+                                <!--<th>查看</th>-->
+                              </tr>
+                            </thead>
+                            <tbody>
+                            {volist name="delivery_record" id="log"}
+                                   <tr>
+                                     <td class="text-center">{$log.admin_id}</td>
+                                     <td class="text-center">{$log.create_time|date='Y-m-d H:i:s',###}</td>
+                                     <td class="text-center">{$log.invoice_no}</td>
+                                     <td class="text-center">{$log.consignee}</td>
+                                     <td class="text-center">{$log.shipping_name}</td>
+                                     <td class="text-center">{$log.note}</td>
+                                 </tr>
+                              {/volist}
+                             </tbody>
+                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    {/volist}
+
+</form>
+</div>
+
+
+
+{/block}
+
+{block name="script"}
+<script type="text/javascript">
+$(function(){
+    if("{$delivery_record[0]['send_type']}" == 3){
+        $('.invoice').hide();
+        $('#invoice_no').attr('disabled',true);
+        $('#shipping_code').attr('disabled',true).hide();
+        $('#shipping_name').attr('disabled',true);
+    }
+})
+function dosubmit(obj){
+    $(this).prop('disabled',true);
+    var shipping = $('input[name="shipping"]').val();
+    var send_type = $('#send_type').val()
+    if ($('#invoice_no').val() == '' && send_type== 0) {
+        layer.alert('请输入配送单号', {icon: 2});
+        return;
+    }
+    if ($('#shipping_code').val() == '' && send_type!= 3) {
+        layer.alert('请选择物流', {icon: 2});
+        return;
+    }
+    if(shipping != 1) {
+        var a = [];
+        $('input[name*=goods]').each(function (i, o) {
+            if ($(o).is(':checked')) {
+                a.push($(o).val());
+            }
+        });
+        if(a.length == 0){
+            layer.alert('请选择发货商品', {icon: 2});
+            return;
+        }
+    }
+    $(obj).removeAttr('onclick');
+    console.log(123213)
+    $('#delivery-form').submit();
+}
+
+function set_shipping_name(obj){
+  var className = $(obj).prop("className");
+  var order_id = $(obj).attr("order_id");
+  
+	var shipping_name = $("."+className).find("option:selected").text();
+  console.log(shipping_name);
+  console.log(className);
+	 var shipping_code = $('.'+className).find("option:selected").val();
+   $(".shipping_name"+order_id).val(shipping_name);
+    $('.'+className).val('');
+    if (shipping_code != ''){
+        $('.'+className).val(shipping_code);
+    }
+}
+
+function change_send(obj){
+  var className = $(obj).prop("className");
+  var order_id = $(obj).attr("order_id");
+	var send_type = $('.' + className).val();
+    $('.invoice_no'+order_id).removeAttr('disabled')
+    $('.shipping_code'+order_id).removeAttr('disabled').show();
+    $('.shipping_name'+order_id).removeAttr('disabled');
+	if(send_type == 0){
+		$('.invoice'+order_id).show();
+	}else if(send_type == 3){
+        $('.invoice'+order_id).hide();
+        $('.invoice_no'+order_id).attr('disabled',true);
+        $('.shipping_code'+order_id).attr('disabled',true).hide();
+        $('.shipping_name'+order_id).attr('disabled',true);
+    } else{
+		$('.invoice'+order_id).hide();
+	}
+}
+</script>
+ {/block}

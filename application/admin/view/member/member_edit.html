@@ -1,0 +1,172 @@
+
+
+{extend name="common:base" /}
+
+{block name="style"}
+<style type="text/css">
+    table thead tr{ background-color: #1ab394; }
+    table thead tr th{ text-align: center; }
+    .table>thead>tr>th {
+    text-align: center;
+   }
+   .center {
+    text-align: center;
+   }
+
+</style>
+{/block}
+
+{block name="content"}
+<div class="main">
+        <formaction="" method='post' class='form-horizontal'>
+            <input type="hidden" name="id" value="{$member['id']}">
+            <div class='panel panel-default'>
+                <div class='panel-heading'>会员详细信息</div>
+                <div class='panel-body'>
+                    <div class="table-responsive">
+                        <table  class="table table-bordered">
+                            <thead class="navbar-inner">
+                                <tr > 
+                                    <th style="width:12%;">粉丝</th>
+                                    <th style="width:16%;">OPENID</th>
+                                    <th>会员等级</th>
+                                    <th>会员分组</th>
+                                    <th>真实姓名</th>
+                                    <th>手机号码</th>
+                                    <th>微信号</th>
+                                    <th>积分</th>
+                                </tr>
+                            </thead>
+                            <tr><td><img style='width:100px;height:100px;padding:1px;border:1px solid #ccc' src='{$member['avatar']}' style='width:100px;height:100px;padding:1px;border:1px solid #ccc' />
+                                <p>{$member['nickname']}</p></td>
+                                <td><div class="form-control-static" style="width: 100%; word-wrap:break-word;">{$member['openid']}</div></td>
+                                <td>
+
+                                <select name='data[level]' class='form-control'>
+                                    <option value=''>普通会员</option>
+            
+                                    {foreach $levels as $key => $vo}
+                                            <option value='{$key}' {if $member['level']==$vo['id']}selected{/if}>{$vo['levelname']}</option>
+                                    {/foreach}
+            
+                                </select>
+                            </td>
+                                <td><div class="center">
+                                        <select name='data[groupid]' class='form-control'>
+                                            <option value=''>无分组</option>
+                                            {foreach $groups as $key => $vo}
+                                            <option value='{$key}' {if $member['groupid']==$vo['id']}selected{/if}>{$vo['groupname']}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </td>
+                                <td><div class="center">
+                                        <input type="text" name="data[realname]" class="form-control" value="{$member['realname']}"  />
+                                    </div></td>
+                                <td><div class="center">
+                                        <input type="text" name="data[mobile]" class="form-control" value="{$member['mobile']}"  />
+                                    </div></td>
+                                <td><div class="center">
+                                        <input type="text" name="data[weixin]" class="form-control" value="{$member['weixin']}"  />
+                                    </div></td>
+                                <td><div class="">
+                                    <div class='input-group'>
+                                        <div class=' input-group-addon'  style='width:200px;text-align: left;'>{$member['balance1']}</div>
+                                        <div class='input-group-btn'>
+                                            <a class='btn btn-primary' href="{:url('finance/integral_recharge', array('id'=>$member['id']))}">充值</a>
+                                        </div>
+                                    </div>
+                                 
+        
+                                </div></td>
+                            </tr>
+                            <thead class="navbar-inner">
+                                <tr>
+                                    <th>登录密码</th>
+                                    <th>余额</th>
+                                    <th>成交订单数</th>
+                                    <th>成交金额</th>
+                                    <th>注册时间</th>
+                                    <th>关注状态</th>
+                                    <th>黑名单</th>
+                                    <th>备注</th>
+                                </tr>
+                            </thead>
+                            <tr>
+                            <td><div class="center">
+                                        <input type="text" name="password" class="form-control" value=""  /> 
+                                    </div></td>
+                                    <td><div class="">
+                                   
+                                    <div class='input-group'>
+                                        <div class=' input-group-addon' style='width:200px;text-align: left;'>{$member['balance']}</div>
+        
+                                        <div class='input-group-btn'><a class='btn btn-primary' href="{:url('finance/balance_recharge', array('id'=>$member['id']))}">充值</a>
+                                        </div>
+                                    </div>
+                                </div></td>
+                                <td>
+                                    <div class='form-control-static center'>{$member['self_ordercount']}</div>
+                                </td>
+                                <td>
+                                    <div class='form-control-static center'>{$member['self_ordermoney']} 元</div>
+                                </td>
+                                <td>
+                                    <div class='form-control-static center'>{$member['createtime']|date="y-m-d H:i:s",###}</div>
+                                </td>
+                                <td><div class='form-control-static center' >
+                                        {if !$followed}
+                                            {if empty($member['uid'])}
+                                                <label class='label label-default'>未关注</label>
+                                                {else}
+                                                <label class='label label-warning'>取消关注</label>
+                                            {/if}
+                                            {else}
+                                            <label class='label label-success'>已关注</label>
+                                        {/if}
+        
+                                    </div>
+                                </td>
+                                <td>
+                                <div class="center">
+
+                                    <div class="radio radio-success radio-inline">
+                                            <input type="radio" value="1" name="data[isblack]" id="isblack1" {if $member['isblack']==1}checked{/if} />
+                                            <label for="isblack1">开启</label>
+                                        </div>
+                
+                                        <div class="radio radio-danger radio-inline">
+                                            <input type="radio" value="0" name="data[isblack]" id="isblack2" {if $member['isblack']==0}checked{/if} />
+                                            <label for="isblack2">关闭</label>
+                                        </div>
+                                    
+                                </div></td>
+                                <td>
+                                  <div class="">
+                                    <textarea name="data[content]" class='form-control'>{$member['content']}</textarea>
+                                  </div>
+                               </td>
+                                
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <div class='panel-body'>
+                            <div class="form-group">
+                                  <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                                  <div class="col-sm-9 col-xs-12">
+                                    <button class="btn btn-primary ajax-post col-lg-1" target-form="form-horizontal" type="submit">提交</button>
+                                    <input type="button" class="btn btn-default" name="submit" onclick="history.go(-1)" value="返回列表" {ifp 'member.member.edit'}style='margin-left:10px;'{/if} />
+                                  </div>
+                              </div>
+                           </div>
+                </div>
+    </form>  
+    </div>
+{/block}
+{block name="script"}
+
+<script>
+
+</script>
+{/block}

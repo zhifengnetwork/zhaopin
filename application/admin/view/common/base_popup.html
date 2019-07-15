@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+        <title>{$meta_title}</title>
+
+        <link href="__INSPINIA__/css/bootstrap.min.css" rel="stylesheet">
+        <link href="__INSPINIA__/font-awesome/css/font-awesome.css" rel="stylesheet">
+
+        <link href="__INSPINIA__/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+        <!-- Toastr style -->
+        <link href="__INSPINIA__/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+
+        <!-- Gritter -->
+        <link href="__INSPINIA__/js/plugins/gritter/jquery.gritter.css" rel="stylesheet">
+        <link href="__INSPINIA__/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+
+        <link href="__INSPINIA__/css/animate.css" rel="stylesheet">
+        <link href="__INSPINIA__/css/style.css?v=20170510" rel="stylesheet">
+
+        {block name="style"}{/block}
+    </head>
+
+    <body>
+        <div id="wrapper">
+            
+
+            <div id="page-wrapper" class="gray-bg dashbard-1" style="margin-left: 0;">
+                
+                
+                {block name="content"} {/block}
+                
+                {block name="footer"}
+                <div class="footer">
+                    <div class="pull-right"></div>
+                    <div>
+                        <strong>Copyright</strong> Example Company &copy; 2014-2015
+                    </div>
+                </div>
+                {/block}
+            </div>
+            
+        </div>
+        <div style="position:fixed; left:220px; right:0; margin:0 15px; top: 10px; z-index: 99999; display: none;" id="top-alert" class="alert alert-dismissable">
+            <button class="close" type="button"> </button>
+            <a class="alert-link alert-content" href="javascript:void(0)">水电费萨芬撒地方是的发</a> 
+        </div>
+        <!-- Mainly scripts -->
+        <script src="__INSPINIA__/js/jquery-2.1.1.js"></script>
+        <script src="__INSPINIA__/js/bootstrap.min.js"></script>
+        <script src="__INSPINIA__/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+        <script src="__INSPINIA__/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+
+        <!-- Custom and plugin javascript -->
+        <script src="__INSPINIA__/js/inspinia.js"></script>
+        <script src="__INSPINIA__/js/plugins/pace/pace.min.js"></script>
+
+        <!-- jQuery UI -->
+        <script src="__INSPINIA__/js/plugins/jquery-ui/jquery-ui.min.js"></script>
+
+        <script src="__INSPINIA__/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+        <script src="__LIB__/layer/layer.js"></script>
+		<script src="__LIB__/layui/layui.js"></script>
+        <script src="__JS__/common.js?v=20170510"></script>
+
+        <script>
+            $(function(){
+                // 日期选择器中文处理
+                $.fn.datepicker.dates['cn'] = {
+                    days: ["周日", "周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+                    daysShort: ["日", "一", "二", "三", "四", "五", "六", "七"],
+                    daysMin: ["日", "一", "二", "三", "四", "五", "六", "七"],
+                    months: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+                    monthsShort: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+                    today: "今天",
+                    clear: "清除"
+                };
+                $.fn.datepicker.defaults.format = "yyyy-mm-dd";
+                $.fn.datepicker.defaults.language = "cn";
+                $.fn.datepicker.defaults.autoclose = true;
+                $.fn.datepicker.defaults.todayHighlight = true;
+                // $.fn.datepicker.defaults.todayBtn = true;
+
+                $('#datepicker .date').datepicker({});
+				
+				
+				
+				// 点击弹窗初始化
+				var popup_area = {
+					"s": ['40%','50%'],
+					"m": ['60%','80%'],
+					"b": ['80%','90%'],
+					"bb": ['90%','96%']
+				};
+				layui.use('layer');
+				$('body').delegate('.gy-popup','click',function(e){
+					//$('.mg-popup').on('click', function(e) {
+					var data = $(this).data();//暂未处理undefined，data也可以考虑与layer参数名一致，直接传递
+					data.shadeClose = (data.shadeClose === false) ? false : true;
+					data.areatype && (data.area = popup_area[data.areatype]);
+					data.href && (data.content = data.href);
+					data.selector && (data.content = $(data.selector));
+					layer.open({
+						type: data.type || 2,
+						title: data.title || false,
+						shadeClose: data.shadeClose,
+						shade: data.shade || 0.3,
+						moveType: data.moveType || 1,
+						area: data.area || popup_area["bb"],
+						content: data.content
+					});
+					return false;
+				});
+            });
+        </script>
+        {block name="script"}{/block}
+        
+    </body>
+</html>

@@ -1,0 +1,54 @@
+{extend name="common:base" /}
+
+{block name="content"}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$meta_title}</h5>
+                    <div class="pull-right" style="margin-top:-8px;">
+                        <a class="btn btn-info" href="{:url('mguser/edit')}"><i class="fa fa-plus"></i> 新增用户</a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>账号</th>
+                                    <th>姓名</th>
+                                    <th>电话</th>
+                                    <th>邮箱</th>
+                                    <th>状态</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {notempty name="list"}
+                                {volist name="list" id="vo"}
+                                <tr>
+                                    <td>{$vo.mgid}</td>
+                                    <td>{$vo.username}</td>
+                                    <td>{$vo.name}</td>
+                                    <td>{$vo.mobile}</td>
+                                    <td>{$vo.email}</td>
+                                    <td>{eq name="vo['status']" value="1"}正常{else /}删除{/eq}</td>
+                                    <td>{$vo.create_time|time_format}</td>
+                                    <td>
+                                        <a class="btn btn-default" href="{:url('mguser/edit',array('mgid'=>$vo['mgid']))}"><i class="fa fa-edit"></i> 编辑</a>
+                                        <a class="btn btn-default" href="{:url('mguser/set_authgroup',array('mgid'=>$vo['mgid']))}"><i class="fa fa-edit"></i> 授权</a>
+                                    </td>
+                                </tr>
+                                {/volist}
+                                {/notempty}
+                            </tbody>
+                        </table>
+                        {$page}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}

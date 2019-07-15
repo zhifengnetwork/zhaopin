@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+		<title>{$meta_title}</title>
+
+		<link href="__INSPINIA__/css/bootstrap.min.css?v=20170801" rel="stylesheet">
+		<link href="__INSPINIA__/font-awesome/css/font-awesome.css" rel="stylesheet">
+
+		<link href="__INSPINIA__/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+		<!-- Toastr style -->
+		<link href="__INSPINIA__/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+
+		<!-- Gritter -->
+		<link href="__INSPINIA__/js/plugins/gritter/jquery.gritter.css" rel="stylesheet">
+		<link href="__INSPINIA__/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+
+		<link href="__INSPINIA__/css/animate.css" rel="stylesheet">
+	  <link href="__STATIC__/fonts/fontStyle.css" rel="stylesheet">
+		
+		<link href="__INSPINIA__/css/style.css?v=20170510" rel="stylesheet"> 
+
+		<!-- timer -->
+		<link href="__STATIC__/timer/calendar.css" rel="stylesheet">
+		
+		{block name="style"}{/block}
+	</head>
+	<style>
+		#tit {
+			margin-left: -15px;
+			font-size: 15px;
+			background: #233645;
+			color: white;
+			min-width: 1200px;
+		}
+		#tit a{
+			
+			color: white;
+			
+		}
+		
+		.biaoti {
+			position: relative;
+			display: inline-block;
+			width: 9%;
+			height: 80px;
+			line-height: 80px;
+			cursor: pointer;
+			text-align: center;
+			min-width: 90px;
+		}
+		
+		.biaoti p {
+			display: inline-block;
+		}
+		
+		.biaoti p:nth-child(1) {
+			position: absolute;
+			top: 34px;
+		}
+		
+		.biaoti p:nth-child(2) {
+			margin-left: 22px;
+		}
+		
+		.select {
+			background: black;
+			border-bottom: 6px solid #1AB394;
+		}
+	</style>
+
+	<body>
+
+		<div id="wrapper">
+			<nav class="navbar-default navbar-static-side" role="navigation">
+				<div class="sidebar-collapse">
+					<ul class="nav metismenu" id="side-menu">
+						<li class="nav-header">
+							<div class="dropdown profile-element">
+								<span><img alt="image" class="img-circle" src="__INSPINIA__/img/profile_small.jpg" /></span>
+							</div>
+							<span class="block m-t-xs"> <strong class="font-bold" style="color: white">{$Think.session.admin_user_auth.username}</strong>
+                                     </span>
+							<div class="logo-element">GAME</div>
+						</li>
+						{volist name="lefts_menu" id="vo"}
+						<li class="{$vo.class}">
+							<a href="{:url($vo['url'])}">
+								<i class="fa {$vo.icon}"></i><span class="nav-label">{$vo.title}</span> {notempty name="vo['_child']"}<span class="fa arrow"></span>{/notempty}
+							</a>
+							{notempty name="vo['_child']"}
+							<ul class="nav nav-second-level">
+								{volist name="vo['_child']" id="v"}
+								  {eq name="v.hide" value="1"}
+									<li class="{$v.class}">
+										<a href="{:url($v['url'])}">{$v.title}</a>
+									</li>
+								   {/eq}
+								{/volist}
+							</ul>
+							{/notempty}
+						</li>
+						{/volist}
+					</ul>
+				</div>
+			</nav>
+			<div id="page-wrapper" class="gray-bg dashbard-1">
+				<!--头部导航栏-->
+				<div id="tit">
+                    {volist name="left_menu" id="vo"}
+					<a class="biaoti {$vo['class2']}" href="{:url($vo['url'])}"><p class="{$vo['icon']}" aria-hidden="true"></p><p style="display: inline-block;">{$vo.title}</p></a>
+                    {/volist}
+				</div>
+
+				<div class="row border-bottom">
+					<nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0;text-align: center;">
+						<div class="navbar-header">
+							<a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+							<div style="float:left; padding:20px 10px; font-size:16px; font-family:'微软雅黑'">{$meta_title}</div>
+						</div>
+						<span style="font-size: 44px;line-height: 61px; color: red;"></span>
+						<ul class="nav navbar-top-links navbar-right">
+							<li>
+								<span class="m-r-sm text-muted welcome-message">欢迎来到后台</span>
+							</li>
+							<li class="dropdown">
+								<a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+									<i class="fa fa-gear"></i>
+								</a>
+								<ul class="dropdown-menu dropdown-messages" style="width: auto;">
+									<li class="text-center">
+										<div class="dropdown-messages-box">
+											<a class="btn btn-sm btn-default" href="{:url('mguser/update_pwsd',['type'=>0])}" style="border:none;">
+												<i class="fa fa-edit"></i> 修&nbsp;&nbsp;改&nbsp;&nbsp;密&nbsp;&nbsp;码
+											</a>
+										</div>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<a href="{:url('login/login_out')}">
+									<i class="fa fa-sign-out"></i> 退出登录
+								</a>
+							</li>
+						</ul>
+					</nav>
+				</div>
+
+				{block name="content"} {/block} {block name="footer"}
+				<div class="footer">
+					<div class="pull-right"></div>
+					<div>
+						<strong>Copyright</strong> 广州智丰网络科技有限公司 &copy; 2018-2019
+					</div>
+				</div>
+				{/block}
+			</div>
+		</div>
+
+		<div style="position:fixed; left:220px; right:0; margin:0 15px; top: 10px; z-index: 99999; display: none;" id="top-alert" class="alert alert-dismissable">
+			<button class="close" type="button"> </button>
+			<a class="alert-link alert-content" href="javascript:void(0)">顶部提示框</a>
+		</div>
+		<!-- Mainly scripts -->
+		<script src="__INSPINIA__/js/jquery-2.1.1.js"></script>
+		<script src="__INSPINIA__/js/bootstrap.min.js"></script>
+		<script src="__INSPINIA__/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+		<script src="__INSPINIA__/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+
+		<!-- Custom and plugin javascript -->
+		<script src="__INSPINIA__/js/inspinia.js"></script>
+		<script src="__INSPINIA__/js/plugins/pace/pace.min.js"></script>
+
+		<!-- jQuery UI -->
+		<script src="__INSPINIA__/js/plugins/jquery-ui/jquery-ui.min.js"></script>
+
+		<script src="__INSPINIA__/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+		<script src="__LIB__/layer/layer.js"></script>
+		<script src="__LIB__/layui/layui.js"></script>
+		<script src="__JS__/common.js?v=20190408"></script>
+
+		<!-- timer -->
+		<script type="text/javascript" src="__STATIC__/timer/calendar.js"></script>
+
+		<script>
+			$(function() {
+				// 日期选择器中文处理
+				$.fn.datepicker.dates['cn'] = {
+					days: ["周日", "周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+					daysShort: ["日", "一", "二", "三", "四", "五", "六", "七"],
+					daysMin: ["日", "一", "二", "三", "四", "五", "六", "七"],
+					months: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+					monthsShort: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+					today: "今天",
+					clear: "清除"
+				};
+				$.fn.datepicker.defaults.format = "yyyy-mm-dd";
+				$.fn.datepicker.defaults.language = "cn";
+				$.fn.datepicker.defaults.autoclose = true;
+				$.fn.datepicker.defaults.todayHighlight = true;
+				// $.fn.datepicker.defaults.todayBtn = true;
+
+				$('#datepicker .date').datepicker({});
+
+				$('.timer').datepicker({});
+
+				// 点击弹窗初始化
+				var popup_area = {
+					"s": ['40%', '50%'],
+					"m": ['60%', '80%'],
+					"b": ['80%', '90%'],
+					"bb": ['90%', '96%']
+				};
+				layui.use('layer');
+				$('body').delegate('.gy-popup', 'click', function(e) {
+					//$('.mg-popup').on('click', function(e) {
+					var data = $(this).data(); //暂未处理undefined，data也可以考虑与layer参数名一致，直接传递
+					data.shadeClose = (data.shadeClose === false) ? false : true;
+					data.areatype && (data.area = popup_area[data.areatype]);
+					data.href && (data.content = data.href);
+					data.selector && (data.content = $(data.selector));
+					layer.open({
+						type: data.type || 2,
+						title: data.title || false,
+						shadeClose: data.shadeClose,
+						shade: data.shade || 0.3,
+						moveType: data.moveType || 1,
+						area: data.area || popup_area["bb"],
+						content: data.content
+					});
+					return false;
+				});
+			});
+		</script>
+		{block name="script"}{/block}
+		<script>
+			// 图片点击放大
+			$(function() {
+				$(document).on('click', ".post_imglist", function(e) {
+					if($(e.target).prop("tagName") == 'IMG') {
+						var _img = $(e.target).attr("src");
+						$("body").append("<div class='mask_img'><img src=''></div>");
+						$(".mask_img img").attr("src", _img)
+						var _width = $(".mask_img img").width()
+						$(".mask_img img").css("marginLeft", -_width / 2)
+						console.log(-_width / 2)
+					}
+				})
+				$("body").delegate('.mask_img', 'click', function() {
+					$(this).remove();
+				})
+			})
+			// //          顶部导航切换
+			// $('#tit a').click(function() {
+			// 	var i = $(this).index(); //下标第一种写法
+			// 	//var i = $('tit').index(this);//下标第二种写法
+			// 	$(this).addClass('select').siblings().removeClass('select');
+			// 	//          $('#con>li').eq(i).show().siblings().hide();
+
+			// });
+		</script>
+	
+	</body>
+
+</html>

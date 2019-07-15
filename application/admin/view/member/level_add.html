@@ -1,0 +1,76 @@
+{extend name="common:base" /}
+{block name="style"}
+<link href="__INSPINIA__/css/plugins/clockpicker/clockpicker.css" rel="stylesheet">
+{/block}
+
+{block name="content"}
+<div class="main">
+        <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+            <div class='panel panel-default'>
+                <div class='panel-heading'>会员等级修改</div>
+                <div class='panel-body'>
+                     <div class="form-group">
+                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <label class="col-xs-12 col-sm-3 col-md-3 control-label">等级权重</label>
+                            <div class="col-sm-9 col-xs-12">
+                                <input type="text" name="level" class="form-control" value="" />
+                                <span class='help-block'>等级权重，数字越大越高级</span>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <label class="col-xs-12 col-sm-3 col-md-3 control-label"><span style='color:red'>*</span> 等级名称</label>
+                            <div class="col-sm-9 col-xs-12">
+                                <input type="text" name="name" class="form-control" value="" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <label class="col-xs-12 col-sm-3 col-md-3 control-label">升级条件</label>
+                            <div class="col-sm-9 col-xs-12">
+                        
+                                <div class='input-group'>
+                                        <span class='input-group-addon'>直推puls会员</span>
+                                        <input type="text" name="children_num" class="form-control" value="" />
+                                        <span class='input-group-addon'>人</span>
+                                        <span class='input-group-addon'>团队满足</span>
+                                        <input type="text" name="team_num" class="form-control" value="" />
+                                        <span class='input-group-addon'>人</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <label class="col-xs-12 col-sm-3 col-md-3 control-label">升级奖励</label>
+                            <div class="col-sm-9 col-xs-12">
+
+                                <div class='input-group'>
+                                    <input type="text" name="reward" class="form-control" value="" />
+                                    <span class='input-group-addon'>元</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group"></div>
+                    <div class="form-group">
+                        <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                        <div class="col-sm-9 col-xs-12">
+                             <button class="btn btn-primary ajax-post col-lg-1" target-form="form-horizontal" type="submit">提交</button>
+                            <input type="button" name="back" onclick='history.back()'  value="返回列表" class="btn btn-default" />
+                        </div>
+                </div>
+                    
+                </div>
+            </div>
+          
+        </form>
+    </div>
+{/block}
+{block name="script"}
+<script src="__INSPINIA__/js/plugins/clockpicker/clockpicker.js"></script>
+<script>
+$(function(){
+    $('.clockpicker').clockpicker();
+});
+</script>
+{/block}

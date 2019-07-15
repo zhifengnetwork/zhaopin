@@ -1,0 +1,130 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+.table>thead>tr>th {
+    text-align: center;
+}
+</style>
+{/block}
+
+{block name="content"}
+<div class="ibox">
+    <div class="ibox-content">
+            <div class="row">
+               <form  method="get" action="{:url()}">
+                            <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label" for="status">订单状态</label>
+                                        <select name="orderstatus" class="form-control" style="width:180px;">
+                                                {foreach $order_status as $key => $vo}
+                                                    <option value="{$key}" {$Think.get.orderstatus==$key?='selected' }>{$vo}</option>
+                                                {/foreach}
+                                            </select>
+                                    </div>
+                             </div>
+                             <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label class="control-label" for="status">支付状态</label>
+                                    <select name="paystatus" class="form-control" style="width:180px;">
+                                            {foreach $pay_status as $key => $vo}
+                                              <option value="{$key}" {$Think.get.paystatus==$key?='selected' }>{$vo}</option>
+                                            {/foreach}
+                                        </select>
+                                </div>
+                            </div>
+                         
+                            <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label" for="order_id">订单号</label>
+                                        <input type="text" placeholder="订单号" name="order_id" value="{$order_id}" class="form-control">
+                                    </div>
+                             </div>
+                            <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label class="control-label" for="invoice_no">快递单号</label>
+                                    <input type="text" placeholder="快递单号" name="invoice_no" value="{$invoice_no}" class="form-control">
+                                </div>
+                            </div>
+                               
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label" for="kw">用户信息</label>
+                                        <input type="text" placeholder="用户手机号/姓名/昵称" name="kw" value="{$kw}" class="form-control">
+                                    </div>
+                                </div>
+                        
+                            <div class="col-sm-1">
+                                    <div class="form-group">
+                                        <label class="control-label" for="status">　</label>
+                                        <div>
+                                            <button class="btn btn-primary">查询</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="control-label">日期</label>
+                                <div class="input-daterange input-group" data-provide="datepicker">
+                                    <input class="form-control input-sm" name="begin_time" type="text" value="{$begin_time}"/>
+                                    <span class="input-group-addon">到</span>
+                                    <input class="form-control input-sm" name="end_time" type="text" value="{$end_time}"/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                            <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label" for="status">　</label>
+                                        <div>
+                                            <a class="btn btn-primary" href="{:url('order/index', $exportParam)}">导出Excel</a>
+                                        </div>
+                                    </div>
+                            </div>
+                </form>
+           </div>
+       </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table  table-bordered table-hover text-center">
+                            <thead>
+                                <tr>
+                                    <th class="col-lg-2">订单号</th>
+                                    <th >收货人</th>
+                                    <th>手机号码</th>
+                                    <th>订单金额（元）</th>
+                                    <th>支付方式</th>
+                                    <th>订单状态</th>
+                                    <th>支付状态</th>
+                                    <th>下单时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead> 
+                            <tbody>
+                                {notempty name="list"}
+                                {volist name="list" id="vo"}
+                                <tr>
+                                    <td>{$vo.order_sn}</td>
+                                    <td>{$vo.consignee}</td>
+                                    <td>{$vo.mobile}</td>
+                                    <td>{$vo.total_amount}</td>
+                                    <td>{$vo.pay_name}</td>
+                                    <td>{$order_status[$vo.order_status]}</td>
+                                    <td>{$pay_status[$vo.pay_status]}</td>
+                                    <td>{$vo.add_time|date="y-m-d H:i:s",###}</td>
+                                    <td>
+                                        <a class="btn btn-default" href="{:url('order/edit',['order_id'=>$vo.order_id])}"><i class="fa fa-list"></i> 查看订单</a>
+                                        <a class="btn btn-default" href="{:url('order/edit',['order_id'=>$vo.order_id])}"><i class="fa fa-list"></i> </a>
+                                    </td>
+                                </tr>
+                                {/volist}
+                                {/notempty}
+                            </tbody>
+                        </table>
+                        {$list->render()}
+                    </div>
+                </div>
+                
+
+
+{/block}

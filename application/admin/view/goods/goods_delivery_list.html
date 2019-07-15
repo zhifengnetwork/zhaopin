@@ -1,0 +1,100 @@
+{extend name="common:base" /}
+
+{block name="content"}
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$meta_title}</h5>
+                    <div class="pull-right" style="margin-top:-8px;">
+                            <a class="btn btn-info" href="{:url('goods/goods_delivery_add')}"><i class="fa fa-plus"></i> 添加配送方式</a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+
+                    <div class="row">
+                    <form method="get" action="">
+                        
+                        <div class="col-sm-2">
+                            <div class="input-group"><input type="text" name="name" value="{$name}" placeholder="搜索配送方式" class="input-sm form-control"> </div>
+                        </div>
+
+                        <div class="col-sm-3">
+                            <div class="input-group"> 
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-sm btn-primary"> 搜索</button> 
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                    </div>
+
+
+                    <div class="table-responsive">
+                        <form action="{:URL('Admin/delAll')}" method="post">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+
+                                <th><input class="ch_all" type="checkbox">ID</th>
+                                <th>配送方式名称 </th>
+                                <th>计费方式 </th>
+                                <th>首重(首件)价格 </th>
+                                <th>续重(续件)价格 </th>
+                                <th>状态 </th>
+                                <th>默认快递 </th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {volist name="list" id="vo"}
+                            <tr>
+                                <td><input type="checkbox" class="i-checks ch_item" name="delivery_id[]" value="{$vo.delivery_id}">{$vo.delivery_id}</td>
+                                <td>{$vo.name}</td>
+                                <td>{if condition="$vo.type eq 1"}按重量计费{elseif condition="$vo.type eq 2"}按件计费{/if}</td>
+                                <td>{$vo.firstprice}</td>
+                                <td>{$vo.secondprice}</td>
+                                <td>{if condition="$vo.is_show"}显示{else/}隐藏{/if}</td>
+                                <td>{if condition="$vo.is_default"}是{else/}否{/if}</td>
+                                <td>
+                                    <a href="{:url('Goods/goods_delivery_edit',['delivery_id'=>$vo.delivery_id],false)}">编辑</a>
+                                    <a onclick="del(this,{$vo.delivery_id})" href="javascript:;">删除</a>
+                                </td>
+                            </tr>
+                            {/volist}
+                            </tbody>
+                        </table>
+                        </form>
+                    </div>
+                    <style>
+                        .pagination{}
+                        .pagination li{float:left;position:relative;margin-top:10px;padding:0 12px;}
+                        .pagination li{float:left;width:42px;height:28px;border:1px solid #DDD; text-align:center;line-height:30px;border-left:none;}
+                        .pagination li.active{color:#f00;}
+                        .pagination li a{float:left;width:42px;height:28px; text-align:center;line-height:30px;border-left:none;color:#3399d5;}
+                    </style>
+                    <ul class="pagination">
+                        {$list->render()}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+{block name='script'}
+<script>
+    function del(obj,delivery_id){
+        if(window.confirm('确认删除该配送方式吗？')){
+            $.post("{:url('Goods/goods_delivery_del')}",{'delivery_id':delivery_id},function(data){
+                alert(data.msg);
+                if(data.code){
+                    $(obj).parents('tr').remove();
+                }
+            },'json');
+        }
+    }
+
+
+</script>
+{/block}

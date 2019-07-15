@@ -1,0 +1,112 @@
+{extend name="common:base" /}
+{block name="content"}
+<div class="ibox">
+    <div class="ibox-title">
+        <h5>{$meta_title}</h5>
+    </div>
+    <div class="ibox-content">
+        <form method="post" class="form-horizontal" action="">
+            <input type="hidden" name="id" value="{$id}">
+            <input type="hidden" name="page_id" value="{$page_id}">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">标题</label>
+                <div class="col-sm-9">
+                    <input type="text" name="title" value="{$info.title|default=''}" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">排序</label>
+                <div class="col-sm-9">
+                    <input type="text" name="sort" value="{$info.sort|default=''}" class="form-control">
+                    <p style="color:red">* 0 - 10 , 客户端显示从小到大。</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">链接</label>
+                <div class="col-sm-9">
+                    <input type="text" name="url" value="{$info.url|default=''}" class="form-control">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">类型</label>
+                <div class="col-sm-9">
+                    <input name="type" type="radio" value="0" {if !isset($info['type']) || $info['type'] == 0}checked="checked"{/if}/><label>轮播</label>
+                    <input name="type" type="radio"  value='1' {if isset($info['type']) && $info['type'] == 1}checked="checked"{/if}/><label>广告</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">图片</label>
+                <div class="img-preview" style="display:{$info.picture? 'block':'none'};margin-left:-20%">
+                    <img src="{$info.picture|default=''}" id='img_show' style="min-width: 0px !important; min-height: 0px !important; max-width: none !important; max-height: none !important; width: 300px; height: 200px">
+                </div>
+               
+                <div class="form-group" style="margin-left:18%;">
+                    <label title="上传图片" for="pictur_btn" class="btn btn-primary" id="pictur">上传新图像
+                        <input type="file" accept="image/jpg,image/jpeg,image/bmp,image/png,image/gif/*" name="file" id="pictur_btn" class="hide" />
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">是否显示</label>
+                    <div class="col-sm-9">
+                        <div class="radio radio-success radio-inline">
+                            <input type="radio" value="1" name="state" id="show1" {if condition="isset($info['state']) and ($info['state'] eq 1)"}checked{/if} >
+                            <label for="show1">显示</label>
+                        </div>
+
+                        <div class="radio radio-danger radio-inline">
+                            <input type="radio" value="0" name="state" id="show2" {if condition="isset($info['state']) and ($info['state'] neq 1)"}checked{elseif condition="!isset($info['state'])"  /}checked{/if} >
+                            <label for="show2">隐藏</label>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-4 col-sm-offset-2">
+                        <button class="btn btn-white" onclick="javascript:history.back(-1);return false;">取消</button>
+                        <button class="btn btn-primary ajax-post" target-form="form-horizontal" type="submit">保存</button>
+                    </div>
+                </div>
+               
+       
+
+
+        </form>
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script>
+$(function() {
+    var id = "{$Think.get.id}";
+    // 图片检测格式
+    $('#pictur_btn').change(function() {
+        if (!this.value) {
+            $("#img_show").attr('src', '');
+            filedata = '';
+            pictur = '';
+            return false;
+        }
+        var file = this.files[0];
+        var ext = file.name.substr(-3, 3);
+        if (ext != 'jpg' && ext != 'gif' && ext != 'png') {
+            layer.msg("文件格式不正确", { icon: 5 });
+            window.location.reload();
+            return false;
+        }
+        if (file.size > 5120000) {
+            layer.msg("该文件太大无法上传", { icon: 5 });
+        } else {
+            var reader = new FileReader();
+            //将文件以Data URL形式读入页面  
+            reader.readAsDataURL(file);
+            reader.onload = function(e) {
+                $('.img-preview').show();
+                $("#img_show").attr('src', this.result);
+            }
+        }
+    });
+});
+</script>
+{/block}

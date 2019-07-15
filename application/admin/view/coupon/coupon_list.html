@@ -1,0 +1,107 @@
+{extend name="common:base" /}
+
+{block name="content"}
+	<div id="enable_page_wrap" class="enable_page_wrap">
+		<!-- 管理页面-s-->
+	
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                
+                <div style=" position:absolute; left:30px;; top:14px;">
+                        <div class="pull-right" style="margin-top:-8px;margin-right:30px;">
+                                <a class="btn btn-info" href="{:url('coupon/coupon_add')}"><i class="fa fa-plus"></i> 添加优惠券</a>
+                        </div>
+					<form method="get" action="">
+							
+							<div class="col-sm-2">
+								<div class="input-group"><input type="text" name="title" value="{$title}" placeholder="搜索优惠券名称" class="input-sm form-control"> </div>
+                            </div>
+                            
+                            <div class="col-sm-2">
+								<div class="input-group"><input type="text" name="goods_name" value="{$goods_name}" placeholder="搜索商品名称" class="input-sm form-control"> </div>
+							</div>
+							
+							<div class="col-sm-2">
+								<div class="input-group"><input type="text" name="start_time" value="{$start_time}" placeholder="搜索开始时间" class="form-control timer"> </div>
+							</div>
+
+							<div class="col-sm-2">
+								<div class="input-group"><input type="text" name="end_time" value="{$end_time}" placeholder="搜索结束时间" class="form-control timer"> </div>
+							</div>
+							
+							<div class="col-sm-2">
+								<div class="input-group"> 
+									<span class="input-group-btn">
+										<button type="submit" class="btn btn-sm btn-primary"> 搜索</button> 
+									</span>
+								</div>
+							</div>
+						</form>
+                </div>
+            </div>
+        <div class="ibox-content">
+            <div class="table-responsive">
+                <table class="table  table-bordered table-hover text-center">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>优惠券名称</th>
+                            <th>商品名称</th>
+                            <th>优惠门槛</th>
+                            <th>优惠金额</th>
+                            <th>优惠券数量</th>
+                            <th>开始时间</th>
+                            <th>结束时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead> 
+                    <tbody>
+                        {notempty name="list"}
+                        {volist name="list" id="vo"}
+                        <tr>
+                            <td>{$vo.coupon_id}</td>
+                            <td>{$vo.title}</td>
+                            <td>{if condition="$vo.goods_name"}{$vo.goods_name}{else/}全商品通用{/if}</td>
+                            <td>{if condition="$vo.threshold neq '0.00'"}{$vo.threshold}{elseif condition="$vo.threshold eq '0.00'"}无门槛{/if}</td>
+                            <td>{$vo.price}</td>
+                            <td>{$vo.number}</td>
+                            <td>{$vo.start_time|date="Y-m-d H:i:s",###}</td>
+                            <td>{$vo.end_time|date="Y-m-d H:i:s",###}</td>
+                            <td>
+                                <a class="btn btn-default delete" href="{:url('coupon_edit',['coupon_id'=>$vo.coupon_id],false)}">修改 </a>
+                                <a class="btn btn-default delete" onclick="del(this)" id="{$vo.coupon_id}" >删除 <i class="fa fa-trash-o" attr_url="{:url('coupon/coupon_del',['coupon_id'=>$vo.coupon_id])}"></i></a>
+                            </td>
+                        </tr>
+                        {/volist}
+                        {/notempty}
+                    </tbody>
+                </table>
+                {$list->render()}
+            </div>
+        </div>
+      </div>  
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script src="__PAGE__/js/pc/public/vue.js"></script>
+<script src="__PAGE__/js/pc/public/axios.js"></script>
+<script src="__PAGE__/js/pc/public/swiper.min.js"></script>
+<script>
+	function del(obj){
+        if(window.confirm('确认删除吗？')){
+            var id = $(obj).attr('id');
+            $.post("{:url('coupon/del')}",{'coupon_id':id},function(data){
+                alert(data.msg);
+                if(data.code){
+                    $(obj).parents('tr').remove();
+                }
+            },'json');
+        }
+    }
+</script>
+
+{/block}

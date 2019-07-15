@@ -1,0 +1,412 @@
+{extend name="common:base" /}
+{block name="content"}
+<link rel="stylesheet"  type="text/css"  href="__STATIC__/layui/build/css/layui.css"  >
+<style type="text/css">
+    .form .row dd{
+        float: left;
+        display: inline-block;
+        width: calc(100% - 85px);
+    }
+  
+    ul, ol, li {
+        list-style: none;
+    }
+    .upload_area .post_imglist li {
+        position: relative;
+        float: left;
+        padding: 0 10px 5px 0;
+        line-height: 38px;
+    }
+    .upload_area .upload_btn {
+        background: url(__STATIC__/layui/src/images/upload_btn.png) center no-repeat;
+        background-size: 60px auto;
+        float: left;
+        overflow: hidden;
+        position: relative;
+        width: 60px;
+        height: 60px;
+    }
+    .del {
+        position: absolute;
+        right: 0px;
+        top: -10px;
+        background: url(__STATIC__/layui/src/images/icon_del.png) no-repeat 15px 0;
+        background-size: 20px auto;
+        width: 40px;
+        height: 20px;
+        display: inline-block;
+    }
+    .upload_area .upload_btn input {
+        opacity: 0;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 10;
+        overflow: hidden;
+        height: 60px;
+        width: 60px;
+    }
+    #imglist li img.wh60 {
+        margin: 0 auto;
+        display: block;
+        width: 60px;
+        height: 60px;
+    }
+    #back div{
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 30%;
+      height: auto;
+      margin-left: -20%;
+  
+    }
+  </style>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$meta_title}</h5>
+                </div>
+                <div class="ibox-content">
+                    <form method="post" class="form-horizontal" action="">
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">分销层级</label>
+                            <div class="col-sm-9">
+                                <div style="line-height:34px;float:left;margin:0 10px 0 0;">
+                                    <select class="form-control" name="distribution_level">
+                                        <option {if condition="$info.distribution_level eq 0"} selected {/if} value="0">不开启分销机制</option>
+                                        <option {if condition="$info.distribution_level eq 1"} selected {/if} value="1">一级分销</option>
+                                        <option {if condition="$info.distribution_level eq 2"} selected {/if} value="2">二级分销</option>
+                                        <option {if condition="$info.distribution_level eq 3"} selected {/if} value="3">三级分销</option>
+                                        <option {if condition="$info.distribution_level eq 4"} selected {/if} value="4">四级分销</option>
+                                        <option {if condition="$info.distribution_level eq 5"} selected {/if} value="5">五级分销</option>
+                                        <option {if condition="$info.distribution_level eq 6"} selected {/if} value="6">六级分销</option>
+                                    </select>
+                                    <div>新加入的分销商（默认等级），<b style="color:red;">采用此默认比例</b></div>
+                                    <div>分销佣金计算优先级： <b style="color:red;">商品固定佣金比例 > 分销商等级佣金比例 >默认佣金比例</b></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">分销内购</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="0" name="distribution_iap" {if condition="!$info.distribution_iap"} checked {/if} /> 禁用
+                                </label>
+                                <label>
+                                    <input type="radio" value="1" name="distribution_iap" {if condition="$info.distribution_iap"} checked {/if} /> 启用
+                                </label>
+                                <div>开启分销内购，分销商自己购买商品，<b style="color:red;">享受一级佣金，上级享受二级佣金，上上级享受三级佣金</b></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">佣金计算方式</label>
+                            <div class="col-sm-9">
+                                <div style="line-height:34px;float:left;margin:0 10px 0 0;">
+                                    <select class="form-control" name="culate_method">
+                                        <option {if condition="$info.culate_method eq 0"} selected {/if} value="0">默认佣金计算方式</option>
+                                        <option {if condition="$info.culate_method eq 1"} selected {/if} value="1">实付款金额</option>
+                                        <option {if condition="$info.culate_method eq 2"} selected {/if} value="2">商品原价</option>
+                                        <option {if condition="$info.culate_method eq 3"} selected {/if} value="3">商品现价</option>
+                                        <option {if condition="$info.culate_method eq 4"} selected {/if} value="4">商品成本价</option>
+                                        <option {if condition="$info.culate_method eq 5"} selected {/if} value="5">商品利润（实付款金额-商品成本价）</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">成为下线条件</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="0" name="become_child" {if condition="!$info.become_child"} checked {/if} /> 首次点击分享链接
+                                </label>
+                                <label>
+                                    <input type="radio" value="1" name="become_child" {if condition="$info.become_child eq 1"} checked {/if} /> 首次下单
+                                </label>
+                                <label>
+                                    <input type="radio" value="2" name="become_child" {if condition="$info.become_child eq 2"} checked {/if} /> 首次付款
+                                </label>
+                                <div>首次点击分享链接： <b style="color:red;">可以自由设置分销商条件</b>&nbsp;&nbsp;首次下单/首次付款： <b style="color:red;">无条件不可用</b></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">购买指定商品升级</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="0" name="upgrade_by_good" {if condition="!$info.upgrade_by_good"} checked {/if} /> 否
+                                </label>
+                                <label>
+                                    <input type="radio" value="1" name="upgrade_by_good" {if condition="$info.upgrade_by_good"} checked {/if} /> 是
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">分销商必须完善资料</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="0" name="become_reg" {if condition="!$info.become_reg"} checked {/if} /> 不需要
+                                </label>
+                                <label>
+                                    <input type="radio" value="1" name="become_reg" {if condition="$info.become_reg"} checked {/if} /> 需要
+                                </label>
+                                <div>(分销商在分销或提现时是否必须完善资料)</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">成为分销商是否需要审核</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="0" name="become_check" {if condition="!$info.become_check"} checked {/if} /> 不需要
+                                </label>
+                                <label>
+                                    <input type="radio" value="1" name="become_check" {if condition="$info.become_check"} checked {/if} /> 需要
+                                </label>
+                                <div>(以上条件达到后，<b style="color:red;">是否需要审核才能成为真正的分销商</b>)</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">打款方式</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="1" name="paymethods" {if condition="$info.paymethods eq 1"} checked {/if} /> 余额
+                                </label>
+                                <label>
+                                    <input type="radio" value="2" name="paymethods" {if condition="$info.paymethods eq 2"} checked {/if} /> 微信钱包
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">开启三级消息提醒</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="0" name="remind_message" {if condition="!$info.remind_message"} checked {/if} /> 关闭
+                                </label>
+                                <label>
+                                    <input type="radio" value="1" name="remind_message" {if condition="$info.remind_message"} checked {/if} /> 开启
+                                </label>
+                                <div>(是否开启三级分销订单消息提醒功能，不开启上级有消息)</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">模板选择</label>
+                            <div class="col-sm-9">
+                                <div style="line-height:34px;float:left;margin:0 10px 0 0;">
+                                    <select class="form-control" name="style">
+                                        <option value="style">style</option>
+                                        <option value="default">default</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">注册面头部图片</label>
+                            <div class="col-sm-9">
+                                <dd class="upload_area clearfix" style="margin: 0 auto;">
+                                    <ul id="imglist" name="reg_head_img" class="post_imglist">
+                                        {if condition="!$info.reg_head_img"}
+                                        <li><img class="wh60" id="file0" src="__STATIC__/images/default.jpg" onclick="showimg()"></li>
+                                        {else /}
+                                        <li><img class="wh60" id="file0" src="__IMAGES__/{$info.reg_head_img}" onclick="showimg()"></li>
+                                        {/if}
+                                    </ul>
+                                    <div class="upload_btn">
+                                        <input type="file" class="upload_image" value="图片上传" accept="image/jpeg,image/gif,image/png" capture="camera">
+                                    </div>
+                                </dd>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">文字设置</label>
+                            <div class="col-sm-9">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">默认级别名称</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="level_name" value="{$info.level_name|default='普通等级'}" class="form-control">
+                                <div>分销商默认等级名称，不填写默认“普通等级”</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">分销商名称</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="distribution_name" value="{$info.distribution_name|default='分销商'}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">小店</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="shop" value="{$info.shop|default='小店'}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">我的小店</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="my_shop" value="{$info.my_shop|default='我的小店'}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">分销中心</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="distribution_center" value="{$info.distribution_center|default='分销中心'}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">成为分销商</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="become_distribution" value="{$info.become_distribution|default='成为分销商'}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">佣金</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="commission" value="{$info.commission|default='佣金'}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">分销佣金</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="distribution_commission" value="{$info.distribution_commission|default='分销佣金'}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">预计佣金</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="commission_total" value="{$info.commission_total|default='累计佣金'}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">已提现佣金</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="commission_pay" value="{$info.commission_pay|default='成功提现佣金'}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">分销订单</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="distribution_order" value="{$info.distribution_order|default='分销订单'}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">我的团队</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="my_team" value="{$info.my_team|default='我的团队'}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">我的客户</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="my_customer" value="{$info.my_customer|default='我的客户'}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">分销等级</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="distribution_rank" value="{$info.distribution_rank|default='等级分销'}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <button class="btn btn-primary ajax-post" target-form="form-horizontal" type="submit">提交</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{/block}
+
+{block name="script"}
+<script src="__STATIC__/layui/src/localResizeIMG2.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+(function () {
+        
+        var imgurlimgurl = '';
+        var imgcount = 0;
+
+        $(document).on('click','.upload_image',function(){
+            var viewImg = $(this).parents('.form-group').find('.post_imglist');
+            var name = $(this).parents('.form-group').find('.post_imglist').attr('name');
+            var obj = $(this);
+            $(this).localResizeIMG({
+            width: 360,
+            quality: 0.8,
+                success: function (result) {
+                    var status = true;
+                    
+                    if (viewImg.find("li").length > 4) {
+                        status = false;
+                        alert("最多上传5张照片");
+                        $(".upload_btn").hide();
+                    }
+                    if (status) {
+                        viewImg.html('<li><span class="pic_time"><span class="p_img"></span><em>50%</em></span></li>');
+                        viewImg.find("li:last-child").html('<img class="wh60" id="file'
+                        + imgcount
+                        + '" onclick="showimg('+imgcount+')" src="' + result.base64 + '"/><input type="hidden" name="'+name+'" value="'
+                        + result.clearBase64 + '">');
+
+                        imgcount++;
+                    }
+                }
+            });
+        })
+    })();
+
+    $(".del").on("click",function(){
+        $(this).parent('li').remove();
+        $("#upload_image").show();
+        $(".upload_btn").show();
+    });
+
+
+    function show_type(flag){
+        if (flag == 2) {
+            $('.show_h').hide();
+            $('.show_n').show();
+        } else {
+            $('.show_h').show();
+            $('.show_n').hide();
+        }
+    }
+    $(':radio[name=type]').click(function(){
+        var val = $(this).val();
+        show_type(val);
+    });
+    
+</script>
+{/block}

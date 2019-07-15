@@ -1,0 +1,95 @@
+{extend name="common:base" /}
+
+{block name="content"}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$meta_title}</h5>
+                    <div class="pull-right" style="margin-top:-8px;">
+                            <a class="btn btn-info" href="{:url('category/add')}"><i class="fa fa-plus"></i> 添加新分类</a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>id</th>
+                                    <th>分类名称</th>
+                                    <!-- <th>是否显示</th> -->
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <style>
+                                .a{
+                                    padding:0 5px;
+                                }
+                            </style>
+                            <tbody>
+                                {notempty name="list"}
+                                {volist name="list" id="vo"}
+                                    <tr>
+                                        <td>{$vo.cat_id}</td>
+                                        <td>{$vo.cat_name}</td>
+                                        <!-- <td>{eq name="vo['is_show']" value="1"}显示{else /}隐藏{/eq}</td> -->
+                                        <td>
+                                            <a class="a" href="{:url('category/add',['pid'=>$vo.cat_id],false)}">添加子分类</a>
+                                            <a class="a" href="{:url('category/edit',['cat_id'=>$vo.cat_id],false)}">编辑</a>
+                                            <a class="a" cat_id="{$vo.cat_id}" onclick="del(this)" href="javascript:;">删除</a>
+                                        </td>
+                                    </tr>
+                                    {if condition="isset($vo['children'])"}
+                                    {volist name="vo['children']" id="v"}
+                                        <tr>
+                                            <td>{$v.cat_id}</td>
+                                            <td>------ {$v.cat_name}</td>
+                                            <!-- <td>{eq name="v['is_show']" value="1"}显示{else /}隐藏{/eq}</td> -->
+                                            <td>
+                                                <a class="a" href="{:url('category/add',['pid'=>$v.cat_id],false)}">添加子分类</a>
+                                                <a class="a" href="{:url('category/edit',['cat_id'=>$v.cat_id],false)}">编辑</a>
+                                                <a class="a" cat_id="{$v.cat_id}" onclick="del(this)" href="javascript:;">删除</a>
+                                            </td>
+                                        </tr>
+                                        {if condition="isset($v['children'])"}
+                                        {volist name="v['children']" id="v1"}
+                                            <tr>
+                                                <td>{$v1.cat_id}</td>
+                                                <td>------------ {$v1.cat_name}</td>
+                                                <!-- <td>{eq name="v1['is_show']" value="1"}显示{else /}隐藏{/eq}</td> -->
+                                                <td>
+                                                    <a class="a" href="{:url('category/add',['pid'=>$v1.cat_id],false)}">添加子分类</a>
+                                                    <a class="a" href="{:url('category/edit',['cat_id'=>$v1.cat_id],false)}">编辑</a>
+                                                    <a class="a" cat_id="{$v1.cat_id}" onclick="del(this)" href="javascript:;">删除</a>
+                                                </td>
+                                            </tr>
+                                        {/volist}
+                                        {/if}
+                                    {/volist}
+                                    {/if}
+                                {/volist}
+                                {/notempty}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+{block name='script'}
+<script>
+    function del(obj){
+        if(window.confirm('确认删除该分类吗？')){
+            var cat_id = $(obj).attr('cat_id');
+            $.post("{:url('category/del')}",{'cat_id':cat_id},function(data){
+                alert(data.msg);
+                if(data.code){
+                    $(obj).parents('tr').remove();
+                }
+            },'json');
+        }
+    }
+
+</script>
+{/block}

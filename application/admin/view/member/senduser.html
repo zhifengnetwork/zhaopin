@@ -1,0 +1,80 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+.table>thead>tr>th {
+    text-align: center;
+}
+</style>
+{/block}
+
+{block name="content"} 
+<div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$meta_title}</h5>
+                    <div class="pull-right" style="margin-top:-8px;">
+                            <a class="btn btn-info" href="{:url('order/senduser_add')}"><i class="fa fa-plus"></i> 添加信息</a>
+                    </div>
+                </div>   
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table  table-bordered table-hover text-center">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th class="col-lg-2">发件人</th>
+                                    <th>发件人电话</th>
+                                    <th>发件人签名</th>
+                                    <th>发件地邮编</th>
+                                    <th>发件地址</th>
+                                    <th>发件城市</th>
+                                    <th>是否默认</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead> 
+                            <tbody>
+                                {notempty name="list"}
+                                {volist name="list" id="row"}
+                                <tr>
+                                        <td>{$row['id']}</td>
+                                        <td>{$row['sendername']}</td>
+                                        <td>{$row['sendertel']}</td>
+                                        <td>{$row['sendersign']}</td>
+                                        <td>{$row['sendercode']}</td>
+                                        <td>{$row['senderaddress']}</td>
+                                        <td>{$row['sendercity']}</td>
+                                        <td>
+                                            {if $row['isdefault']==1}
+                                            <span class='label label-success'><i class='fa fa-check'></i></span> {/if}
+                                        </td>
+                                        <td style="text-align:left;">
+                                                <a href="{:url('order/senduser_edit')}" style="background-color: #ffb034; color: #fff;padding: 5px 10px;"><i class="fa fa-edit "></i></a>
+                                        
+                                                <a href="" class="btn btn-default btn-sm" onclick="return confirm('确认删除此模板?')"title="删除" style="background-color: #000; color: #fff;"><i class="fa fa-times"></i></a>
+                                            
+                                                <a href="" class="btn btn-default btn-sm" onclick="return confirm('确认设置默认?')" title="设置默认" style="background-color: #13c879; color: #fff;"><i class="fa fa-check"></i></a> 
+                                        </td>
+                                {/volist}
+                                {/notempty}
+                            </tbody>
+                        </table>
+                        {$list->render()}
+                    </div>
+                </div>
+             </div>
+        </div>
+</div>
+{/block}
+{block name="script"}
+<script language='javascript'>
+        require(['bootstrap'], function ($) {
+            $('.btn').hover(function () {
+                $(this).tooltip('show');
+            }, function () {
+                $(this).tooltip('hide');
+            });
+        });  
+</script>
+{/block}
+  

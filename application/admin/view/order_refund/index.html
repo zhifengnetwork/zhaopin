@@ -1,0 +1,117 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+.table > thead>tr> th{
+   text-align: center;
+}
+</style>
+{/block}
+
+{block name="content"}
+<div class="ibox">
+    <div class="ibox-content">
+            <div class="row">
+                    <form  method="get" action="{:url()}">
+
+                        <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label class="control-label" for="good_name">收货人</label>
+                                    <input type="text" placeholder="收货人" name="good_name" value="" class="form-control">
+                                </div>
+                         </div>
+                         <div class="col-sm-2">
+                            <div class="form-group">
+                                <label class="control-label" for="kw">商品名称</label>
+                                <input type="text" placeholder="用户手机号/姓名/昵称" name="kw" value="" class="form-control">
+                            </div>
+                       </div>
+                         <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label class="control-label" for="order_id">订单号</label>
+                                    <input type="text" placeholder="订单号" name="order_id" value="" class="form-control">
+                                </div>
+                         </div>
+                         <div class="col-sm-2">
+                            <div class="form-group">
+                                <label class="control-label" for="kw">用户信息</label>
+                                <input type="text" placeholder="用户手机号/姓名/昵称" name="kw" value="" class="form-control">
+                            </div>
+                         </div>
+                         
+                   
+                        <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label class="control-label" for="status">　</label>
+                                    <div>
+                                        <button class="btn btn-primary">查询</button>
+                                    </div>
+                                </div>
+                            </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label class="control-label">日期</label>
+                            <div class="input-daterange input-group" data-provide="datepicker">
+                                <input class="form-control input-sm" name="begin_time" type="text" value=""/>
+                                <span class="input-group-addon">到</span>
+                                <input class="form-control input-sm" name="end_time" type="text" value=""/>
+                            </div>
+                        </div>
+                    </div>
+                  
+                        <div class="col-sm-2">
+                                <div class="form-group">
+                                    <label class="control-label" for="status">　</label>
+                                    <div>
+                                        <a class="btn btn-primary" href="">导出</a>
+                                    </div>
+                                </div>
+                        </div>
+                    
+                    </form>
+                </div>
+            </div>
+       </form>
+
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table  table-bordered table-hover text-center">
+                            <thead>
+                                <tr>
+                                    <th>订单号</th>
+                                    <th class="col-lg-2">收货人</th>
+                                    <th>手机号码</th>
+                                    <th>商品名称</th> 
+                                    <th>订单金额（元）</th>
+                                    <th>处理状态</th>
+                                    <th>下单时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead> 
+                            <tbody>
+                                {notempty name="list"}
+                                {volist name="list" id="vo"}
+                                <tr>
+                                    <td>{$vo.order_id}</td>
+                                    <td>{$vo.consignee}</td>
+                                    <td>{$vo.mobile}</td>
+                                    <td></td>
+                                    <td>{$vo.order_amount}</td>
+                                    <td>{$vo.pay_status}</td>
+                                    <td>{$vo.create_time}</td>
+                                    <td>
+                                        <a class="btn btn-default" href="{:url('order_refund/edit',['order_id'=>$vo.order_id])}"><i class="fa fa-list"></i> 查看订单</a>
+                                    </td>
+                                </tr>
+                                {/volist}
+                                {/notempty}
+                            </tbody>
+                        </table>
+                        {$list->render()}
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

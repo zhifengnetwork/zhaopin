@@ -1,0 +1,105 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+    .table>thead>tr>th {
+        text-align: center;
+    }
+    .yes{
+        color: #fff;
+        background: #31b906;
+        padding: 2px 13px;
+    }
+    .no{
+        color: #fff;
+        background: #b50b0a;
+        padding: 2px 13px;
+    }
+</style>
+{/block}
+
+{block name="content"}
+<div class="ibox">
+    <div class="ibox-content">
+        <div class="row">
+            <div class="ibox-content">
+                <div class="row" style="height: 50px;">
+                    <form method="get" action="">
+                        <div class="col-sm-2">
+                            <div class="input-group"><input type="text" name="realname" value="{if $realname}{$realname}{/if}" placeholder="搜索用户" class="input-sm form-control"> </div>
+                        </div>
+                        <div class="col-sm-1" style=" width: 90px;padding: 5px 14px;">
+                            <div class="input-group">
+                                交易日期
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="input-daterange input-group" data-provide="datepicker">
+                                <input class="form-control input-sm" name="punch_time"  value="{if $punch_time}{$punch_time}{/if}"  type="text"  autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="col-sm-1" style=" width: 90px;padding: 5px 14px;">
+                            <div class="input-group">
+                                支付状态
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="input-daterange input-group" data-provide="datepicker">
+                                <select name="pay_status" class="form-control" style="width:180px;">
+                                    <option value="-1" {if condition="$pay_status eq -1"} selected {/if}>未支付</option>
+                                    <option value="1" {if condition="$pay_status eq 1"} selected {/if}>已支付</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-sm btn-primary"> 搜索</button>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive">
+                    <table class="table  table-bordered table-hover text-center">
+                        <thead>
+                        <tr>
+                            <th class="col-lg-2">订单号</th>
+                            <th >用户</th>
+                            <th >标题</th>
+                            <th>支付金额(元)</th>
+                            <th>支付状态</th>
+                            <th>支付渠道</th>
+                            <th>支付时间</th>
+                            <th>瓜分金额(元)</th>
+                            <th>瓜分时间</th>
+                            <th>创建时间</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {notempty name="list"}
+                        {volist name="list" id="vo"}
+                        <tr>
+                            <td>{$vo.order_sn}</td>
+                            <td><a href="{:url('member/member_edit',array('id' => $vo['uid']));}" title="会员详情">{$vo.realname}</a></td>
+                            <td>{$vo.title}</td>
+                            <td>{$vo.pay_money}</td>
+                            <td>{if condition="$vo.pay_status eq 1"}<span class="yes">已支付</span>{else/}<span class="no">未支付{/if}</span></td>
+                            <td>{if condition="$vo.pay_type eq 1"}<span >余额支付</span>{/if}
+                                {if condition="$vo.pay_type eq 2"}<span >微信支付</span>{/if}
+                            </td>
+                            <td>{if $vo.pay_time }{$vo.pay_time|date="y-m-d H:i:s",###}{/if}</td>
+                            <td>{if condition="$vo.get_money gt '0.00'" }{$vo.get_money}{/if}</td>
+                            <td>{if $vo.get_time }{$vo.get_time|date="y-m-d H:i:s",###}{/if}</td>
+                            <td>{$vo.create_time|date="y-m-d H:i:s",###}</td>
+                        </tr>
+                        {/volist}
+                        {/notempty}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{/block}

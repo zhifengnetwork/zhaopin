@@ -1,0 +1,103 @@
+{extend name="common:base" /}
+
+{block name="content"}
+	<div id="enable_page_wrap" class="enable_page_wrap">
+		<!-- 管理页面-s-->
+	
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                <div style=" position:absolute; left:30px;; top:14px;">
+					<form method="get" action="">
+
+							<!-- <div class="col-sm-2 m-b-xs">
+								<select name="is_show" class="input-sm form-control input-s-sm inline">
+									<option value="">选择商品状态</option>
+									<option value="1">已上架</option>
+									<option value="0">未上架</option>
+								</select>
+							</div> -->
+							
+							<div class="col-sm-2">
+								<div class="input-group"><input type="text" name="keyword" value="{$keyword}" placeholder="搜索操作员名称" class="input-sm form-control"> </div>
+							</div>
+							
+							<div class="col-sm-2">
+								<div class="input-group"><input type="text" name="start_time" value="{$start_time}" placeholder="搜索开始时间" class="form-control timer"> </div>
+							</div>
+
+							<div class="col-sm-2">
+								<div class="input-group"><input type="text" name="end_time" value="{$end_time}" placeholder="搜索结束时间" class="form-control timer"> </div>
+							</div>
+							
+	
+							<div class="col-sm-3">
+								<div class="input-group"> 
+									<span class="input-group-btn">
+										<button type="submit" class="btn btn-sm btn-primary"> 搜索</button> 
+									</span>
+								</div>
+							</div>
+						</form>
+                </div>
+            </div>
+        <div class="ibox-content">
+            <div class="table-responsive">
+                <table class="table  table-bordered table-hover text-center">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>操作员</th>
+                            <th>类型</th>
+                            <th>操作内容</th>
+                            <th>操作IP</th>
+                            <th>操作时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead> 
+                    <tbody>
+                        {notempty name="list"}
+                        {volist name="list" id="vo"}
+                        <tr>
+                            <td>{$vo.id}</td>
+                            <td>{$vo.username}</td>
+                            <td>{$vo.name}</td>
+                            <td>{$vo.op}</td>
+                            <td>{$vo.ip}</td>
+                            <td>{$vo.createtime|date="Y-m-d H:i:s",###}</td>
+                            <td>
+                                <a class="btn btn-default delete" onclick="del(this)" id="{$vo.id}" >删除 <i class="fa fa-trash-o" attr_url="{:url('index/page_delete',['id'=>$vo.id])}"></i></a>
+                            </td>
+                        </tr>
+                        {/volist}
+                        {/notempty}
+                    </tbody>
+                </table>
+                {$list->render()}
+            </div>
+        </div>
+      </div>  
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script src="__PAGE__/js/pc/public/vue.js"></script>
+<script src="__PAGE__/js/pc/public/axios.js"></script>
+<script src="__PAGE__/js/pc/public/swiper.min.js"></script>
+<script>
+	function del(obj){
+        if(window.confirm('确认删除吗？')){
+            var id = $(obj).attr('id');
+            $.post("{:url('Log/del')}",{'id':id},function(data){
+                alert(data.msg);
+                if(data.code){
+                    $(obj).parents('tr').remove();
+                }
+            },'json');
+        }
+    }
+</script>
+
+{/block}

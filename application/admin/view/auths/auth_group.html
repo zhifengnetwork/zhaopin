@@ -1,0 +1,48 @@
+{extend name="common:base" /}
+
+{block name="content"}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$meta_title}</h5>
+                    <div class="pull-right" style="margin-top:-8px;">
+                        <a class="btn btn-info" href="{:url('auths/edit')}"><i class="fa fa-plus"></i> 新增分组</a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>分组名称</th>
+                                    <th>描述</th>
+                                    <th>状态</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {notempty name="list"}
+                                {volist name="list" id="vo"}
+                                <tr>
+                                    <td>{$vo.title}</td>
+                                    <td>{$vo.desc}</td>
+                                    <td>{eq name="vo['status']" value="1"}正常{else /}删除{/eq}</td>
+                                    <td>{$vo.create_time|time_format}</td>
+                                    <td>
+                                        <a class="btn btn-default" href="{:url('auths/edit',array('id'=>$vo['id']))}"><i class="fa fa-edit"></i> 编辑</a>
+                                        <a class="btn btn-default" href="{:url('auths/manage_auths',array('id'=>$vo['id']))}"><i class="fa fa-edit"></i> 访问授权</a>
+                                        <a class="btn btn-default" href="{:url('auths/auth_user',array('group_id'=>$vo['id']))}"><i class="fa fa-edit"></i> 授权用户</a>
+                                    </td>
+                                </tr>
+                                {/volist}
+                                {/notempty}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}

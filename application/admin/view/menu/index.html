@@ -1,0 +1,63 @@
+{extend name="common:base" /}
+
+{block name="content"}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$meta_title}</h5>
+                    <div class="pull-right" style="margin-top:-8px;">
+                        <!-- <button class="btn btn-info" id='clean_database'><i class="fa fa-refresh"></i> 清空数据</button> -->
+                        <a class="btn btn-info ajax-get" href="{:url('menu/import_menu')}" target-form="form-horizontal" ><i class="fa fa-refresh"></i> 更新菜单</a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>url地址</th>
+                                    <th>状态</th>
+                                    <th>显示</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {notempty name="menu_list_tree"}
+                                {volist name="menu_list_tree" id="vo"}
+                                <tr>
+                                    <td>{$vo.title}</td>
+                                    <td>{$vo.url}</td>
+                                    <td>{eq name="vo['status']" value="1"}正常{else /}删除{/eq}</td>
+                                    <td>{eq name="vo['hide']" value="1"}显示{else /}隐藏{/eq}</td>
+                                </tr>
+                                {if condition="isset($vo['_child'])"}
+                                {volist name="vo['_child']" id="v"}
+                                    <tr>
+                                        <td>------ {$v.title}</td>
+                                        <td>{$v.url}</td>
+                                        <td>{eq name="v['status']" value="1"}正常{else /}删除{/eq}</td>
+                                        <td>{eq name="v['hide']" value="1"}显示{else /}隐藏{/eq}</td>
+                                    </tr>
+                                    {if condition="isset($v['_child'])"}
+                                    {volist name="v['_child']" id="v1"}
+                                        <tr>
+                                            <td >------------ {$v1.title}</td>
+                                            <td>{$v1.url}</td>
+                                            <td>{eq name="v1['status']" value="1"}正常{else /}删除{/eq}</td>
+                                            <td>{eq name="v['hide']" value="1"}显示{else /}隐藏{/eq}</td>
+                                        </tr>
+                                    {/volist}
+                                    {/if}
+                                {/volist}
+                                {/if}
+                                {/volist}
+                                {/notempty}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}

@@ -1,0 +1,102 @@
+{extend name="common:base" /}
+{block name="content"}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>{$meta_title}</h5>
+            </div>
+            <div class="ibox-content">
+                <form method="post" class="form-horizontal" action="">
+                    <input type="hidden" name="id" value="{$Think.get.id}">
+
+                   
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">配送方式名称</label>
+                        <div class="col-sm-4">
+                            <input type="text" name="channel_name" value="{$info.channel_name|default=''}" class="form-control">
+                        </div>
+                    </div>
+                   
+                    <div class="form-group">
+                            <label class="col-sm-2 control-label"></label>
+                                    <div class="table-responsive">
+                                        <table class="table ">
+                                            <thead>
+                                                <tr>
+                                                    <th>配送区域</th>
+                                                    <th class="col-lg-2">首重（克）</th>
+                                                    <th>首费（元）</th>
+                                                    <th>续重（续件价格）</th>
+                                                    <th>续费（元）</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead> 
+                                            <tbody>
+                                                    <tr>
+                                                            <td>全国[默认运费]</td>
+                                                            <td><input type="number" class="form-control" style="width:100px;" value="1000">  </td>
+                                                            <td><input type="text" class="form-control" style="width:100px;"> </td>
+                                                            <td><input type="number" class="form-control" style="width:100px;" value="1000"> </td>
+                                                            <td><input type="text" class="form-control" style="width:100px;"> </td>
+                                                            <td>
+                                                                <!-- <a class="btn btn-default" href=""><i class="fa fa-list"></i> 删除</a> -->
+                                                            </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                                <button type="button" class="btn btn-outline btn-danger">+新增配送区域</button>
+                                                        </td>
+                                                    </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                               
+                        </div>
+                    
+                   
+                        <div class="form-group">
+                                <label class="col-sm-2 control-label">配送规则</label>
+                                <div class="col-sm-7">
+                                        <span > 根据重量来计算运费，当物品不足《《首重重量》》时,按照《《首重费用》》计算，超过部分按照《《续重重量》》和《《续重费用》》来计算。</span>
+                                 </div>
+                         </div>
+                  
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">是否显示</label>
+                        <div class="col-sm-9">
+                            <div class="radio radio-success radio-inline">
+                                <input type="radio" value="1" name="status" id="status1" {if condition="isset($info['status']) and ($info['status'] eq 1)" }checked{/if}> <label for="status1">开启</label>
+                            </div>
+                            <div class="radio radio-warning radio-inline">
+                                <input type="radio" value="0" name="status" id="status2" {if condition="isset($info['status']) and ($info['status'] eq 0)" }checked {elseif condition="!isset($info['status'])" /}checked{/if}> <label for="status2">关闭</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-2">
+                            <button class="btn btn-white" onclick="javascript:history.back(-1);return false;">取消</button>
+                            <button class="btn btn-primary ajax-post" target-form="form-horizontal" type="submit">保存</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script>
+$(function() {
+    var platform_id = { $info.platform_id | default = 0 };
+    var type_id = { $info.type_id | default = 0 };
+    if (type_id != 0) {
+        $('[name=type_id]').val(type_id);
+        $('[name=platform_id]').val(platform_id);
+    }
+
+    console.log(platform_id);
+    console.log(type_id);
+});
+</script>
+{/block}

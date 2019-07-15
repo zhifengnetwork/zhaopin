@@ -1,0 +1,42 @@
+{extend name="common:base" /}
+
+{block name="style"}
+
+
+{/block}
+
+{block name="content"}
+<div class="main">
+        <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
+            <div class='panel panel-default'>
+                <div class='panel-heading'>会员分组新增</div>
+                <div class='panel-body'>
+                     <div class="form-group">
+                         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <label class="col-xs-12 col-sm-3 col-md-3 control-label">* 分组名称</label>
+                            <div class="col-sm-9 col-xs-12">
+                                <input type="text" name="groupname" class="form-control" value="" />
+                                <span class='help-block'>分组名称不能为空</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group"></div>
+                    <div class="form-group">
+                        <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                        <div class="col-sm-9 col-xs-12">
+                           <button class="btn btn-primary ajax-post col-lg-1" target-form="form-horizontal" type="submit">提交</button>
+                           <input type="button" name="back" onclick='history.back()'  value="返回列表" class="btn btn-default" />
+                        </div>
+                  </div>
+                </div>
+             </div>
+        </form>
+    </div>
+{/block}
+{block name="script"}
+
+<script>
+
+</script>
+{/block}

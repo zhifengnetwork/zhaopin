@@ -1,0 +1,87 @@
+{extend name="common:base" /}
+
+{block name="style"}
+<link href="__INSPINIA__/css/plugins/iCheck/custom.css" rel="stylesheet">
+<link href="__INSPINIA__/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+{/block}
+
+{block name="content"}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$meta_title}</h5>
+                </div>
+                <div class="ibox-content">
+                    <form method="post" class="form-horizontal" action="">
+                        <input type="hidden" name="id" value="{$id}">
+                        {volist name="menu_tree" id="vo"}
+                        <div class="row rules-box" style="margin-bottom:15px;">
+                            <div class="col-lg-12" style="background:#f1f1f1;">
+                                <div class="checkbox" style="padding-top:10px; padding-bottom:5px;">
+                                    <input type="checkbox" class="auth-rules rules-all" name="rules[]" value="{$vo.id}" id="checkbox_{$vo.id}"  {if condition="in_array($vo['id'], $rules_list)"}checked{/if} >
+                                    <label for="checkbox_{$vo.id}">{$vo.title}</label>
+                                </div>
+                            </div>
+                            {notempty name="vo['_child']"}
+                                {volist name="vo['_child']" id="v"}
+                                <div class="col-lg-12 rules-box1">
+                                    <div class="col-lg-12" style="padding-left:25px; margin-top:5px; margin-bottom:5px;">
+                                        <div class="checkbox">
+                                            <input type="checkbox" class="auth-rules rules-row" name="rules[]" value="{$v.id}" id="checkbox_{$v.id}" {if condition="in_array($v['id'], $rules_list)"}checked{/if} >
+                                            <label for="checkbox_{$v.id}">{$v.title}</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-12 rules-box2" style="padding-left:60px; margin-top:5px; margin-bottom:5px;">
+                                        {notempty name="v['_child']"}
+                                        {volist name="v['_child']" id="v1"}
+                                        <div class="checkbox" style="width:110px; float:left;">
+                                            <input type="checkbox" class="auth-rules" name="rules[]" value="{$v1.id}" id="checkbox_{$v1.id}" {if condition="in_array($v1['id'], $rules_list)"}checked{/if} >
+                                            <label for="checkbox_{$v1.id}">{$v1.title}</label>
+                                        </div>
+                                        {/volist}
+                                        {/notempty}
+                                    </div>
+                                </div>
+                                {/volist}
+                            {/notempty}
+                        </div>
+                        {/volist}
+
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <button class="btn btn-white" onclick="javascript:history.back(-1);return false;">取消</button>
+                                <button class="btn btn-primary ajax-post" target-form="form-horizontal" type="submit">保存</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="script"}
+<script src="__INSPINIA__/js/plugins/iCheck/icheck.min.js"></script>
+<script>
+    $(function(){
+        //全选节点
+        $('.rules-all').on('change',function(){
+            $(this).closest('.rules-box').find('.rules-box1').find('input').prop('checked',this.checked);
+        });
+        $('.rules-row').on('change',function(){
+            $(this).closest('.rules-box1').find('.rules-box2').find('input').prop('checked',this.checked);
+        });
+
+        $('.auth-rules').on('change',function(){
+            if(this.checked){
+                $(this).parents('.rules-box1').find('.rules-row').prop('checked',this.checked);
+                $(this).parents('.rules-box').find('.rules-all').prop('checked',this.checked);
+            }
+        });
+    });
+</script>
+{/block}

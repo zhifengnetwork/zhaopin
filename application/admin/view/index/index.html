@@ -1,0 +1,482 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+
+.table>thead>tr>th {
+    text-align: center;
+}
+</style>
+<link rel="stylesheet" href="__PAGE__/css/pc/public/swiper.min.css">
+<link rel="stylesheet" href="__PAGE__/css/pc/public/public.css" />
+<link rel="stylesheet" href="__PAGE__/css/pc/enable_page.css" />
+{/block}
+{block name="content"}
+	<div id="enable_page_wrap" class="enable_page_wrap">
+		<!-- 管理页面-s-->
+	
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                <div style=" position:absolute; left:30px;; top:14px;">
+                    <a class="btn btn-sm btn-info" style="margin-left: 0px;" href="{:url('index/page_add')}">
+                        添加一个新页面 <i class="fa fa-edit"></i>
+                    </a>
+                    <span class="tips">Tips:采用自定义页面后将代替系统默认页面，首页仅允许设置一个启用页面。</span>
+                </div>
+            </div>
+        <div class="ibox-content">
+            <div class="table-responsive">
+                <table class="table  table-bordered table-hover text-center">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th class="col-lg-2">页面名称</th>
+                            <th>页面类型</th>
+                            <th>页面创建时间</th>
+                            <th>最后修改时间</th>
+                            <th>是否启用</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead> 
+                    <tbody>
+                        {notempty name="list"}
+                        {volist name="list" id="vo"}
+                        <tr>
+                            <td>{$vo.id}</td>
+                            <td>{$vo.page_name}</td>
+                            <td><p class="pType">
+                                <span>店铺首页</span>
+                            </p></td>
+                            <td>{$vo.add_time|date="Y-m-d H:i:s",###}</td>
+                            <td>{$vo.update_time|date="Y-m-d H:i:s",###}</td>
+                            <td>{eq name="$vo.status" value="1"}
+                                    <button data-toggle="button" class="btn btn-primary active qi" @click.stop="prohibition($event)" attr_url="{:url('index/page_enable',['id'=>$vo.id,'status'=>0])}" type="button" aria-pressed="true" status="{$vo.status}" page_id="{$vo.id}">启用</button>
+                                 {else/}
+                                    <button data-toggle="button" class="btn btn-primary active qi" @click.stop="prohibition($event)" attr_url="{:url('index/page_enable',['id'=>$vo.id,'status'=>1])}" type="button" aria-pressed="true" status="{$vo.status}" page_id="{$vo.id}">禁止</button>
+                                 {/eq}
+                                </td>
+                            <td>
+                                <a class="btn btn-default" @click.stop="preview(),send($event)" page_id="{$vo.id}"><i class="fa fa-list" page_id="{$vo.id}"></i> 预览</a>
+                                <a class="btn btn-default editxz" href="{:url('index/page_edit',['id'=>$vo.id])}">编辑 <i class="fa fa-edit"></i></a>
+                                <a class="btn btn-default delete" @click.stop="del_data($event)" attr_url="{:url('index/page_delete',['id'=>$vo.id])}" id="{$vo.id}" >删除 <i class="fa fa-trash-o" attr_url="{:url('index/page_delete',['id'=>$vo.id])}"></i></a>
+                            </td>
+                        </tr>
+                        {/volist}
+                        {/notempty}
+                    </tbody>
+                </table>
+                {$list->render()}
+            </div>
+        </div>
+      </div>  
+    </div>
+</div>        
+
+        
+		<!-- 管理页面-e-->
+		<!--预览页面-->
+		<div class="preview_mask"  :class="phone_box?'show_box':'hide_box'" @click="preview">
+			<!--中间 wrap, @click.stop=""阻止外层点击事件-->
+			<div class="middle_wrap" @click.stop="">
+				<!--模拟手机 box-->
+				<div class="middle_box">
+					<!--绝对定位=>设置图片，模拟手机-->
+					<p class="phone_top"></p>
+					<p class="phone_left"></p>
+					<p class="phone_right"></p>
+					<!--模拟手机的 wrap，背景图两边（img）-->
+					<div class="html_wrpa">
+						<!--水平居中-->
+						<div class="html_box">
+							<!--隐藏滚动条-->
+							<div class="html_box_new" :class="hide_var == true ? 'show_box':'hide_box'">
+								<!--div 循环-->
+								<div class="drag_box" v-for="(v,i) in backData['data']">
+									<!--轮播图 box-->
+									<div class="modle_box" :class="v.id+v.key_num" v-if="v.id == 'rotationId'? true:''" :key="v.id">
+										<div class="slide swiper-wrapper">
+											<div class="slide_item swiper-slide" v-for="(val,index) in v.data.images">
+												<img :src="val.imgUrl" alt="" />
+											</div>
+										</div>
+										<div class="slide_but swiper-pagination" :class="[v.params.butPosition,v.params.butStart]">
+											<span v-for="(val,index) in v.data.images" :class="v.params.butStyle" :style="{'background':index == 0?v.params.clickColor:v.params.butColor}"></span>
+										</div>
+									</div>
+
+									<!--搜索模块 box-->
+									<div class="modle_box" v-if="v.id == 'searchId'? true:''" :key="v.id">
+										<div class="search" :style="{'background':v.params.backColor}">
+											<form action="#" :style="{'border-color':v.params.borderColor}"
+												:class="v.params.reStyle">
+												<input type="submit" class="searchBtn" value="">
+												<input type="text" class="searchText" placeholder="搜索：输入关键字在店内搜索"
+													:style="{'color':v.params.textColor}" v-model="v.data.tipeText">
+											</form>
+										</div>
+
+									</div>
+									<!--按钮组 模块 box-->
+									<div class="modle_box" v-if="v.id == 'bottonsId'? true:''" :key="v.id">
+										<div class="modle_bottons" :style="{backgroundColor:v.params.iconColor}">
+											<!--四个按钮=>20%，五个按钮=>25%-->
+											<div class="modle_mod_nav" v-for="item in v.data.iconList"
+												:style="{width: v.params.iconNum == '4' ? '25%':'20%'}">
+												<!--四个按钮=>margin: 0 16px; 五个按钮=>margin: 0 12px;-->
+												<p class="modle_mod_img"
+													:style="{margin: v.params.iconNum == '4' ? '0 16px':'0 12px'}">
+													<img :src="item.url" :style="{borderRadius:v.params.iconStyle}">
+												</p>
+												<p class="modle_mod_text" :style="{color:item.siezColor}">{{item.text}}
+												</p>
+											</div>
+										</div>
+
+									</div>
+
+									<!--单图模块 box-->
+									<div class="modle_box" v-if="v.id == 'signageId'? true:''" :key="v.id">
+										<div class="signage">
+											<div class="signage_img" v-for="item in v['data']['images']">
+												<img :src="item['imgUrl']" alt="">
+											</div>
+										</div>
+									</div>
+
+									<!--商品组模板 box -->
+									<div class="modle_box" v-if="v.id == 'productListId'? true:''" :key="v.id">
+										<div class="modle_shop clearfloat">
+											<div class="modle_shop_title" :style="{color:v.params.titleColor}"
+												v-if="v.params.titletext!=''&&v.params.title=='true'">
+												{{v.params.titletext}}</div>
+											<!-- 显示一个 -->
+											<div class="modle_shop_item" v-if="v.params.listStyle=='modle_shop_item'"
+												v-for="item in v.data.msg">
+												<div class="modle_shop_img">
+													<img :src="item.img" alt="">
+													<div class="modle_shop_attr" :class="v.params.attr"></div>
+												</div>
+												<div class="modle_shop_info">
+													<p class="modle_shop_name">{{item.goods_name}}</p>
+													<p class="modle_shop_price" :class="v.params.price">
+														￥{{item.price}}<s>￥{{item.original_price}}</s>
+													</p>
+													<div class="modle_shop_buybtn" :class="v.params.btnStyle"></div>
+												</div>
+											</div>
+											<!-- 显示多个 -->
+											<div :class="v.params.listStyle"
+												v-if="v.params.listStyle!='modle_shop_item'" v-for="item in v.data.msg">
+												<div class="modle_shop_img">
+													<img :src="item.img" alt="">
+													<div class="modle_shop_attr" :class="v.params.attr"></div>
+													<p class="modle_shop_price" :class="v.params.price">
+														￥{{item.price}}<s>￥{{item.original_price}}</s>
+													</p>
+												</div>
+												<div class="modle_shop_info" :class="v.params.name">
+													<div class="modle_shop_name"
+														:style="{width:v.params.btnStyle==''?'100%':''}">
+														{{item.goods_name}}
+													</div>
+													<div class="modle_shop_buybtn" :class="v.params.btnStyle"></div>
+												</div>
+											</div>
+
+										</div>
+									</div>
+
+									<!--公告模板 box-->
+									<div class="modle_box" v-if="v.id == 'noticeId'? true:''" :key="v.id">
+										<div class="notice_move"></div>
+										<div class="notice" :style="{backgroundColor:v.params.bgColor}">
+											<div class="notice_icon">
+												<img class="vertical_centering" src="__PAGE__/img/pc/notice-icon.png" />
+											</div>
+
+											<div class="scroll_notice">
+												<a href="#" v-bind:href="v.data.noticeUrl"
+													:style="{color:v.params.textColor}">
+													<div class="notice_content"
+														:class="{hide_box:v.params.rollState == 0}">
+														<marquee scrollamount="3">{{v.data.content}}</marquee>
+													</div>
+													<div class="notice_content"
+														:class="{hide_box:v.params.rollState == 1}">{{v.data.content}}
+													</div>
+												</a>
+											</div>
+
+											<div class="more" :class="{hide_box:v.params.moreState == 0}">
+												<a v-bind:href="v.data.moreUrl">更多</a>
+											</div>
+										</div>
+
+									</div>
+
+									<!--辅助空白模块 box，拖拽的div-->
+									<div class="modle_box" v-if="v.id == 'blankId'? true:''" :key="v.id">
+										<p class="blank"
+											:style="{height:v.params.height,background:v.params.background}"></p>
+									</div>
+
+									<!--辅助线模块 box，拖拽的div-->
+									<div class="modle_box" v-if="v.id == 'sublineId'? true:''" :key="v.id">
+										<div class="subline">
+											<p
+												:style="{'border-bottom-width':v.params.boderHeight,'border-bottom-style':v.params.borderStyle,'border-bottom-color':v.params.borderBackground,}">
+											</p>
+										</div>
+
+									</div>
+
+									<!--标题模块 box，拖拽的div-->
+									<div class="modle_box" v-if="v.id == 'titleId'? true:''" :key="v.id">
+										<div class="title"
+											:style="{textAlign:v.params.alignPosition,color:v.params.textColor,backgroundColor:v.params.bgColor}">
+											<h2 :style="{fontSize:v.params.fontSize}">{{v.data.title}}</h2>
+											<h4 :class="{hide_box:v.data.subTitleState == 0}"
+												:style="{fontSize:v.params.subfontSize}">{{v.data.subTitle}}</h4>
+										</div>
+									</div>
+
+								</div>
+							</div>
+							<!--隐藏滚动条-->
+
+						</div>
+					</div>
+					<!--模拟手机的 wrap，背景图两边（img）-->
+					<p class="phone_bottom"></p>
+				</div>
+			</div>
+		</div>
+	</div>
+{/block}
+{block name="script"}
+<script src="__PAGE__/js/pc/public/vue.js"></script>
+<script src="__PAGE__/js/pc/public/axios.js"></script>
+<script src="__PAGE__/js/pc/public/swiper.min.js"></script>
+<script>
+    // 深克隆，把引用数据类型的，分解成基础类型（克隆）
+    // 第一个参数是数据，第二参数是数组或对象(想转换的类型)
+    function clones(_type, _memory) {
+        var newMemory = null;
+        // 判断传过来的数据类型
+        if (_type instanceof Array) {
+            newMemory = _memory || [];
+        } else {
+            newMemory = _memory || {};
+        }
+        for (var x in _type) {
+            //引用数据类型的 typeof为 object
+            if (typeof _type[x] == "object") {
+                newMemory[x] = (_type[x].constructor == Array) ? [] : {};
+                clones(_type[x], newMemory[x]); //递归
+            } else {
+                // 数据赋值
+                newMemory[x] = _type[x];
+            }
+        }
+        return newMemory;
+    }
+
+
+
+    var newVue = new Vue({
+        el: "#enable_page_wrap",
+        data() {
+            return {
+                /*页面渲染data 对象形式*/
+                backData: {
+                    /*页面名字*/
+                    page_name: '',
+                    data: [
+                        /**axios=>页面渲染数据（请求成功-清除第一条数据(初始数据-双向绑定)）**/
+                        //								/*{
+                        //									params: {},
+                        //									data: {}
+                        //								},*/
+                    ],
+
+                },
+                /*加载页面=>隐藏变量{{变量}}*/
+                hide_var: false,
+                // 手机显示隐藏
+                phone_box:false,
+                // 是否启用
+                using:true,
+                /*预览页面id*/
+                page_id: null,
+                /*存轮播数据*/
+                res: [],
+            }
+        },
+        methods:{
+        	/*预览-显示隐藏*/
+            preview(){
+                this.phone_box = !this.phone_box;
+            },
+            /*是否启用*/
+            pUsing(){
+                this.using = !this.using;
+                return value=true;	
+            },
+            /* 预览-页面数据-请求*/
+			send(_event){
+				var that = this;
+				
+				that.res = [];
+				that.page_id = Number(_event.target.getAttribute("page_id"));
+				console.log('预览id:',that.page_id,_event.target);
+				/*axios=>请求-页面数据*/
+				axios.post("{:url('shop/getShopData')}", {
+					id: that.page_id,
+				})
+				.then(function (response) {
+					console.log(response['data']);
+					if (response['data']['code'] == 1) {
+						/*alert(response['data']['msg']);*/
+						/*页面名字*/
+						that.backData['page_name'] = response['data']['data']['page_name'];
+						/*页面渲染数据*/
+						that.backData['data'] = clones(response['data']['data']['data']);
+						/*获取轮播图数据*/ 
+						for(let i=0;i<response.data.data.data.length;i++){
+							if(response.data.data.data[i].id=="rotationId"){
+								/*轮播图设置*/
+								that.res.push({'data':response.data.data.data[i],'key':response.data.data.data[i].key_num});
+								console.log(that.res)
+								that.$nextTick(function(){
+									that.carousel(that.res);
+								});
+							}
+						}
+					} else {
+						/*保存失败*/
+						alert(response['data']['msg']);
+					}
+				})
+				.catch(function (error) {
+					alert(error);
+					console.log(error);
+				});
+			},
+			/*调用轮播插件*/
+			carousel(_res){
+		      for(let l=0;l<_res.length;l++){
+//		      	console.log('调用轮播插件:',_res[l].data.id);
+//				console.log(_res[l].key);
+		          new Swiper('.'+_res[l].data.id+_res[l].key, {
+		            autoplay: {
+					   //自动播放
+		              delay: 3000,
+					  //用户操作swiper之后，是否禁止autoplay。默认为true：停止。
+		              disableOnInteraction: false,
+						
+		            },
+		            loop: true, // 循环模式选项
+		            pagination:{
+		                el: '.swiper-pagination',
+		                // 自定义分页器，必须的type类型
+		                type: 'custom',
+		                renderCustom: function(swiper,current, total){
+		                  var paginationHtml = "";
+		                  for(var i= 0; i<total; i++) {
+		                  // 判断是不是激活焦点
+		                    if(i === (current-1)){
+		                        paginationHtml += '<span class="'+_res[l].data.params.butStyle+'" style="background:'+_res[l].data.params.clickColor+'"></span>';
+		                      }else{
+		                        paginationHtml += '<span class="'+_res[l].data.params.butStyle+'" style="background:'+_res[l].data.params.butColor+'"></span>';
+		                      }
+		                  }
+		                  return paginationHtml;
+		              }
+		            }
+		          }); 
+		      } 
+		    },
+			/*删除，对应-页面data*/
+			del_data(_event){
+				var that = this;
+				var del_url = _event.target.getAttribute('attr_url');
+				console.log('删除的ajax-url',del_url);
+				/*确认-弹框*/
+				layer.confirm("是否确定删除", { icon: 3, title: '提示'},function(){
+					/*axios=>请求-页面数据*/
+					axios.get(del_url, {
+						
+					})
+					.then(function (response) {
+						console.log(response['data']);
+						if (response['data']['code'] == 1) {
+							/*删除成功-防止请求慢，页面刷新*/
+							layer.confirm(response['data']['msg'], {
+					            btn: ["确定"] //按钮
+					        }, function(){
+					        	/*刷新-当前页面*/
+					        	location.reload();
+					        });
+							
+						} else {
+							/*删除失败*/
+							layer.msg(response['data']['msg'], { icon: 5 });
+						}
+					})
+					.catch(function (error) {
+						alert(error);
+						console.log(error);
+					});
+				}, function(){
+					/*取消-操作*/
+		        });
+			},
+			/*禁用 || 启用*/
+			prohibition(_eve){
+				var page_state = _eve.target.getAttribute('attr_url');
+				console.log('启用||禁用',page_state);
+				/*axios=>请求-页面数据*/
+				axios.get(page_state, {
+					
+				})
+				.then(function (response) {
+					console.log(response['data']);
+					if (response['data']['code'] == 1) {
+						/*成功-防止请求慢，页面刷新*/
+						layer.confirm(response['data']['msg'], {
+				            btn: ["确定"] //按钮
+				        }, function(){
+				        	/*刷新-当前页面*/
+				        	location.reload();
+				        });
+						
+					} else {
+						/*失败*/
+						layer.msg(response['data']['msg'], { icon: 5 });
+					}
+				})
+				.catch(function (error) {
+					alert(error);
+					console.log(error);
+				});
+			},
+				
+        },
+        /*组件实例创建完成，属性已绑定，但DOM还未生成*/
+        created: function () {
+        	
+        },
+        /*挂载结束*/
+        mounted: function () {
+            /*防止页面未渲染完成--vue的{{变量名}},v-cloak不管用*/
+            this.hide_var = true;         
+			
+        },
+        
+   })
+
+</script>
+
+{/block}

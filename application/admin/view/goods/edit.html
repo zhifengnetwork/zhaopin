@@ -1,0 +1,735 @@
+{extend name="common:base" /}
+{block name="content"}
+<link rel="stylesheet"  type="text/css"  href="__STATIC__/layui/build/css/layui.css"  >
+<style type="text/css">
+    .form .row dd{
+        float: left;
+        display: inline-block;
+        width: calc(100% - 85px);
+    }
+  
+    ul, ol, li {
+        list-style: none;
+    }
+    .upload_area .post_imglist li {
+        position: relative;
+        float: left;
+        padding: 0 10px 5px 0;
+        line-height: 38px;
+    }
+    .upload_area .upload_btn {
+        background: url(__STATIC__/layui/src/images/upload_btn.png) center no-repeat;
+        background-size: 60px auto;
+        float: left;
+        overflow: hidden;
+        position: relative;
+        width: 60px;
+        height: 60px;
+    }
+    .del {
+        position: absolute;
+        right: 0px;
+        top: -10px;
+        background: url(__STATIC__/layui/src/images/icon_del.png) no-repeat 15px 0;
+        background-size: 20px auto;
+        width: 40px;
+        height: 20px;
+        display: inline-block;
+    }
+    .del_td {
+        background: url(__STATIC__/layui/src/images/icon_del.png) no-repeat 10px 0;
+        background-size: 20px auto;
+        width: 40px;
+        height: 20px;
+        display: inline-block;
+    }
+    .upload_area .upload_btn input {
+        opacity: 0;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 10;
+        overflow: hidden;
+        height: 60px;
+        width: 60px;
+    }
+    #imglist li img.wh60 {
+        margin: 0 auto;
+        display: block;
+        width: 60px;
+        height: 60px;
+    }
+    #back div{
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 30%;
+      height: auto;
+      margin-left: -20%;
+  
+    }
+    
+    #goods_table input{
+        width:100% !important;
+    }
+  </style>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$meta_title}</h5>
+                </div>
+                <div class="ibox-content">
+                    <form method="post" class="form-horizontal" onsubmit="return check()" action="">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><span style="color:red;">*</span>商品名称</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="goods_name" value="{$info.goods_name}" class="form-control">
+                            </div>
+                        </div>
+
+
+                        <div class="row cl">
+                            <label class="col-sm-2 control-label">{:lang(\'规格\')}:</label>
+                            <div class="col-sm-9">
+                                <div class="check-box" style="padding-left: 10px;padding-bottom: 5px;">
+                                    <input type="checkbox" checked id="checkbox-1">
+                                    <label for="checkbox-1" >规格</label>
+                                  </div>
+                                <button  class="btn btn-primary radius" type="button" style="margin-bottom: 10px;" onclick="addCol();">{:lang(\'其他属性\')}</button>
+                                <button  class="btn btn-primary radius" type="button" style="margin-bottom: 10px; float: right;" onclick="addRow();">{:lang(\'添加行\')}</button>
+                                <div>
+                                    <table id="goods_table" class="table table-border table-bordered table-striped">
+                                        <thead>
+                                         <tr>
+                                             <th>规格ID</th>
+                                             <th class="th_1"><input type="text" readonly="readonly" style="border: 0px;" name="goods_th[1][]" value="规格"></th>
+                                             {volist name='rsts.th' id='data_th'}
+                                             {if condition="($data_th neq '价格') and ($data_th neq '拼团价格') and ($data_th neq '库存') and ($data_th neq '冻结库存') and ($data_th neq '规格') and ($data_th neq '长度') and ($data_th neq '宽度') and ($data_th neq '高度') and ($data_th neq '体积') and ($data_th neq '重量') and ($data_th neq '温藏')"}
+                                                 <th class="th_{$key + 1}"><input type="text" readonly="readonly" style="border: 0px;width: 85%;" name="goods_th[{$key+1}][]" value="{$data_th}"><i class="Hui-iconfont Hui-iconfont-close th_close" style="color: #778899;display:none;"></i></th>
+                                             {/if}	
+                                             {/volist}
+                                             <th><input type="text" readonly="readonly" style="border: 0px;" name="pri_th[pri][]" value="本店售价(元)"></th>
+                                             <th><input type="text" readonly="readonly" style="border: 0px;" name="pri_th[pri][]" value="拼团价格"></th>
+                                             <th><input type="text" readonly="readonly" style="border: 0px;" name="goods_th[num][]" value="库存"></th>
+                                             <th>冻结库存</th>
+                                             <th style="width: 25px;">操作</th>
+                                         </tr>
+                                         </thead>
+                                         <tbody>
+                                             {volist name='rsts.td' id='data_td'}
+                                             <tr {if condition="$key === 0"}class="tr_1"{/if}>
+                                                 {volist name='data_td' id='vo'}
+                                                     {if condition="($key !== 'com_price') and ($key !== 'groupon_price') and ($key !== 'inventory') and ($key !== 'frozen_stock') and ($key !== 'l') and ($key !== 'w') and ($key !== 'h') and ($key !== 'v') and ($key !== 'wg') and ($key !== 'refrigerate') and ($key !== 'sku_id')"}
+                                                     <td class="td_{$key+1}"><input class="input-text" type="text" name="goods_td[{$key+1}][]" value="{$vo}"></td>
+                                                     {/if}
+                                                     {if condition="($key === 'inventory')"}
+                                                     <td><input class="input-text" type="text" name="goods_td[num][]" value="{$vo}"></td>
+                                                     {/if}
+                                                     {if condition="($key === 'frozen_stock')"}
+                                                     <td style="width: 75px;">{$vo}</td>
+                                                     {/if}
+                                                     {if condition="($key === 'com_price')"}
+                                                     <td>
+                                                         <input type="text" class="pri_id" value="{$vo}" name="pri_td[pri][]">
+                                                     </td>
+                                                     {/if}
+                                                     {if condition="($key === 'groupon_price')"}
+                                                     <td>
+                                                         <input type="text" class="pri_id" value="{$vo}" name="pri_td[group_pri][]">
+                                                     </td>
+                                                     {/if}
+                                                     {if condition="($key === 'sku_id')"}
+                                                         <td><input type="text" readonly class="input-text" name="sku_id[]" value="{$vo}"></td>
+                                                     {/if}
+                                                 {/volist}
+                                                 <td onclick="delTr(this)"><i class="Hui-iconfont del_td"></i></td>
+                                             </tr>
+                                             {/volist}
+                                         </tbody>
+                
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">商品简介</label>
+                            <div class="col-sm-9">
+                                <textarea name="desc"  class="form-control" placeholder="说点什么...最少输入0个字符" datatype="*0-100" onkeyup="textarealength(this,100)">{$info.desc}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">商品详情</label>
+                            <div class="col-sm-9">
+                                <script id="editor" name="content" type="text/plain" style="width:100%;height:400px;">{$info.content}</script> 
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">商品属性</label>
+                            <div class="col-sm-9">
+                                {volist name="goods_attr" id="vo"}
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input {if condition="is_array($info.goods_attr) and in_array($vo.attr_id,$info.goods_attr)"} checked {/if} type="checkbox" value="{$vo.attr_id}" class="goods_attr" name="goods_attr[]" /> {$vo.attr_name}
+                                </label>
+                                {/volist}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"></label>
+                            <div class="col-sm-9">
+                                <div style="line-height:34px;">
+                                    <span style="float:left;margin: 0 7px;">限时卖时间 </span>
+                                    <span style="float:left;margin: 0 7px;"><input type="text" {if condition="is_array($info.goods_attr) and !in_array(6,$info.goods_attr)"} disabled {/if} id="limited_start" name="limited_start" value="{$info.limited_start|date='Y-m-d',###}" class="form-control"></span>
+                                    <span style="float:left;margin: 0 7px;"><input type="text" {if condition="is_array($info.goods_attr) and !in_array(6,$info.goods_attr)"} disabled {/if} id="limited_end" name="limited_end" value="{$info.limited_end|date='Y-m-d',###}" class="form-control"></span>
+                                </div>
+
+                                <div style="line-height:34px;">
+                                <span style="float:left;margin: 0 7px;">puls会员折扣 </span>
+                                <span style="float:left;margin: 0 7px;"><input type="text"  name="puls_discount" value="{$info.puls_discount}" class="form-control">商品现价的%</span>
+                                </div>
+                                <div style="line-height:34px;">
+                                <span style="float:left;margin: 0 7px;">分享金 </span>
+                                <span style="float:left;margin: 0 7px;"><input type="text"  name="share_discount" value="{$info.share_discount}" class="form-control">商品现价的%</span>
+                                </div>
+                                    </div>
+                        </div>
+
+                        <style type="text/css">
+                            .li_img{margin: 10px;border: 1px solid #ccc;}
+                            .main{text-align: center;cursor: pointer;}
+                        </style>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">商品封面</label>
+                            <div class="col-sm-9">
+                                    <dd class="upload_area clearfix" style="margin: 0 auto;">
+                                        <ul id="imglist" class="post_imglist">
+                                            {notempty name="$img"}
+                                            {volist name="$img" id="vo"}
+                                                {if condition="$vo"}
+                                                <li style="padding: 10px;" class="li_img"><span imgid="{$vo.id}" class="del"></span>
+                                                <div>
+                                                <img class="wh60" src="__IMAGES__/{$vo.picture}" onclick="showimg({$key})">
+                                                </div>
+                                                {if condition="$vo.main"}
+                                                <div style="color:green;" class="main">主图</div>
+                                                {else /}
+                                                <div style="color:red;" class="main">设为主图</div>
+                                                {/if}
+                                                </li>
+                                                {/if}
+                                            {/volist}
+                                            {/notempty}
+                                            
+                                        </ul>
+                                        <div class="upload_btn">
+                                            <input type="file" id="upload_image" value="图片上传" accept="image/jpeg,image/gif,image/png" capture="camera">
+                                        </div>
+                                    </dd>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">商品价格</label>
+                            <div class="col-sm-9">
+                                <div style="line-height:34px;">
+                                    <span style="float:left;margin: 0 7px;">现价 </span>
+                                    <span style="float:left;width:10%;"><input type="text" name="price" value="{$info.price}" class="form-control"></span>
+                                    <span style="float:left;margin: 0 7px;">元</span>
+                                </div>
+
+                                <div style="line-height:34px;">
+                                    <span style="float:left;margin: 0 7px;">原价 </span>
+                                    <span style="float:left;width:10%;"><input type="text" name="original_price" value="{$info.original_price}" class="form-control"></span>
+                                    <span style="float:left;margin: 0 7px;">元</span>
+                                </div>
+
+                                <div style="line-height:34px;">
+                                    <span style="float:left;margin: 0 7px;">成本 </span>
+                                    <span style="float:left;width:10%;"><input type="text" name="cost_price" value="{$info.cost_price}" class="form-control"></span>
+                                    <span style="float:left;margin: 0 7px;">元</span>
+                                </div>
+
+
+
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">返利（现价的百分比）</label>
+
+                                <div style="line-height:34px;">
+                                    <span style="float:left;margin: 0 7px;">省代返佣 </span>
+                                    <span style="float:left;width:10%;"><input type="text" name="province_proportion" value="{$info.province_proportion}" class="form-control"></span>
+                                    <span style="float:left;margin: 0 7px;">%</span>
+                                </div>
+
+                                <div style="line-height:34px;">
+                                    <span style="float:left;margin: 0 7px;">2级返佣 </span>
+                                    <span style="float:left;width:10%;"><input type="text" name="tow_proportion" value="{$info.tow_proportion}" class="form-control"></span>
+                                    <span style="float:left;margin: 0 7px;">%</span>
+                                </div>
+
+                                <div style="line-height:34px;">
+                                    <span style="float:left;margin: 0 7px;">无限级返佣 </span>
+                                    <span style="float:left;width:10%;"><input type="text" name="infinite_proportion" value="{$info.infinite_proportion}" class="form-control"></span>
+                                    <span style="float:left;margin: 0 7px;">%</span>
+                                </div>
+                        </div>
+
+
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"><span style="color:red;">*</span>商品分类</label>
+                            <div class="col-sm-9">
+                                <div style="line-height:34px;float:left;margin:0 10px 0 0;">
+                                    <select class="form-control" name="cat_id1">
+                                        <option value="" >请选择一级分类</option>
+                                        {volist name="cat_id1" id="vo"}
+                                        <option {if condition="$info.cat_id1 eq $vo.cat_id"} selected {/if} value="{$vo.cat_id}">{$vo.cat_name}</option>
+                                        {/volist}
+                                    </select>
+                                </div>
+
+
+
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">库存</label>
+                            <div class="col-sm-9">
+                                <span style="width:80%;float:left;">
+                                    <input type="text" name="stock" value="{$info.stock}" class="form-control">
+                                </span>
+                                <span style="line-height:34px;">
+                                    商品的剩余数量
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">减库存方式</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="1" name="less_stock_type" {if condition="$info.less_stock_type eq 1"} checked {/if} /> 拍下减库存
+                                </label>
+                                <label>
+                                    <input type="radio" value="2" name="less_stock_type" {if condition="$info.less_stock_type eq 2"} checked {/if} /> 付款减库存
+                                </label>
+                                <label>
+                                    <input type="radio" value="3" name="less_stock_type" {if condition="$info.less_stock_type eq 3"} checked {/if} /> 永不减库存
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">运费设置</label>
+                            <div class="col-sm-9">
+                                <label style="line-height:34px;float: left;">
+                                    <span style="float:left;"><input type="radio" value="1" name="shipping_setting" {if condition="$info.shipping_setting eq 1"} checked {/if} /> 统一运费</span>
+                                    <span style="float:left;width:30%;margin:0 7px;"><input type="text" name="shipping_price" value="{$info.shipping_price}" class="form-control"></span>
+                                    <span style="float:left;">元</span>
+                                    
+                                </label>
+
+                                <label style="line-height:34px;width: 35%;">
+                                    <span style="float:left;"><input type="radio" value="2" name="shipping_setting" {if condition="$info.shipping_setting eq 2"} checked {/if} /> 运费模版</span>
+                                    <span style="float:left;width:70%;margin:0 7px;">
+                                        <div style="line-height:34px;float:left;margin:0 10px 0 0;">
+                                            <select class="form-control" name="delivery_id">
+                                                <option value="0" >默认模板</option>
+                                                {volist name="delivery" id="vo"}
+                                                <option {if condition="$info.shipping_setting eq 2 and $info.delivery_id eq $vo.delivery_id"} checked {/if} value="{$vo.delivery_id}">{$vo.name}</option>
+                                                {/volist}
+                                            </select>
+                                        </div>
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">是否支持货到付款</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="1" name="is_hdfk" {if condition="$info.is_hdfk"} checked {/if} /> 支持
+                                </label>
+                                <label>
+                                    <input type="radio" value="0" name="is_hdfk" {if condition="!$info.is_hdfk"} checked {/if} /> 不支持
+                                </label>
+                            </div>
+                        </div>
+
+
+    
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">用户最多购买量</label>
+                            <div class="col-sm-9">
+                                <span style="width:80%;float:left;">
+                                    <input type="text" name="most_buy_number" value="{$info.most_buy_number}" class="form-control">
+                                </span>
+                                <span style="line-height:34px;">
+                                    件
+                                </span>
+                                <div>用户购买过的此商品数量限制</div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">已售数量</label>
+                            <div class="col-sm-9">
+                                <span style="width:80%;float:left;">
+                                    <input type="text" name="number_sales" value="{$info.number_sales}" class="form-control">
+                                </span>
+                                <span style="line-height:34px;">
+                                    件
+                                </span>
+                                <div>物品虚拟出售数，会员下单此数据就会增加，无论是否支付</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">单次最多购买量</label>
+                            <div class="col-sm-9">
+                                <span style="width:80%;float:left;">
+                                    <input type="text" name="single_number" value="{$info.single_number}" class="form-control">
+                                </span>
+                                <span style="line-height:34px;">
+                                    件
+                                </span>
+                                <div>用户单次购买此商品数量限制</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">是否上架</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="1" name="is_show" {if condition="$info.is_show"} checked {/if} /> 是
+                                </label>
+                                <label>
+                                    <input type="radio" value="0" name="is_show" {if condition="!$info.is_show"} checked {/if} /> 否
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">是否升级PULS会员</label>
+                            <div class="col-sm-9">
+                                <label style="margin-top:4px; margin-right:20px;">
+                                    <input type="radio" value="1" name="is_puls" {if condition="$info.is_puls"} checked {/if} /> 是
+                                </label>
+                                <label>
+                                    <input type="radio" value="0" name="is_puls" {if condition="!$info.is_puls"} checked {/if} /> 否
+                                </label>
+                            </div>
+                        </div>
+                        
+
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <input type="hidden" name="goods_id" value="{$info.goods_id}" />
+                                <button class="btn btn-primary ajax-post" target-form="form-horizontal" type="submit">提交</button>
+                                <button class="btn btn-white" onclick="javascript:history.back(-1);return false;">取消</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{/block}
+
+{block name="script"}
+<script type="text/javascript" src="__STATIC__/ueditor/1.4.3/ueditor.config.js"></script> 
+<script type="text/javascript" src="__STATIC__/ueditor/1.4.3/ueditor.all.min.js"> </script> 
+<script type="text/javascript" src="__STATIC__/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script> 
+<script src="__STATIC__/layui/src/localResizeIMG2.js" type="text/javascript"></script>
+<style type="text/css">
+    .mask_img{
+          position: fixed;
+          top: 0;
+          left: 0;
+          z-index: 100;
+          background-color: rgba(0,0,0,0.5);
+          width: 100%;
+          height: 100%
+      }
+      .mask_img img{position: relative;top: 30%;left: 50%;}
+  </style>
+<script type="text/javascript">
+
+Calendar.setup({
+    inputField     :    "limited_start",
+    ifFormat       :    "%Y-%m-%d %H:%M:%S",
+    showsTime      :    true,
+    timeFormat     :    "12"
+});
+
+Calendar.setup({
+    inputField     :    "limited_end",
+    ifFormat       :    "%Y-%m-%d %H:%M:%S",
+    showsTime      :    true,
+    timeFormat     :    "12"
+});
+
+    var rowCount = $("#goods_table tbody").find("tr").length - 1; //行数
+    var colCount = $("#goods_table thead").find("tr").find("th").length - 6; //列数
+    
+    // 添加行
+    function addRow(){
+
+        var tr = $("#goods_table tbody").find("tr").eq(0).clone().find('input').val("").parents('tr').find('input').eq(0).attr('type','hidden').parents('tr');
+
+        console.log(tr);
+        $("#goods_table tbody").append(tr);
+        // rowCount++;
+    
+        // var base_row = $("#goods_table tbody .tr_1").html();
+        // if (typeof(base_row) == 'undefined') {
+            // var add_td;
+            // var add_td_len = $("#goods_table thead tr th").length - 11;
+            // for (var i = 0; i < add_td_len; i++) {
+            //     add_td += '<td class="td_'+(i+2)+'"><input class="input-text" type="text" name="goods_td['+(i+2)+'][]"></td>'
+            // }
+            // var base_row ='<td><input type="hidden" name="sku_id[]" value></td><td class="td_1"><input class="input-text" type="text" name="goods_td[1][]"></td>'+add_td+'<td><input class="input-text" type="text" name="attr_td[l][]"></td><td><input type="text" class="pri_id" name="pri_td[pri][]"></td><td><input class="input-text" type="text" name="goods_td[num][]"></td><td onclick="delTr(this)"><i class="Hui-iconfont del_td"></i></td>';
+        // }
+    
+        // var html = '<tr class = "tr_'+rowCount+'">'+base_row+'</tr>';
+    
+        // $("#goods_table tbody").append(html);
+        // var tr_num = "tr_"+rowCount;
+        // $("#goods_table tbody tr:last td input").attr('value', '');
+        // $("#goods_table tbody input[name='attr_td[v][]']").attr('value', 'nonentity');
+    }
+    
+    // 添加列
+    function addCol(){
+        colCount++;
+        var table_th;
+        table_th = prompt("请输入名称");
+        if (table_th == null) {
+            return false;
+        }
+        if (!table_th) {
+            alert('名称不能为空');
+            return false;
+        }
+        var th = '<th class="th_'+colCount+'"><input type="text" readonly="readonly" style="border: 0px;width:85%;" name="goods_th['+colCount+'][]" value="'+table_th+'"><i class="Hui-iconfont del_td th_close" style="color: #778899;display:none;"></i></th>';
+        var th_num = colCount - 1;
+        $("#goods_table thead tr .th_"+th_num).after(th);
+    
+        var trHtml = '<td class="td_'+colCount+'"><input class="input-text" type="text" name="goods_td['+colCount+'][]"></td>';
+        $("#goods_table tbody tr .td_"+th_num).after(trHtml);
+    }
+    
+    function delTr(this_td){
+        // console.log($(this_td).parent());
+        var len = $("#goods_table tbody tr").length;
+        if (len > 1) {
+            $(this_td).parent().remove();
+        }
+    }
+
+    // 表单提交前验证
+    function check(){
+        var v = 1;
+        $("#goods_table input[type='text']").each(function(){
+            var val = $(this).val();
+            if (val === '') {
+                
+                v = 0;
+            }
+        });
+        if (v == 0) {alert('规格不能为空');return false}
+    }
+</script>
+
+
+<script type="text/javascript">
+
+    //限时卖
+    $('.goods_attr').on('click',function(){
+        if( $(this).val() == 6 ){
+            if( $(this).is(':checked') ){
+                $('input[name=limited_start]').removeAttr('disabled');
+                $('input[name=limited_end]').removeAttr('disabled');
+            }else{
+                $('input[name=limited_start]').attr('disabled','disabled');
+                $('input[name=limited_end]').attr('disabled','disabled');
+            }
+        }
+    })
+
+    //设为主图
+    $(document).on('click','.main',function(e){
+        var id = $(e.target).parents('li').find('span').attr('imgId');
+        if(!id){
+        return;
+        }
+
+        $.post("{:url('Goods/ImgMain')}" ,{'id':id} ,function(data){
+            $(e.target).parents('li').siblings().find('.main').css('color','red').html('设为主图');
+            $(e.target).css('color','green').html('主图');
+        },'json');
+    })
+
+    
+
+    //实例化富文本编辑器
+    var ue = UE.getEditor('editor',{
+        initialFrameWidth:650,
+        initialFrameHeight:180,
+        toolbars: [[
+            'fullscreen', 'source', '|', 'undo', 'redo', '|', 'searchreplace' ,
+            'bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript', 'subscript', 'removeformat', 'formatmatch','pasteplain', '|', 'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc', '|',
+            'rowspacingtop', 'rowspacingbottom', 'lineheight', 'paragraph', 'fontfamily', 'fontsize', 'indent', '|',
+            'justifyleft', 'justifycenter', 'justifyright', 'justifyjustify', '|', 'touppercase', 'tolowercase', '|',
+            'link', 'unlink', 'insertimage', 'insertvideo', 'music', 'attachment', 'map', 'gmap',
+        ]]
+    });
+
+
+    (function () {
+        var viewImg = $("#imglist");
+        var imgurl = '';
+        var imgcount = 0;
+        $('#upload_image').localResizeIMG({
+            width: 360,
+            quality: 0.8,
+            success: function (result) {
+                var status = true;
+                
+                if (viewImg.find("li").length > 4) {
+                    status = false;
+                    alert("最多上传5张照片");
+                    $(".upload_btn").hide();                    
+                }
+                if (status) {
+                    viewImg.append('<li style="padding: 10px;" class="li_img"><span class="pic_time"><span class="p_img"></span><em>50%</em></span></li>');
+                    viewImg.find("li:last-child").html('<span imgid="0" class="del"></span><img class="wh60" id="file'
+                    + imgcount
+                    + '" src="' + result.base64 + '"/><input type="hidden" name="img[]" value="'
+                    + result.clearBase64 + '">');
+
+                    imgcount++;
+                }
+            }
+        });
+    })();
+
+    
+
+    $(document).on("click",".del",function(e){
+      if( $(this).attr('imgid') != '0' ){
+        var t = $(this);
+        if( confirm('{:lang(\'确定要删除吗\')}?') == true ){
+          $.post("{:url('Goods/del_img')}" ,{'id':$(this).attr('imgid')} ,function(msg){
+            if( msg ){
+              t.parent('li').remove();
+              layer.msg('{:lang(\'删除成功\')}!',{icon: 6,time:1000});
+            }else{
+              layer.msg('{:lang(\'删除失败\')}!',{icon: 5,time:1000});
+            }
+          },'json');
+        }
+      }else{
+        $(this).parent('li').remove();
+        $("#upload_image").show();
+        $(".upload_btn").show();
+      }
+        
+    });
+
+
+
+    //禁用同级点击
+  $(document).on("click", ".checkbox", function(e){ 
+    $(e.target).siblings().removeAttr('checked');
+    $(e.target).attr('checked','checked');
+  });
+
+  //添加
+  $('.addd').on('click',function(){
+    $('.vv').parents('tbody').append( $('.vv').eq(0).clone().find('.validate').removeAttr('disabled').find('option').removeAttr('selected').parents('tr').find('.dels').css('display','inline-block').attr('sku_id','').parents('tr').prop("outerHTML") );
+  });
+
+  //删除
+  $(document).on("click", ".dels", function(e){ 
+    if( $('.vv').length == 1 ){
+      alert('最少保留一条规格!');
+      return;
+    }
+    
+    if( $(e.target).attr('sku_id') ){
+      if (confirm('确认要删除吗?')==true) {
+        $.post("{:url('Goods/del_sku')}" ,{'sku_id':$(e.target).attr('sku_id')} ,function(data){
+          if(data){
+            $(e.target).parents('.vv').remove();
+            layer.msg('{:lang(\'已删除\')}!',{icon:1,time:1000});
+          }else{
+            layer.msg('{:lang(\'删除失败\')}!',{icon: 5,time:1000});
+          }
+        },'json');
+      }
+    }else{
+      $(e.target).parents('.vv').remove();
+    }
+
+  });
+
+
+function isRepeat(arr){
+  var  hash = {};
+  for(var i in arr) {
+    if(hash[arr[i]]) {
+      return true;
+    }
+    hash[arr[i]] = true;
+  }
+  return false;
+}
+
+//表单提交验证事件
+$("form").submit(function(e){
+  var validate = 0
+  $('.validate').each(function(k,v){
+    if( !$(v).val() ){
+      validate=1;
+      return false;
+    }
+  });
+  if(validate){
+    alert('商品规格必须填写完整!');
+    return false;
+  }
+
+  var arr = new Array();
+  $('.vv').each(function(key,value){
+    var arr2 = new Array()
+    $(value).find('select').find('option:selected').each(function(k,v){
+      arr2.push( $(v).val() );
+    });
+    arr.push( arr2 );
+  });
+
+  if( isRepeat(arr) ){
+    alert('商品规格有重复,请检查!');
+    return false;
+  }
+
+  $('.validate').removeAttr('disabled');
+
+});
+</script>
+{/block}

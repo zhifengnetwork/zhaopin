@@ -1,0 +1,139 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+.table>thead>tr>th {
+    text-align: center;
+}
+</style>
+{/block}
+
+{block name="content"}
+<div class="main rightlist">
+    <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data" >
+       
+        <div class="panel panel-default"> 
+            <div class='panel-body'>
+                <div class='alert alert-info'>在开启以下支付方式前，请设置好参数。
+                </div>
+
+                <div class="form-group form-group-s">
+                    <label class="col-xs-12 col-sm-2 control-label">支付账号名称</label>
+                    <div class="col-sm-8 col-xs-12">
+                            <input type="text" name="wechat[account_name]" class="form-control" value="{$set['wechat']['account_name']}" autocomplete="off"/>
+                       <!-- <span class="help-block"><strong class="text-danger">微信支付要求公众号为“认证服务号”，该公众号没有微信支付的权限</strong></span>  -->
+                    </div>
+                </div>
+                <div class="form-group form-group-s">
+                    <label class="col-xs-12 col-sm-2 control-label">身份标识<br />
+                        (appId)</label>
+                    <div class="col-sm-8 col-xs-12">
+                        <input type="text" class="form-control"  name = "wechat[appid]" value="{$set['wechat']['appid']}"  autocomplete="off">
+                        <span class="help-block">公众号身份标识</div>
+                </div>
+                <div class="form-group form-group-s">
+                    <label class="col-xs-12 col-sm-2 control-label">身份密钥<br />
+                        (appSecret)</label>
+                    <div class="col-sm-8 col-xs-12">
+                        <input type="text" class="form-control" name = "wechat[secret]"  value="{$set['wechat']['secret']}"  autocomplete="off"/>
+                        <span class="help-block">公众平台API(参考文档API 接口部分)的权限获取所需密钥Key <a href="{:url('account/post', array('uniacid' => 3))}">请通过修改公众号信息来保存</a></span> </div>
+                </div>
+                <div class="form-group form-group-s s"  >
+                    <label class="col-xs-12 col-sm-2 control-label">商户密钥<br />
+                        (partnerKey)</label>
+                        <div class="col-sm-8 col-xs-12">
+                        <input type="text" name="wechat[key]" class="form-control" value="{$set['wechat']['key']}" autocomplete="off"/>
+                       </div>
+                    </div>
+                    <div class="form-group form-group-s" id="mchid"  style="">
+                        <label class="col-xs-12 col-sm-2 control-label">微信支付商户号<br>(MchId)</label>
+                        <div class="col-sm-8 col-xs-12">
+                            <input type="text" name="wechat[mchid]" class="form-control" value="{$set['wechat']['mchid']}" autocomplete="off"/>
+                            <span class="help-block">公众号支付请求中用于加密的密钥Key</span> </div>
+                    </div>
+                   
+                    <div class="form-group form-group-s s" id="apikey">
+                        <label class="col-xs-12 col-sm-2 control-label">商户支付密钥<br>(API密钥)</label>
+                    <div class="col-sm-8 col-xs-12">
+                    <div class="input-group">
+                        <input type="text" name="wechat[apikey]" id="apikey" class="form-control" maxlength="32" value="{$set['wechat']['apikey']}" autocomplete="off"/>
+                        <span onclick="tokenGen();" style="cursor:pointer" class="input-group-addon">生成新的</span> </div>
+                    <span class="help-block">此值需要手动在腾讯商户后台API密钥保持一致。<a href="http://bbs.we7.cc/thread-5788-1-1.html" target="_blank">查看设置教程</a></span> </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">微信支付</label>
+                    <div class="col-sm-9">
+                        <div class="radio radio-success radio-inline">
+                            <input type="radio" value="1" name="pay[weixin]" id="weixin1" {if $set['pay']['weixin']==1}checked{/if}  />
+                            <label for="weixin1">开启</label>
+                        </div>
+
+                        <div class="radio radio-danger radio-inline">
+                            <input type="radio" value="0" name="pay[weixin]" id="weixin2" {if $set['pay']['weixin']==0}checked{/if}  />
+                            <label for="weixin2">关闭</label>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">余额支付</label>
+                    <div class="col-sm-9">
+                        <div class="radio radio-success radio-inline">
+                            <input type="radio" value="1" name="pay[credit]" id="credit1" {if $set['pay']['credit']==1}checked{/if}  />
+                            <label for="credit1">开启</label>
+                        </div>
+
+                        <div class="radio radio-danger radio-inline">
+                            <input type="radio" value="0" name="pay[credit]" id="credit2" {if $set['pay']['credit']==0}checked{/if}  />
+                            <label for="credit2">关闭</label>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">货到付款</label>
+                    <div class="col-sm-9">
+                        <div class="radio radio-success radio-inline">
+                            <input type="radio" value="1" name="pay[cash]" id="cash1" {if $set['pay']['cash']==1}checked{/if} />
+                            <label for="cash1">开启</label>
+                        </div>
+
+                        <div class="radio radio-danger radio-inline">
+                            <input type="radio" value="0" name="pay[cash]" id="cash2" {if $set['pay']['cash']==0}checked{/if} />
+                            <label for="cash2">关闭</label>
+                        </div>
+
+                    </div>
+                </div>
+
+                
+                       <div class="form-group"></div>
+            <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                    <div class="col-sm-9 col-xs-12">
+                    <button class="btn btn-primary ajax-post col-lg-1" target-form="form-horizontal" type="submit">保存</button>
+                     </div>
+            </div>
+
+            </div>
+        </div>     
+    </form>
+</div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript">
+   $(function () {
+                    $(":radio[name='pay[weixin]']").click(function () {
+                        if ($(this).val() == 1) {
+                            $("#certs").show();
+                        }
+                        else {
+                            $("#certs").hide();
+                        }
+                    })
+
+                })
+</script>
+{/block}

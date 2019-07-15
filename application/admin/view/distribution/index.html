@@ -1,0 +1,177 @@
+{extend name="common:base" /}
+
+{block name="content"}
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$meta_title}</h5>
+                    <div class="pull-right" style="margin-top:-8px;">
+                            <!-- <a class="btn btn-info" href="{:url('goods/add')}"><i class="fa fa-plus"></i> 添加商品</a> -->
+                    </div>
+                </div>
+                <div class="ibox-content">
+
+                    <div class="row">
+                    <form method="get" action="">
+
+                        
+
+                        <div class="col-sm-3">
+                            <div class="input-group"> 
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-sm btn-primary"> 搜索</button> 
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-1"><a href="{:url('Goods/add')}">添加商品</a></div>
+                        <div class="col-sm-1"><a onclick="is_show_all(1)" href="javascript:;">批量上架</a></div>
+                        <div class="col-sm-1"><a onclick="is_show_all(0)" href="javascript:;">批量下架</a></div>
+                        <div class="col-sm-1"><a onclick="del_all()" href="javascript:;">批量删除</a></div>
+
+                    </div>
+
+                    <div class="table-responsive">
+                        <form action="{:URL('Admin/delAll')}" method="post">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+
+                                <th><input class="ch_all" type="checkbox">ID</th>
+                                <th>商品 </th>
+                                <th>商品状态 </th>
+                                <th>商品价格（元）</th>
+                                <th>库存</th>
+                                <th>销量</th>
+                                <th>上架时间</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            
+                            </tbody>
+                        </table>
+                        </form>
+                    </div>
+                    <style>
+                        .pagination{}
+                        .pagination li{float:left;position:relative;margin-top:10px;padding:0 12px;}
+                        .pagination li{float:left;width:42px;height:28px;border:1px solid #DDD; text-align:center;line-height:30px;border-left:none;}
+                        .pagination li.active{color:#f00;}
+                        .pagination li a{float:left;width:42px;height:28px; text-align:center;line-height:30px;border-left:none;color:#3399d5;}
+                    </style>
+                    <ul class="pagination">
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+{block name='script'}
+<script>
+    function del(obj,goods_id){
+        if(window.confirm('确认删除该商品吗？')){
+            $.post("{:url('Goods/del')}",{'goods_id':goods_id},function(data){
+                alert(data.msg);
+                if(data.code){
+                    $(obj).parents('tr').remove();
+                }
+            },'json');
+        }
+    }
+
+    function is_show(obj,goods_id){
+        var is_show = $(obj).attr('is_show');
+
+        if( is_show == 1 ){
+            is_show = 0;
+            ts = '是否下架?';
+        }else{
+            is_show = 1;
+            ts = '是否上架?';
+        }
+
+        if(window.confirm(ts)){
+            $.post("{:url('Goods/is_show')}",{'goods_id':goods_id,'is_show':is_show},function(data){
+                if(data.code){
+                    $(obj).attr('is_show',is_show);
+                    if( is_show ){
+                        $(obj).parents('tr').find('td').eq(2).html('已上架');
+                        $(obj).html('下架');
+                        alert('上架成功！');
+                    }else{
+                        $(obj).parents('tr').find('td').eq(2).html('未上架');
+                        $(obj).html('上架');
+                        alert('下架成功！');
+                    }
+                }
+            },'json');
+        }
+    }
+
+    function is_show_all(is_show){
+
+        var goods_id = '';
+        var flag = 0
+        $('.ch_item').each(function(k,v){
+            if( $(v).is(':checked') ){
+                flag = 1;
+                goods_id += $(v).val() + ',';
+            }
+        });
+        if( !flag ){
+            if( is_show == 1 ){
+                alert('请勾选需要批量上架的ID！');
+            }else{
+                alert('请勾选需要批量下架的ID！');
+            }
+        }
+        goods_id = goods_id.substring(0, goods_id.length - 1);  
+        
+        $.post("{:url('Goods/is_show_all')}",{'goods_id':goods_id,'is_show':is_show},function(data){
+            if(data.code){
+                if( is_show ){
+                    alert('批量上架成功！');
+                }else{
+                    alert('批量下架成功！');
+                }
+                location.reload();
+            }
+        },'json');
+
+    }
+
+    function del_all(obj,goods_id){
+        var goods_id = '';
+        var flag = 0
+        $('.ch_item').each(function(k,v){
+            if( $(v).is(':checked') ){
+                flag = 1;
+                goods_id += $(v).val() + ',';
+            }
+        });
+        if( !flag ){
+            alert('请勾选需要批量删除的ID！');
+            return;
+        }
+        goods_id = goods_id.substring(0, goods_id.length - 1);
+
+        if(window.confirm('确认批量删除商品吗？')){
+            $.post("{:url('Goods/del_all')}",{'goods_id':goods_id},function(data){
+                if(data.code){
+                    alert('批量删除成功！');
+                    location.reload();
+                }else{
+                    alert('批量删除失败！');
+                }
+            },'json');
+        }
+    }
+
+</script>
+{/block}

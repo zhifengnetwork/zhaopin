@@ -1,0 +1,802 @@
+/*最外边框*/
+.enable_page_wrap {
+	position: relative;
+	min-width: 1112px;
+	height: 937px;
+	/* background: red;  */
+}
+/*手机模拟蒙版-s*/
+.preview_mask {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 3;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,.2);
+}
+/*中间 wrap*/
+.middle_wrap {
+	margin: 0 auto;
+	padding-left: 15px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	width: 387px;
+	min-height: 100%;
+}
+/*模拟手机 box*/
+
+.middle_box {
+	position: relative;
+	padding-top: 16px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	width: 372px;
+	/*min-height: 600px;*/
+	height: auto;
+}
+
+
+/*另外一个页面显示 wrap*/
+
+.html_wrpa {
+	width: 100%;
+	height: auto;
+	background: url(../../img/pc/phone/phone_center.png) 0 0 repeat-y;
+}
+
+
+/*另外一个页面显示 box*/
+
+.html_box {
+	margin: 0 auto;
+	/*加多342px+17px的滚动条*/
+	width: 342px;
+	height: 600px;
+	overflow: hidden;
+	background-color: #ffffff;
+}
+
+
+/*隐藏滚动条*/
+.html_box_new {
+	/*防止页面未渲染完成--vue的{{变量名}}*/
+	display: none;
+	/*加多17px的滚动条*/
+	width: 359px;
+	height: 100%;
+	overflow-y: scroll;
+	/*防止轮播图溢出-X轴出现滚动条*/
+	overflow-x: hidden;
+}
+
+
+/*模拟手机*/
+
+.phone_top {
+	width: 100%;
+	height: 83px;
+	background: url(../../img/pc/phone/phone_top.png) 0 0 no-repeat;
+}
+
+.phone_left {
+	position: absolute;
+	top: 16px;
+	left: -5px;
+	z-index: 1;
+	height: 293px;
+	width: 5px;
+	background: url(../../img/pc/phone/phone_left.png) 0px 88px no-repeat;
+}
+
+.phone_right {
+	position: absolute;
+	top: 16px;
+	right: -6px;
+	z-index: 1;
+	height: 220px;
+	width: 6px;
+	background: url(../../img/pc/phone/phone_right.png) 0px 158px no-repeat;
+	float: left;
+}
+
+.phone_bottom {
+	height: 92px;
+	width: 372px;
+	background: url(../../img/pc/phone/phone_bottom.png) 0 0 no-repeat;
+}
+
+
+/*右 wrap（隐藏滚动条）*/
+.right_wrap {
+	display: none;
+	float: left;
+	padding: 80px 10px 0 20px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	width: 590px;
+	max-height: 100%;
+	overflow: hidden;
+}
+/*右 wrap=> box（显示滚动条）*/
+.right_box {
+	padding: 0 32px 60px 10px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	width: 610px;
+	/*width: 610px;*/
+	height: 100%;
+	/*max-height: 100%;*/
+	height: 937px;
+	/*937px-80px(padding-top:80px;)-离底部保存栏17px*/
+	height: 840px;
+	color: #171717;
+	border-radius: 6px;
+	background: #fff;
+	overflow-y: scroll;
+}
+
+/*public=>包着组件div*/
+.modle_box {
+	position: relative;
+}
+
+/* 轮播图 -s */
+.slide {
+	position: relative;
+	width: 100%;
+	height: 200px !important;
+}
+
+.slide_item,
+.slide_item>img {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+.slide_but {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	z-index: 1;
+	width: 100%;
+	height: 20px;
+	line-height: 20px;
+}
+
+.slide_but>span {
+	display: inline-block;
+	margin-right: 5px;
+	-moz-opacity: .5;          
+	-khtml-opacity: .5;          
+	opacity: .5; 
+}
+
+
+/* 长方形按钮 */
+.slide_but .rectangle {
+	width: 20px;
+	height: 4px;
+}
+/* 正方形按钮 */
+
+.slide_but .square {
+	width: 10px;
+	height: 10px;
+}
+/* 线形按钮 */
+.slide_but .linetype {
+	width: 24px;
+	height: 2px;
+}
+
+
+/* 圆形按钮 */
+
+.slide_but .roundness {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+}
+
+
+/* 按钮位置 靠左 */
+
+.slide_wrap .left {
+	text-align: left;
+}
+/* 按钮位置 居中 */
+.slide_wrap .center {
+	text-align: center;
+}
+/* 按钮位置 靠右 */
+
+.slide_wrap .right {
+	text-align: right;
+}
+/* 轮播图 -e */
+/* 搜索 -s */
+.search {
+	padding: 10px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+
+.search form{
+	width: 100%;
+	height: 40px;
+	align-items: center;
+	background: #fff;
+	border: 1px solid #c0c0c0;
+	border-radius: 3px;
+}
+.search .searchBtn{
+	float: left;
+	padding: 0;
+	width: 40px;
+	height: 40px;
+	background: url(../../img/pc/searchObj/search_ico.png) no-repeat center;
+	background-size: 60%;
+	border: 0;
+}
+.search .searchText{
+	width: 85%;
+	height: 38px;
+	border: 0px;
+	padding: 0px 8px;
+	box-sizing: border-box;
+	margin: 0px;
+	outline: none;
+	color: #999;
+	float: left;
+}
+/* 搜索样式二 */
+.search .style2 .searchBtn{
+	float: right;
+}
+/* 搜索 -e */
+/* 按钮组 -s*/
+.modle_bottons {
+	padding-top: 10px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	width: 100%;
+    height: auto;
+}
+/*四个按钮=>20%，五个按钮=>25%*/
+.modle_mod_nav {
+	display: inline-block;
+	/*width: 25%;*/
+    height: 100%;
+}
+.modle_mod_img img {
+    width: 100%;
+    height: 100%;
+}
+
+.modle_mod_text {
+	width: 100%;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    color: #999999;
+    font-size: 12px;
+    overflow: hidden;
+}
+/* 按钮图片 圆形样式 */
+.modle_mod_garden {
+	border-radius: 100%;
+}
+/* 按钮组 -e*/
+/* 单图-s */
+.signage{
+	width: 100%;
+	height: auto;
+}
+.signage_img{
+	width: 100%;
+	height: auto;
+}
+.signage_img img{
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+/* 单图-e */
+/* 商品组-s */
+.modle_shop{
+	padding: 5px 10px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+.modle_shop_title{
+	line-height: 30px;
+	font-size: 16px;
+}
+/* 显示一个 */
+.modle_shop_item{
+	padding: 5px;
+	height: 90px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+.modle_shop_item .modle_shop_img{
+	float: left;
+	width:25%;
+	height: 80px;
+}
+.modle_shop_item .modle_shop_img img{
+	width: 100%;
+}
+.modle_shop_item .modle_shop_info{
+	position: relative;
+	float: left;
+	width: 70%;
+	height: 100%;
+	margin-left: 10px;
+}
+.modle_shop_item .modle_shop_info .modle_shop_name{
+	font-size: 16px;
+	height: 40px;
+	margin-bottom: 20px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
+.modle_shop_item .modle_shop_info .modle_shop_price{
+	width: 100%;
+	font-size: 14px;
+}
+.modle_shop_item .modle_shop_info .modle_shop_price s{
+	font-size: 12px;
+}
+.modle_shop_item .modle_shop_info .modle_shop_buybtn{
+	position: absolute;
+	right: 5px;
+	bottom: -5px;
+	width: 24px;
+	height: 24px;
+}
+/* 显示俩个 */
+.modle_shop_item2{
+	float: left;
+	margin: 0 5px 5px;
+	width: 46.8%;
+}
+.modle_shop_item2 .modle_shop_img{
+	height: 148px;
+}
+/* 显示三个 */
+.modle_shop_item3{
+	float: left;
+	margin: 0 5px 5px;
+	width: 30%;
+}
+.modle_shop_img{
+	position: relative;
+	width:100%;
+}
+.modle_shop_item3 .modle_shop_img{
+	height: 100px;
+}
+.modle_shop_item2 .modle_shop_img img,.modle_shop_item3 .modle_shop_img img{
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;
+	display: block;
+	width:100%;
+}
+.modle_shop_attr{
+	position: absolute;
+	left: 0;
+	top: 0;
+	width:40px;
+	height:40px;
+}
+.modle_shop_item2 .modle_shop_price,.modle_shop_item3 .modle_shop_price{
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+	font-size: 14px;
+	color: #f3f3f3;
+	overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+	background: rgba(0,0,0,.3);
+}
+.modle_shop_item2 .modle_shop_price s,.modle_shop_item3 .modle_shop_price s{
+	font-size: 12px;
+}
+.modle_shop_item2 .modle_shop_name,.modle_shop_item3 .modle_shop_name{
+	float: left;
+	line-height: 20px;
+	height: 40px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+}
+.modle_shop_item2 .modle_shop_name{
+	width: 84%;
+}
+.modle_shop_item3 .modle_shop_name{
+	width: 75%;
+}
+.modle_shop_item2 .modle_shop_buybtn,.modle_shop_item3 .modle_shop_buybtn{
+	display: none;
+	float: right;
+    width: 24px;
+    height: 24px;
+}
+/* 商品价格显示 */
+.modle_shop_item .show,.modle_shop_item2 .show,.modle_shop_item3 .show{
+	display: block;
+}
+/* 商品价格隐藏 */
+.modle_shop_item .none,.modle_shop_item2 .none,.modle_shop_item3 .none{
+	display: none;
+}
+/* 只显示原价 */
+.modle_shop_item .price s,.modle_shop_item2 .price s,.modle_shop_item3 .price s{
+	display: none;
+}
+/* 显示名字 */
+.modle_shop_item2 .no,.modle_shop_item3 .no{
+	display: none;
+}
+/* 隐藏名字 */
+.modle_shop_item2 .sw,.modle_shop_item3 .sw{
+	display: block;
+}
+/* 商品属性-s */
+/* 热销 */
+.sale_rx{
+	background: url(../../img/pc/sale-rx.png) no-repeat;
+	background-size: contain;
+}
+/* 推荐 */
+.sale_tj{
+	background: url(../../img/pc/sale-tj.png) no-repeat;
+	background-size: contain;
+}
+/* 新上 */
+.sale_xp{
+	background: url(../../img/pc/sale-xp.png) no-repeat;
+	background-size: contain;
+}
+/* 包邮 */
+.sale_by{
+	background: url(../../img/pc/sale-by.png) no-repeat;
+	background-size: contain;
+}
+/* 限时 */
+.sale_xs{
+	background: url(../../img/pc/sale-xs.png) no-repeat;
+	background-size: contain;
+}
+/* 促销 */
+.sale_cx{
+	background: url(../../img/pc/sale-cx.png) no-repeat;
+	background-size: contain;
+}
+/* 商品属性-e */
+/* 商品组-按钮样式-s */
+.buy_1{
+	display: block !important;
+	background: url(../../img/pc/ico_buy_1.png) no-repeat;
+	background-size: contain;
+}
+.buy_2{
+	display: block !important;
+	background: url(../../img/pc/ico_buy_2.png) no-repeat;
+	background-size: contain;
+}
+.buy_3{
+	display: block !important;
+	background: url(../../img/pc/ico_buy_3.png) no-repeat;
+	background-size: contain;
+}
+.buy_4{
+	display: block !important;
+	background: url(../../img/pc/ico_buy_4.png) no-repeat;
+	background-size: contain;
+}
+/* 商品组-按钮样式-e */
+/* 商品组-e */
+/* 公告 -s */
+.edit_modle .tips {
+    font-size: 12px;
+    margin-left: 10px;
+    letter-spacing: 1px;
+}
+/* (公告)移动层 */
+.notice_move {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    z-index: 1;
+    background: rgba(0,0,0,0);
+    z-index: 99;
+}
+
+.notice {
+	position: relative;
+	display: -webkit-box;
+	display: -moz-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex;
+	align-items:center;
+	-webkit-align-items:center;
+	box-align:center;
+	-moz-box-align:center;
+	-webkit-box-align:center;
+    height: 30px;
+    background: #fff;
+    font-size: 14px;
+    color: #525252;
+	padding: 10px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+     background: red; /**/
+	
+}
+.notice .notice_icon {
+	margin-right: 4px;
+	position: relative;
+	width: 28px;
+	height: 26px;
+	
+}
+.notice .notice_icon img{
+	width: 80%;
+}
+
+.notice .scroll_notice{
+	flex: 1;
+	box-flex: 1;
+	-webkit-box-flex: 1;
+	-moz-box-flex: 1;
+	flex: 1;
+	-webkit-flex: 1;
+	height: 28px;
+	line-height: 28px;
+	overflow: hidden; 
+	white-space: nowrap; 
+	text-overflow: ellipsis; 
+}
+.notice a{
+	color: #666;
+}
+.notice .scroll_notice .notice_content{
+	width: 100%;
+}
+.notice .scroll_notice marquee{
+	height: 100%;
+	line-height: 28px;
+}
+
+.notice .more{
+	width: 50px;
+	height: 24px;
+	line-height: 24px;
+	border-left: 2px solid #ddd;
+	text-align: right;
+	margin-left: 10px;
+}
+/* 公告 -e */
+/* 辅助空白label 辅助线label -s*/
+.edit_blank .edit_content_label,.edit_subline .edit_content_label{
+	margin-right: 5px;
+	font-size: 12px;
+}
+.edit_blank .edit_content_label .text,.edit_subline .edit_content_label .text{
+    margin-left: 4px;
+    padding-left: 8px;
+    width: 50px;
+	height: 22px;
+    line-height: 20px;
+    color: #aaa;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    outline: none;
+}
+/* 辅助空白label 辅助线label -e*/
+/* 辅助线 -s */
+.subline{
+	padding: 10px 0;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+/* 辅助线 -e */
+/* 标题 -s */
+.title{
+	height: auto;
+	text-align: left;
+	padding: 10px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	overflow: hidden;
+}
+.title h2{
+	font-size: 18px;
+    padding: 0;
+    margin: 0;
+    font-weight: 100;
+}
+.title h4{
+	margin: 0;
+	padding: 0;
+	padding-top: 3px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+    font-size: 14px;
+    font-weight: 100;
+   
+}
+/* 标题 -e */
+/*手机模拟蒙版-e*/
+
+/* 管理页面-s */
+.preview_info{
+	width:100%;
+	padding:0 20px 20px;
+	letter-spacing: 1px;
+	border: 2px solid #ddd;
+	border-radius: 5px;
+	background: #fff;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+/* 管理标题 */
+.preview_info_title{
+	color: #151515;
+	font-size: 14px;
+	font-weight: bold;
+	line-height: 50px;
+	border-bottom: 2px solid#ccc;
+	display: flex;
+	display: -moz-box;  /* Firefox */
+	display: -ms-flexbox;    /* IE10 */
+	display: -webkit-box;    /* Safari */ 
+	display: -webkit-flex;    /* Chrome, WebKit */
+	display: box; 
+	display: flexbox; 
+	justify-content:space-around;
+	box-pack:space-around;
+	-moz-box-pack:space-around;
+	-webkit-justify-content:space-around;
+}
+.preview_info_title p{
+	width:14%;
+	text-align:center;
+}
+/* 管理内容 */
+.preview_info_content{
+	width: 100%;
+}
+.content_item{
+	line-height: 40px;
+	border-bottom: 1px solid #ccc;
+	display: flex;
+	display: -moz-box;  /* Firefox */
+	display: -ms-flexbox;    /* IE10 */
+	display: -webkit-box;    /* Safari */ 
+	display: -webkit-flex;    /* Chrome, WebKit */
+	display: box; 
+	display: flexbox; 
+	justify-content:space-around;
+	box-pack:space-around;
+	-moz-box-pack:space-around;
+	-webkit-justify-content:space-around;
+}
+.content_item p{
+	width: 14%;
+	text-align:center;
+}
+/* 数据类型 */
+.pType{
+	color:#ffffff;
+}
+/* 是否启用 */
+.pUsing span{
+	color: #fff;
+	cursor: pointer;
+	padding: 5px 10px;
+	border-radius: 5px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+.pUsing .on{
+	background: #5cb85c;
+}
+.pUsing .on::before{
+	content: "已启用";
+}
+.pUsing .off{
+	background: #777;
+}
+.pUsing .off::before{
+	content: "未启用"
+}
+.pType span{
+	padding: 5px 10px;
+	border-radius:5px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	background: #428bca;
+}
+.operation span{
+	color: #428bca;
+	cursor: pointer;
+}
+/* 添加按钮 */
+.preview_add{
+	line-height: 30px;
+	padding: 10px;
+	border-bottom:1px solid #ccc;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+.add_btn{
+	padding: 8px 12px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	cursor: pointer;
+}
+.add_btn img{
+	width: 14px;
+	height: 14px;
+	margin-right:5px;
+	vertical-align: text-top;
+}
+.tips{
+	color:red;
+}
+/* 管理页面-e */
+
+
+
+
+/*publi -s*/
+/* 隐藏 */
+.hide_box {
+	display: none;
+}
+/* 隐藏 */
+.show_box {
+	display: block;
+}
+/*public -e*/

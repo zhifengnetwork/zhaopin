@@ -1,0 +1,219 @@
+
+div.calendar {
+    position: relative;
+}
+.calendar, .calendar table {
+    background: none repeat scroll 0 0 #F9FCF1;
+    border: 1px solid #CDE4B3;
+    color: #000000;
+    cursor: default;
+    font-family: tahoma,verdana,sans-serif;
+    font-size: 11px;
+}
+.calendar table {
+    border: 1px solid #FFFFFF;
+}
+.calendar table thead td {
+    background: none repeat scroll 0 0 #E7F6D5;
+    border-bottom: 1px solid #FFFFFF;
+    border-right: medium none;
+    color: #97C069;
+    height: 16px;
+    width: 18px;
+}
+.calendar table thead tr.headrow td {
+    background: none repeat scroll 0 0 #EDF9E0;
+}
+.headrow {
+    border-top: 1px solid #CDE4B3;
+}
+.calendar table thead td.button div div {
+    background-image: url("../../images/question-balloon.png");
+    background-repeat: no-repeat;
+    overflow: hidden;
+    text-indent: -100px;
+}
+.headrow .button {
+    border-right: 1px solid #FFFFFF;
+    padding: 0;
+    text-align: center;
+}
+.headrow .button div, .calendar table .wn div {
+    border-right: 1px solid #CDE4B3;
+    height: 23px;
+    line-height: 23px;
+}
+.calendar .nav {
+}
+.calendar thead .title {
+    color: #6B9936;
+    font-weight: bold;
+    padding: 2px;
+    text-align: center;
+    width: auto;
+}
+.calendar thead tr {
+    background: none repeat scroll 0 0 #007ED1;
+    color: #FFFFFF;
+}
+.calendar thead .daynames {
+    background: none repeat scroll 0 0 #EDF9E0;
+}
+.calendar thead .name {
+    border-bottom: 1px solid #CDE4B3;
+    color: #000000;
+    padding: 2px;
+    text-align: center;
+}
+.calendar thead .weekend {
+    color: #AA6666;
+}
+.calendar thead .hilite {
+    background-color: #E7F6D5;
+    color: #6B9936;
+}
+.calendar tbody .day {
+    color: #445566;
+    padding: 2px 4px 2px 2px;
+    text-align: right;
+    width: 2em;
+}
+.calendar tbody .day div {
+    padding-right: 5px;
+}
+.calendar tbody .day.othermonth {
+    color: #BBBBBB;
+    font-size: 80%;
+}
+.calendar tbody .day.othermonth.oweekend {
+    color: #FFBBBB;
+}
+.calendar table .wn {
+    background: none repeat scroll 0 0 #EDF9E0;
+    border-right: 1px solid #FFFFFF;
+    padding: 0;
+}
+.calendar tbody .rowhilite td {
+    background: none repeat scroll 0 0 #DDEEFF;
+}
+.calendar tbody .rowhilite td.wn {
+    background: none repeat scroll 0 0 #F9FCF1;
+}
+.calendar tbody td.hilite {
+    background: none repeat scroll 0 0 #93B9E2;
+    color: #FFFFFF;
+    padding: 1px 3px 1px 1px;
+}
+.calendar tbody td.active {
+    background: none repeat scroll 0 0 #CCDDEE;
+    padding: 2px 2px 0;
+}
+.calendar tbody td.selected {
+    background: none repeat scroll 0 0 #FF7200;
+    color: #FFFFFF;
+    font-weight: bold;
+    padding: 1px 3px 1px 1px;
+}
+.calendar tbody td.weekend {
+    color: #AA6666;
+}
+.calendar tbody td.today {
+    color: #D50000;
+    font-weight: bold;
+}
+.calendar tbody .disabled {
+    color: #999999;
+}
+.calendar tbody .emptycell {
+    visibility: hidden;
+}
+.calendar tbody .emptyrow {
+    display: none;
+}
+.calendar tfoot .footrow {
+    background: none repeat scroll 0 0 #206A9B;
+    color: #FFFFFF;
+    text-align: center;
+}
+.calendar tfoot .ttip {
+    background: none repeat scroll 0 0 #EDF9E0;
+    border-top: 1px solid #CDE4B3;
+    color: #6B9936;
+    height: 24px;
+    padding: 1px;
+}
+.calendar tfoot .hilite {
+    background: none repeat scroll 0 0 #B8DAF0;
+    border: 1px solid #178AEB;
+    color: #000000;
+    padding: 1px;
+}
+.calendar tfoot .active {
+    background: none repeat scroll 0 0 #006AA9;
+    padding: 2px 0 0 2px;
+}
+.calendar .combo {
+    background: none repeat scroll 0 0 #DDEEFF;
+    border: 1px solid #665555;
+    color: #000000;
+    cursor: default;
+    display: none;
+    font-size: 90%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 4em;
+    z-index: 2147483647;
+}
+.calendar .combo .label, .calendar .combo .label-IEfix {
+    padding: 1px;
+    text-align: center;
+}
+.calendar .combo .label-IEfix {
+    width: 4em;
+}
+.calendar .combo .hilite {
+    background: none repeat scroll 0 0 #34ABFA;
+    border-bottom: 1px solid #4466AA;
+    border-top: 1px solid #4466AA;
+    font-weight: bold;
+}
+.calendar .combo .active {
+    background: none repeat scroll 0 0 #F9FCF1;
+    border-bottom: 1px solid #4466AA;
+    border-top: 1px solid #4466AA;
+    font-weight: bold;
+}
+.calendar td.time {
+    background-color: #EDF2E3;
+    border-top: 1px solid #CDE4B3;
+    height: 24px;
+    padding: 1px 0;
+    text-align: center;
+}
+.calendar td.time .hour, .calendar td.time .minute, .calendar td.time .ampm {
+    background-color: #F9FCF1;
+    border: 1px solid #888899;
+    font-weight: bold;
+    padding: 0 3px 0 4px;
+}
+.calendar td.time .ampm {
+    text-align: center;
+}
+.calendar td.time .colon {
+    font-weight: bold;
+    padding: 0 2px 0 3px;
+}
+.calendar td.time span.hilite {
+    background-color: #267DB7;
+    border-color: #000000;
+    color: #FFFFFF;
+}
+.calendar td.time span.active {
+    background-color: #000000;
+    border-color: #FF0000;
+    color: #A5FF00;
+}
+.calendar thead .active div {
+    background: none repeat scroll 0 0 #BDD2E8;
+}

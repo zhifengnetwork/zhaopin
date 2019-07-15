@@ -1,0 +1,57 @@
+@charset "utf-8";
+body,div,dl,dt,dd,ul,li,h1,h2,h3,h4,h5,h6,input,form,a,p,textarea{
+    margin:0;
+    padding:0;
+}
+body {
+	font-size: 12px;
+}
+li{
+	list-style-type: none;
+}
+a{
+	text-decoration: none;
+	color: #000;
+}
+/*清除浮动代码 '父元素'*/
+.clearfloat:after{
+	display: block;
+	clear: both;
+	content:" ";
+	visibility: hidden;
+	height: 0;
+}
+.clearfloat{
+	zoom: 1;
+}
+
+/*public 省略号*/
+.publicEllipsis {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+/*垂直居中*/
+.vertical_centering {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 1;
+	margin: auto;
+}
+
+/* 左箭头 */
+.right-arrow {
+    border-bottom: 2px solid #cccccc;
+    border-right: 2px solid #cccccc;
+    width: 8px;
+    height: 8px;
+    -webkit-transform: rotate(-45deg);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto 0;
+    right: 14px;
+}

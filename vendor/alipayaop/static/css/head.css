@@ -1,0 +1,40 @@
+html, body {
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	min-width: 1200px;
+	height: 100%;
+	font-size: 12px;
+	font-family: 'MircoSoft Yahei'
+}
+
+.head {
+	height: 100px;
+	background-color: #00AAEE;
+}
+
+.header {
+	height: 70px;
+	text-align: center;
+	line-height: 70px;
+	font-size: 24px;
+	color: #FFF;
+}
+
+.info {
+	text-align: right;
+	padding-right:20%;
+}
+.info a {
+	text-decoration:none;
+	color:#333;
+	font-size:16px;
+}
+.info a:hover {
+	text-decoration:underline;
+}
+
+.content {
+	height: auto;
+	width: 100%;
+}

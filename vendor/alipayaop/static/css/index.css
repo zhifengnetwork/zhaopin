@@ -1,0 +1,38 @@
+.uploadKey {
+	width: 100%;
+	height:auto;
+	padding-top:150px;
+}
+.uploadKey a {
+	display: block;
+	text-decoration: none;
+	height: 60px;
+	width: 500px;
+	text-align: center;
+	margin: 0 auto;
+	line-height: 60px;
+	font-size: 18px;
+	border-radius: 10px;
+	color: #FFF;
+	background-color: #00AAEE;
+}
+.label-submit:hover {
+	background-color: #49A9EE
+}
+
+.attention {
+	margin: 0 auto;
+	padding: 40px 20% 0;
+	border-radius: 5px;
+	font-size: 14px;
+	color: #333
+}
+
+.attention .title {
+	font-weight: bold;
+}
+
+.attention a {
+	text-decoration: none;
+	color: #00AAEE
+}

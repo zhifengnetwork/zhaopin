@@ -1,0 +1,90 @@
+.container{
+  color: #666;
+  font-size: 12px;
+}
+.container-body{
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.nav-tabs>li>a{
+  color: #666;
+}
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover,.nav-tabs>li>a:hover{
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid #2DB7F5;
+  color: #2DB7F5; 
+}
+.tab-content{
+  margin-top: 20px;
+}
+.red{
+  color:red;
+}
+.btn.btn-blue:hover,.btn-blue,.btn-blue.active,
+.btn-blue:focus,
+.btn-blue.focus {
+  background-color: #2DB7F5;
+  border-color: #2DB7F5;
+  outline: none;
+  color: #fff;
+  border: none;
+}
+.btn .glyphicon{
+  font-size: 12px;
+}
+.form-set{
+  background-color: #f4f4f4;
+  font-size: 14px;
+}
+.my-collaspe{
+  border: 1px dashed #555;
+  overflow: hidden;
+  padding-top: 15px;
+  padding-right: 15px;
+  border-radius: 3px; 
+  margin-bottom: 15px;
+}
+.hide{
+  display: hidden;
+}
+.glyphicon{
+  cursor: pointer;
+}
+.form-group.js-goods label,.form-group.js-protocol label{
+  font-weight: 500;
+}
+.notice{
+  color: #999;
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+.panel-collaspe{
+  float: right;
+  color: #2DB7F5;
+  cursor: pointer;
+  font-size: 14px;
+}
+.list-group{
+  border-bottom: 1px solid #ddd;
+  padding: 10px;
+}
+.list-group{
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-top-color: transparent;
+  border-right-color: transparent;
+  border-left-color: transparent;
+}
+.list-group .list-header{
+  height: 30px;
+  line-height: 30px;
+  padding-right: 0;
+}
+.list-group .list-header .glyphicon{
+  float: right;
+  display: none;
+}
+.list-group:hover .glyphicon{
+  display: inline;
+}

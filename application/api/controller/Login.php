@@ -17,14 +17,48 @@ use app\common\util\jwt\JWT;
 
 class Login extends \think\Controller
 {
+
+
+
+    /**
+     * 微信登录
+     */
     public function index () {
-        redirect('login/login')->send();
-        exit;
+        $code = I('code');
+        if(!$code){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'code不能为空','data'=>'']);
+        }
+
+        $appid = M('config')->where(['name'=>'appid'])->value('value');
+        $appsecret = M('config')->where(['name'=>'appsecret'])->value('value');
+
+        $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$appid.'&secret='.$appsecret.'&js_code='.$code.'&grant_type=authorization_code' ;
+        $result = httpRequest($url, 'GET');
+        $arr = json_decode($result, true);
+        if(!isset($arr['openid'])){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>$arr['errmsg'],'data'=>'']);
+        }
+
+        $openid = $arr['openid'];
+
+        // 查询数据库，判断是否有此openid
+        $data = Db::table('member')->where('openid',$openid)->find();
+        if(!$data){
+            Db::table('member')->insert(['openid'=>$openid]);
+            $data = Db::table('member')->where('openid',$openid)->find();
+
+            $data['token'] = $this->create_token($data['id']);
+
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$data]);
+        }else{
+
+            $data['token'] = $this->create_token($data['id']);
+
+            $this->ajaxReturn( ['status'=>1,'msg'=>'获取用户信息成功','data'=>$data]);
+
+        }
+
     }
-
-
-
-
 
 
     /**
@@ -79,58 +113,4 @@ class Login extends \think\Controller
 
 
 
-
-//    public function login () {
-//        if (Request::instance()->isPost()) {
-//            $username = input('username');
-//            $password = input('password');
-//            // 实例化验证器
-//            $validate = Loader::validate('Login');
-//            // 验证数据
-//            $data = ['username' => $username, 'password' => $password];
-//            // 验证
-//            $code = input('captcha');
-//            $str = session('captcha_id');
-//            $captcha = new \think\captcha\Captcha();
-//            if (!$captcha->check($code,$str)){
-//                return json(['code'=>0,'msg'=>'验证码错误']);
-//            }
-//            if (!$validate->check($data)) {
-//                return $this->error($validate->getError());
-//            }
-//            $where['username'] = $username;
-//            $where['status']   = 1;
-//            $user_info = Db::table('mg_user')->where($where)->find();
-//            if ($user_info && $user_info['password'] === minishop_md5($password, $user_info['salt'])) {
-//                $session['uid']     = $user_info['mgid'];
-//                $session['user_name'] = $user_info['username'];
-//                // 记录用户登录信息
-//                Session::set('admin_user_auth', $session);
-//                return json(['code'=>1,'msg'=>'登录成功']);
-//            }
-//            return json(['code'=>0,'msg'=>'密码错误！']);
-//        }
-//    }
-
-
-
-//    /*
-//     *  获取验证码
-//      */
-//    public function loginCaptcha () {
-//        $str  = time().uniqid();
-//        Session::set('captcha_id', $str);
-//        $captcha = new Captcha();
-//        return $captcha->entry($str);
-//    }
-//
-//    /*
-//     * 退出登录
-//     */
-//    public function login_out()
-//    {
-//        session('admin_user_auth', null);
-//        session('ALL_MENU_LIST', null);
-//        return json(['code'=>1,'msg'=>'请登录','data'=>'']);
-//    }
 }

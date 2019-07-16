@@ -46,8 +46,6 @@ class Common extends Controller
     
         $this->view->lefts_menu  = self::lefts_menu($leftmenu);
         $this->view->left_menu   = $leftmenu;
-        // var_dump(self::lefts_menu($leftmenu)[0]['_child']);
-        
         View::share('meta_title', 'GAME');
     }
 
@@ -82,6 +80,7 @@ class Common extends Controller
         $auth_rules = get_menu_auth();
         $list       = [];
         foreach ($all_menu as $val) {
+            $val['url'] = 'admin/'.$val['url'];
             if (check_menu_auth($val['id'], $auth_rules)) {
                 $list[] = $val;
             }
@@ -100,8 +99,9 @@ class Common extends Controller
         static $url;
         //!$url && $url = strtolower(request()->controller() . '/' . request()->action());
         !$url && $url = request()->path();
+
         if($url == '/'){
-           $url = 'index/index';
+           $url = 'admin/index/index';
         }
         // $url = str_replace('admin/', '', $url);
         $array = array();
@@ -109,6 +109,7 @@ class Common extends Controller
             if($url == $val['url']){
                 $val['left'] = 1;
             }
+
             if (!empty($val['_child'])) {
                 $val['_child'] = self::menu($val['_child']);
                 
@@ -140,6 +141,7 @@ class Common extends Controller
     private function lefts_menu($leftmenu){
         $left_array = array();
         foreach($leftmenu as $v ){
+
             if(isset($v['left'])){
                 $left_array = array($v);
                 break;
@@ -151,6 +153,7 @@ class Common extends Controller
                         break;
                     }
                     if(!empty($k['_child'])){
+
                         foreach($k['_child'] as $j){
                             if(isset($j['left'])){
                                 $left_array = $v;
@@ -161,7 +164,6 @@ class Common extends Controller
                     }
                 }              
             }
-
         }
         $left_array = isset($left_array[0]['_child'])?$left_array[0]['_child']:array();
         return $left_array;

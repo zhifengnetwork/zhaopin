@@ -17,11 +17,7 @@ class Index extends Common
     {
         $where= [];
         $where['status'] = ['>=',0];
-        $list       = Db::table('diy_ewei_shop')
-                    ->where($where)
-                    ->order('id')
-                    ->paginate(10, false, ['page' => request()->param('page')]);
-        $this->assign('list', $list);
+        $this->assign('list', []);
         $this->assign('meta_title', '店铺装修');
         return $this->fetch();
     }

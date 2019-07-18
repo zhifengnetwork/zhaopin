@@ -43,7 +43,7 @@ class User extends Validate
         'telephone' => 'require|checkTel',
         'district' => 'require|checkDistinct',
         'address' => 'require|length:4,50',
-        'type' => 'require|number',
+        'type' => 'require',
         'company_name' => 'require|chs|length:8,40',
         'desc' => 'require|length:10,100',
         'c_img' => 'require',

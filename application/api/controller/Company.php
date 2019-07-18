@@ -116,7 +116,7 @@ class Company extends ApiBase
         $ids = input('ids');
         $ids = rtrim($ids, ',');
         if (empty($ids)) {
-            $this->ajaxReturn(['status' => -2, 'msg' => '收藏不存在']);
+            $this->ajaxReturn(['status' => -2, 'msg' => '职位不存在']);
         }
 
         if (!Db::name('recruit')->where("id in ($ids)")->delete()) {
@@ -173,24 +173,27 @@ class Company extends ApiBase
             ->join('person p', 'p.id = r.person_id', 'LEFT')
             ->where($where)
             ->paginate(10, false, $param);
-        foreach ($list as &$v) {
+
+        $list=$list->toArray();
+        foreach ($list['data'] as &$v) {
             $v['images'] = $v['images'] ? 1 : 0;
             $v['job_type'] = Category::getNameById($v['job_type']) ?: '';
         }
-        $this->ajaxReturn(['status' => 1, 'msg' => '保存成功', 'data' => $list]);
+        $this->ajaxReturn(['status' => 1, 'msg' => '获取成功', 'data' => $list['data']]);
 
     }
 
     // 预约操作
     public function reserve()
     {
+        $this->getCompany();
         $id = input('id/d');
         if(!Db::name('person')->where(['id'=>$id])->find()){
             $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在']);
         }
         if(!Reserve::getBy($this->_id,$id)){
             if(Db::name('reserve')->insert(['company_id'=>$this->_id,'person_id'=>$id,'create_time'=>time()])){
-                $this->ajaxReturn(['status' => -2, 'msg' => '操作成功']);
+                $this->ajaxReturn(['status' => 1, 'msg' => '操作成功']);
             }
         }
         $this->ajaxReturn(['status' => -2, 'msg' => '操作失败']);

@@ -388,7 +388,7 @@ class User extends ApiBase
 //            $this->ajaxReturn(['status' => -2, 'msg' => '验证码错误！', 'data' => '']);
 //        }
         $data['salt']=create_salt();
-        $data['password']= minishop_md5($pwd, $data['salt']);
+        $data['password']= md5($data['salt'].$pwd);
         $data['regtype']=$type;
         $data['mobile']=$mobile;
         $id=Db::name('member')->insertGetId($data);
@@ -496,10 +496,10 @@ class User extends ApiBase
      *  登录接口
      */
     public function login(){
-        $type = input('type',1);
-        if($type == 1){
-           $user_info = $this->GetOpenid();//微信授权用户信息
-        }else{
+//        $type = input('type',1);
+//        if($type == 1){
+//           $user_info = $this->GetOpenid();//微信授权用户信息
+//        }else{
             $mobile   = input('mobile');
             $password = input('password');
             // $code     = input('code');
@@ -521,7 +521,6 @@ class User extends ApiBase
 
 
             $password = md5( $data['salt'] . $password);
-
             if ($password != $data['password']) {
                 $this->ajaxReturn(['status' => -2 , 'msg'=>'登录密码错误！']);
             }
@@ -531,7 +530,7 @@ class User extends ApiBase
             $data['token']    = $this->create_token($data['id']);
 
             $this->ajaxReturn(['status' => 1 , 'msg'=>'登录成功！','data'=>$data]);
-        }
+//        }
 
     }
 

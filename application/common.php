@@ -90,6 +90,10 @@ function checkMobile($mobilePhone)
     }
 }
 
+function isTel($str) {
+    return preg_match("/^((\(\d{2,3}\))|(\d{3}\-))?(\(0\d{2,3}\)|0\d{2,3}-)?[1-9]\d{6,7}(\-\d{1,4})?$/", preg_replace('/[A-Z.]+/i', '', $str), $matches) > 0;
+}
+
 function send_zhangjun($mobile,$code){//掌骏
     
     $content = "【ETH】您的手机验证码为：".$code."，该短信1分钟内有效。如非本人操作，可不用理会！";

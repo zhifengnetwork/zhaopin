@@ -11,6 +11,11 @@ class Member extends Model
 
     protected $autoWriteTimestamp = true;
 
+    static $_registerType = [
+        1=>'公司',
+        2=>'第三方',
+        3=>'个人'
+    ];
     /***
      * 充值积分and余额
      */

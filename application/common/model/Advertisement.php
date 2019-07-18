@@ -1,6 +1,8 @@
 <?php
+
 namespace app\common\model;
 
+use think\Db;
 use think\Model;
 
 class Advertisement extends Model
@@ -21,7 +23,7 @@ class Advertisement extends Model
                 return [1, $file->error()];
             }
             // 大小验证，暂时不处理
-            $image    = \think\Image::open($file);
+            $image = \think\Image::open($file);
             $saveName = DS . 'uploads' . DS . $name . DS . date('Ymd') . DS . md5(microtime(true)) . '.' . $image->type();
 
             $fileName = ROOT_PATH . 'public' . $saveName;
@@ -34,5 +36,15 @@ class Advertisement extends Model
             }
         }
         return [0, ''];
+    }
+
+    public static function getList()
+    {
+        $page = input('page', 1);
+        $list = Db::table('advertisement')->field('picture,url')->where(['state' => 1, 'page_id' => $page])->limit(5)->order('type asc sort asc')->select();
+        for ($i = 0; $i < count($list); $i++) {
+            $list[$i]['picture'] = SITE_URL . '/public' . $list[$i]['picture'];
+        }
+        return $list;
     }
 }

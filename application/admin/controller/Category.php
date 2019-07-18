@@ -38,22 +38,7 @@ class Category extends Common
                 $this->error('分类名称必须填写！');
             }
             
-            if( isset($data['img']) ){
-                
-                    $saveName = request()->time().rand(0,99999) . '.png';
-    
-                    $img=base64_decode($data['img']);
-                    //生成文件夹
-                    $names = "category" ;
-                    $name = "category/" .date('Ymd',time()) ;
-                    if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
-                        mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
-                    }
-                    //保存图片到本地
-                    file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
-    
-                    $data['img'] = $name.$saveName;
-            }
+
             
             if($pid){
                 $data['level'] = Db::table('category')->where('cat_id',$pid)->value('level') + 1;
@@ -97,26 +82,7 @@ class Category extends Common
                 $this->error('分类名称必须填写！');
             }
 
-            if( isset($data['img']) ){
-                
-                $saveName = request()->time().rand(0,99999) . '.png';
 
-                $img=base64_decode($data['img']);
-                //生成文件夹
-                $names = "category" ;
-                $name = "category/" .date('Ymd',time()) ;
-                if (!file_exists(ROOT_PATH .Config('c_pub.img').$names)){ 
-                    mkdir(ROOT_PATH .Config('c_pub.img').$names,0777,true);
-                } 
-                //保存图片到本地
-                file_put_contents(ROOT_PATH .Config('c_pub.img').$name.$saveName,$img);
-
-                $data['img'] = $name.$saveName;
-
-                if($info['img']){
-                    @unlink( ROOT_PATH .Config('c_pub.img') . $info['img'] );
-                }
-            }
 
             if ( Db::table('category')->update($data) !== false ) {
                 //添加操作日志
@@ -150,9 +116,7 @@ class Category extends Common
         }
 
         if( Db::table('category')->where('cat_id',$cat_id)->delete() ){
-            if( $info['img'] ){
-                @unlink( ROOT_PATH .Config('c_pub.img') . $info['img'] );
-            }
+
             //添加操作日志
             slog($cat_id);
             jason([],'删除分类成功！');

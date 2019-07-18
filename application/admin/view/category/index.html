@@ -17,6 +17,7 @@
                                 <tr>
                                     <th>id</th>
                                     <th>分类名称</th>
+                                    <th>注册佣金</th>
                                     <!-- <th>是否显示</th> -->
                                     <th>操作</th>
                                 </tr>
@@ -32,6 +33,7 @@
                                     <tr>
                                         <td>{$vo.cat_id}</td>
                                         <td>{$vo.cat_name}</td>
+                                        <td>{$vo.money}</td>
                                         <!-- <td>{eq name="vo['is_show']" value="1"}显示{else /}隐藏{/eq}</td> -->
                                         <td>
                                             <a class="a" href="{:url('category/add',['pid'=>$vo.cat_id],false)}">添加子分类</a>
@@ -44,6 +46,7 @@
                                         <tr>
                                             <td>{$v.cat_id}</td>
                                             <td>------ {$v.cat_name}</td>
+                                            <td>{$v.money}</td>
                                             <!-- <td>{eq name="v['is_show']" value="1"}显示{else /}隐藏{/eq}</td> -->
                                             <td>
                                                 <a class="a" href="{:url('category/add',['pid'=>$v.cat_id],false)}">添加子分类</a>
@@ -56,6 +59,7 @@
                                             <tr>
                                                 <td>{$v1.cat_id}</td>
                                                 <td>------------ {$v1.cat_name}</td>
+                                                <td>{$v1.money}</td>
                                                 <!-- <td>{eq name="v1['is_show']" value="1"}显示{else /}隐藏{/eq}</td> -->
                                                 <td>
                                                     <a class="a" href="{:url('category/add',['pid'=>$v1.cat_id],false)}">添加子分类</a>

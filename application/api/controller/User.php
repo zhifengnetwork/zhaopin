@@ -356,19 +356,24 @@ class User extends ApiBase
      */
     public function register()
     {
-        $user_id = $this->get_user_id();
-        if (!$user_id || !($member = Member::get($user_id))) {
-            $this->ajaxReturn(['status' => -2, 'msg' => '用户错误']);
-        }
+//        $user_id = $this->get_user_id();
+//        if (!$user_id || !($member = Member::get($user_id))) {
+//            $this->ajaxReturn(['status' => -2, 'msg' => '用户错误']);
+//        }
         $type = input('type');
         if (!key_exists($type, Member::$_registerType)) {// 1公司，2第三方,3个人
             $this->ajaxReturn(['status' => -2, 'msg' => '类型选择错误']);
         }
-        if ($member->mobile) {
-            $this->ajaxReturn(['status' => -2, 'msg' => '当前账号已注册，请直接登录！']);
-        }
+//        if ($member->mobile) {
+//            $this->ajaxReturn(['status' => -2, 'msg' => '当前账号已注册，请直接登录！']);
+//        }
         $mobile = input('mobile');
+        $pwd = input('pwd');
+        $pwd2 = input('pwd2');
         $code = input('code');
+        if($pwd!=$pwd2){
+            $this->ajaxReturn(['status' => -2, 'msg' => '两次密码输入不一样！请重新输入！']);
+        }
         if (!checkMobile($mobile)) {
             $this->ajaxReturn(['status' => -2, 'msg' => '手机格式错误！']);
         }
@@ -382,19 +387,18 @@ class User extends ApiBase
 //        } else if (!$res) {
 //            $this->ajaxReturn(['status' => -2, 'msg' => '验证码错误！', 'data' => '']);
 //        }
-
-        $id = $member->save([
-            'regtype' => $type,
-            'mobile' => $mobile,
-            'salt' => create_salt()
-        ]);
+        $data['salt']=create_salt();
+        $data['password']= minishop_md5($pwd, $data['salt']);
+        $data['regtype']=$type;
+        $data['mobile']=$mobile;
+        $id=Db::name('member')->insertGetId($data);
         if (!$id) {
             $this->ajaxReturn(['status' => -2, 'msg' => '注册失败，请重试！', 'data' => '']);
         }
-
-        $data['token'] = $this->create_token($id);
-        $data['mobile'] = $mobile;
-        $this->ajaxReturn(['status' => 1, 'msg' => '注册成功！']);
+        $data_user['token'] = $this->create_token($id);
+        $data_user['mobile'] = $mobile;
+        $data_user['id'] = $id;
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'注册成功！','data'=>$data_user]);
     }
 
     // 下一步
@@ -414,6 +418,7 @@ class User extends ApiBase
                 return $this->ajaxReturn(['status' => -2, 'msg' => $validate]);
             }
             $data = input('get.');
+            unset($data['token']);
             $data['city'] = Region::getParentId($data['district']) ?: 0;
             $data['city'] > 0 && $data['province'] = Region::getParentId($data['city']) ?: 0;
             $data['user_id'] = $user_id;
@@ -427,12 +432,20 @@ class User extends ApiBase
                 return $this->ajaxReturn(['status' => -2, 'msg' => $validate]);
             }
             $data = input('get.');
+
             $data['gender'] = $data['gender'] == 2 ? 'female' : 'male';
             $data['birth'] = implode('-', [$data['birth_year'], $data['birth_month'], $data['birth_day']]);
             $data['graduate_time'] = implode('-', [$data['graduate_year'], $data['graduate_month'], $data['graduate_day']]);
             $data['work_age'] = date('Y') - $data['graduate_year'];
             $data['user_id'] = $user_id;
             $data['create_time'] = time();
+            unset($data['token']);
+            unset($data['birth_year']);
+            unset($data['birth_month']);
+            unset($data['birth_day']);
+            unset($data['graduate_year']);
+            unset($data['graduate_month']);
+            unset($data['graduate_day']);
             if (Db::name('person')->insert($data)) {
                 $this->ajaxReturn(['status' => 1, 'msg' => '注册成功！']);
             }

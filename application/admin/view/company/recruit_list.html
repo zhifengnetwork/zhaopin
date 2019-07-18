@@ -1,0 +1,428 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+    .table>thead>tr>th {
+        text-align: center;
+    }
+
+    .fant {
+        font-weight: 600;
+    }
+</style>
+{/block}
+{block name="content"}
+<div class="row wrapper border-bottom white-bg page-heading">
+
+    <div class="col-lg-2">
+
+    </div>
+
+    <div class="ibox-content">
+        <div class="table-responsive">
+            <table class="table  table-bordered table-hover text-center">
+                <thead>
+                <tr>
+                    <th>企业编号</th>
+                    <th>企业名称</th>
+                    <th>标题</th>
+                    <th>工种</th>
+                    <th>工龄</th>
+                    <th>薪资</th>
+                    <th>是否需要证书</th>
+                    <th>时间</th>
+                    <th>当前热招</th>
+                    <th>热门推荐</th>
+                    <th>待遇更好</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {notempty name="list"}
+                {volist name="list" id="row"}
+                <tr>
+                    <td> {$row['company_id']}</td>
+                    <td>
+                        {$row['company_name']}
+                    </td>
+                    <td   class='hidden-xs'>
+                        {$row['title']}
+                    </td>
+
+                    <td>{$row['type']}</td>
+                    <td>{$row['work_age']}</td>
+                    <td>
+                        {$row['salary']}
+                    <td>
+                        {if $row['require_cert']==1}
+                        是
+                        {else /}
+                        否
+                        {/if}
+                    </td>
+                    <td>
+                        {$row['create_time']|date="y-m-d H:i:s",###}
+                    </td>
+
+                    <td align="left" axis="col0">
+                        <div style="text-align: left; width: 30px;">
+                            {if condition='$row.is_hot eq 1'}
+                            <span onClick="change_is_hot('{$row.id}',this)">
+                                                    <i class="fa fa-check-circle"></i>是</span>
+                            {else/}
+                            <span onClick="change_is_hot('{$row.id}',this)">
+                                                    <i class="fa fa-ban"></i>否</span>
+                            {/if}
+                        </div>
+
+                    </td>
+                    <td align="left" axis="col0">
+                        <div style="text-align: left; width: 30px;">
+                            {if condition='$row.is_rcmd eq 1'}
+                            <span onClick="change_is_rcmd('{$row.id}',this)">
+                                                    <i class="fa fa-check-circle"></i>是</span>
+                            {else/}
+                            <span onClick="change_is_rcmd('{$row.id}',this)">
+                                                    <i class="fa fa-ban"></i>否</span>
+                            {/if}
+                        </div>
+
+                    </td>
+                    <td align="left" axis="col0">
+                        <div style="text-align: left; width: 30px;">
+                            {if condition='$row.is_better eq 1'}
+                            <span onClick="change_is_better('{$row.id}',this)">
+                                                    <i class="fa fa-check-circle"></i>是</span>
+                            {else/}
+                            <span onClick="change_is_better('{$row.id}',this)">
+                                                    <i class="fa fa-ban"></i>否</span>
+                            {/if}
+                        </div>
+
+                    </td>
+                    <td>
+                        {if $row['status']==0}
+                        <span class='label label-default'>待审批</span>
+                        {elseif $row['status']==1 /}
+                        <span class='label label-success'>通过审批</span>
+                        {elseif $row['status']== -1 /}
+                        <span class='label label-success'>不通过审批</span>
+                        {/if}
+                    </td>
+                    <td>
+                        {if $row['status'] == -1}
+                        <a class='btn btn-default' data-toggle="modal" data-target="#myModal{$row['id']}"   style=" margin-top: 6px; background-color: #ff5858; color:#fff;">
+                            不通过审批的理由
+                        </a>
+                        <br />
+
+
+                        <div class="modal fade" id="myModal{$row['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                            &times;
+                                        </button>
+                                        <h4 class="modal-title" id="myModalLabel">
+                                            审批不通过原因
+                                        </h4>
+                                    </div>
+                                    <div class="modal-body">
+                                                                <textarea class="form-control" name='content' rows="3">
+                                                                     {$row['remark']}
+                                                                </textarea>
+                                    </div>
+                                    <div class="modal-footer">
+
+                                    </div>
+                                </div><!-- /.modal-content -->
+                            </div>
+
+
+
+
+                            {/if}
+
+                            {if $row['status'] == 0}
+                            <a class='btn btn-default' onclick="return confirm('通过审批')" href="{:url('company/recruit_audit',array('status'=>'1','id' => $row['id']));}" style="background-color: #ffb034; color:#fff;">
+                                通过审批
+                            </a>
+                            <br />
+
+
+
+                            <a class='btn btn-default' data-toggle="modal" data-target="#myModal{$row['id']}"  style=" margin-top: 6px; background-color: #ff5858; color:#fff;">
+                                不通过审批
+                            </a>
+                            <br />
+
+
+                            <div class="modal fade" id="myModal{$row['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <form action="{:url('company/recruit_audit',array('status'=>'-1','id' => $row['id']));}" method="post">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                    &times;
+                                                </button>
+                                                <h4 class="modal-title" id="myModalLabel">
+                                                    审批不通过原因
+                                                </h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <textarea class="form-control" name='content' rows="3"></textarea>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                                                </button>
+                                                <button   type="submit" class="btn btn-primary">
+                                                    提交更改
+                                                </button>
+                                            </div>
+                                        </div><!-- /.modal-content -->
+                                    </div><!-- /.modal -->
+                                </form>
+
+                            </div>
+                            {/if}
+                    </td>
+                </tr>
+                {/volist}
+                {/notempty}
+                </tbody>
+            </table>
+            {$list->render()}
+        </div>
+    </div>
+</div>
+{/block}
+{block name='script'}
+<script>
+    function del(obj,goods_id){
+        if(window.confirm('确认删除该商品吗？')){
+            $.post("{:url('Goods/del')}",{'goods_id':goods_id},function(data){
+                alert(data.msg);
+                if(data.code){
+                    $(obj).parents('tr').remove();
+                }
+            },'json');
+        }
+    }
+    function change_is_hot(id,obj) {
+        var text = obj.innerHTML ;
+        var src = "";
+        if(text.indexOf("是") > 0 )
+        {
+            src = '<i class="fa fa-ban"></i>否';
+            var value = 0;
+        }else{
+            src = '<i class="fa fa-check-circle"></i>是</span>';
+            var value = 1;
+        }
+        $.post("{:url('Company/recruit_exit')}",{'id':id,'key':'is_hot','value':value},function(data){
+            if(data.code == 1){
+                updateAlert(data.msg ,'alert-success');
+                $(obj).html(src);
+            }else{
+                updateAlert(data.msg ,'alert-danger');
+            }
+        },'json');
+    }
+    function change_is_rcmd(id,obj) {
+        var text = obj.innerHTML ;
+        var src = "";
+        if(text.indexOf("是") > 0 )
+        {
+            src = '<i class="fa fa-ban"></i>否';
+            var value = 0;
+        }else{
+            src = '<i class="fa fa-check-circle"></i>是</span>';
+            var value = 1;
+        }
+        $.post("{:url('Company/recruit_exit')}",{'id':id,'key':'is_rcmd','value':value},function(data){
+            if(data.code == 1){
+                updateAlert(data.msg ,'alert-success');
+                $(obj).html(src);
+            }else{
+                updateAlert(data.msg ,'alert-danger');
+            }
+        },'json');
+    }
+    function change_is_better(id,obj) {
+        var text = obj.innerHTML ;
+        var src = "";
+        if(text.indexOf("是") > 0 )
+        {
+            src = '<i class="fa fa-ban"></i>否';
+            var value = 0;
+        }else{
+            src = '<i class="fa fa-check-circle"></i>是</span>';
+            var value = 1;
+        }
+        $.post("{:url('Company/recruit_exit')}",{'id':id,'key':'is_better','value':value},function(data){
+            if(data.code == 1){
+                updateAlert(data.msg ,'alert-success');
+                $(obj).html(src);
+            }else{
+                updateAlert(data.msg ,'alert-danger');
+            }
+        },'json');
+    }
+    function is_show(obj,goods_id){
+        var is_show = $(obj).attr('is_show');
+
+        if( is_show == 1 ){
+            is_show = 0;
+            ts = '是否下架?';
+        }else{
+            is_show = 1;
+            ts = '是否上架?';
+        }
+
+        if(window.confirm(ts)){
+            $.post("{:url('Goods/is_show')}",{'goods_id':goods_id,'is_show':is_show},function(data){
+                if(data.code){
+                    $(obj).attr('is_show',is_show);
+                    if( is_show ){
+                        $(obj).parents('tr').find('td').eq(4).html('已上架');
+                        $(obj).html('下架');
+                        alert('上架成功！');
+                    }else{
+                        $(obj).parents('tr').find('td').eq(4).html('未上架');
+                        $(obj).html('上架');
+                        alert('下架成功！');
+                    }
+                }
+            },'json');
+        }
+    }
+
+    function is_show_all(is_show){
+
+        var goods_id = '';
+        var flag = 0
+        $('.ch_item').each(function(k,v){
+            if( $(v).is(':checked') ){
+                flag = 1;
+                goods_id += $(v).val() + ',';
+            }
+        });
+        if( !flag ){
+            if( is_show == 1 ){
+                alert('请勾选需要批量上架的ID！');
+            }else{
+                alert('请勾选需要批量下架的ID！');
+            }
+        }
+        goods_id = goods_id.substring(0, goods_id.length - 1);
+
+        $.post("{:url('Goods/is_show_all')}",{'goods_id':goods_id,'is_show':is_show},function(data){
+            if(data.code){
+                if( is_show ){
+                    alert('批量上架成功！');
+                }else{
+                    alert('批量下架成功！');
+                }
+                location.reload();
+            }
+        },'json');
+
+    }
+
+    function del_all(obj,goods_id){
+        var goods_id = '';
+        var flag = 0
+        $('.ch_item').each(function(k,v){
+            if( $(v).is(':checked') ){
+                flag = 1;
+                goods_id += $(v).val() + ',';
+            }
+        });
+        if( !flag ){
+            alert('请勾选需要批量删除的ID！');
+            return;
+        }
+        goods_id = goods_id.substring(0, goods_id.length - 1);
+
+        if(window.confirm('确认批量删除商品吗？')){
+            $.post("{:url('Goods/del_all')}",{'goods_id':goods_id},function(data){
+                if(data.code){
+                    alert('批量删除成功！');
+                    location.reload();
+                }else{
+                    alert('批量删除失败！');
+                }
+            },'json');
+        }
+    }
+
+
+
+    function changeTableVal(table,id_name,id_value,field,obj)
+    {
+        var text = obj.innerHTML ;
+
+        var src = "";
+        if(text.indexOf("是") > 0 )
+        {
+            src = '<i class="fa fa-ban"></i>否';
+            var value = 0;
+        }else{
+            src = '<i class="fa fa-check-circle"></i>是</span>';
+            var value = 1;
+        }
+
+        $.ajax({
+            url:"/Api/Index/changeTableVal?table="+table+"&id_name="+id_name+"&id_value="+id_value+"&field="+field+'&value='+value,
+            success: function(data){
+                if(data.status == 1){
+                    updateAlert(data.msg ,'alert-success');
+                }else{
+                    updateAlert(data.msg ,'alert-danger');
+                }
+                $(obj).html(src);
+            }
+        });
+    }
+
+    function changeTableCommend(table,id_name,id_value,field,obj)
+    {
+        var text = obj.innerHTML ;
+
+        var src = "";
+        if(text.indexOf("是") > 0 )
+        {
+            src = '<i class="fa fa-ban"></i>否';
+            var value = 0;
+        }else{
+            src = '<i class="fa fa-check-circle"></i>是</span>';
+            var value = 1;
+        }
+
+        $.ajax({
+            url:"/Api/Index/changeTableCommend?table="+table+"&id_name="+id_name+"&id_value="+id_value+"&field="+field+'&value='+value,
+            success: function(data){
+                if(data.status == 1){
+                    updateAlert(data.msg ,'alert-success');
+                }else{
+                    updateAlert(data.msg ,'alert-danger');
+                }
+                $(obj).html(src);
+            }
+        });
+    }
+
+
+    $(function() {
+        $('#checkall').on('click',function(){
+            if(this.checked) {
+                $("input[name='goods_id[]']").prop('checked',true);
+            }else {
+                $("input[name='goods_id[]']").prop('checked',false);
+            }
+        });
+    });
+</script>
+{/block}

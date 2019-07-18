@@ -33,15 +33,10 @@ class Finance extends Common
         if(!empty($source_type)){
             $where['log.source_type'] = $source_type;
         }
-        if(!empty($level)){
-            $where['m.level'] = $level;
-        }
-        if(!empty($groupid)){
-            $where['m.groupid'] = $groupid;
-        }
+
 
         if(!empty($kw)){
-            is_numeric($kw)?$where['m.mobile'] = ['like', "%{$kw}%"]:$where['m.realname'] = ['like', "%{$kw}%"];
+            $where['m.mobile'] = ['like', "%{$kw}%"];
         }
         if ($begin_time && $end_time) {
             $where['m.createtime'] = [['EGT', strtotime($begin_time)], ['LT', strtotime($end_time)]];
@@ -62,10 +57,8 @@ class Finance extends Common
         ];
 
         $list  = Db::name('menber_balance_log')->alias('log')
-            ->field('log.id,m.id as mid, log.user_id,m.realname,m.avatar,m.weixin,log.note,log.source_type,m.nickname,m.mobile,g.groupname,log.old_balance,log.balance,log.create_time,l.levelname')
+            ->field('log.id,m.id as mid, log.user_id,m.avatar,m.weixin,log.note,log.source_type,m.mobile,log.old_balance,log.balance,log.create_time')
             ->join("member m",'m.id=log.user_id','LEFT')
-            ->join("member_group g",'m.groupid=g.id','LEFT')
-            ->join("member_level l",'m.level =l.id','LEFT')
             ->where($where)
             ->where(['log.balance_type' => 1])
             ->order('m.createtime DESC')
@@ -122,15 +115,9 @@ class Finance extends Common
         if(!empty($source_type)){
             $where['log.source_type'] = $source_type;
         }
-        if(!empty($level)){
-            $where['m.level'] = $level;
-        }
-        if(!empty($groupid)){
-            $where['m.groupid'] = $groupid;
-        }
 
         if(!empty($kw)){
-            is_numeric($kw)?$where['m.mobile'] = ['like', "%{$kw}%"]:$where['m.realname'] = ['like', "%{$kw}%"];
+            $where['m.mobile'] = ['like', "%{$kw}%"];
         }
         if ($begin_time && $end_time) {
             $where['m.createtime'] = [['EGT', strtotime($begin_time)], ['LT', strtotime($end_time)]];
@@ -151,10 +138,8 @@ class Finance extends Common
         ];
 
         $list  = Db::name('menber_balance_log')->alias('log')
-            ->field('log.id,log.user_id,m.id as mid, m.realname,m.avatar,m.weixin,log.note,log.source_type,m.nickname,m.mobile,g.groupname,log.old_balance,log.balance,log.create_time,l.levelname')
+            ->field('log.id,log.user_id,m.id as mid,m.avatar,m.weixin,log.note,log.source_type,m.nickname,m.mobile,log.old_balance,log.balance,log.create_time,l.levelname')
             ->join("member m",'m.id=log.user_id','LEFT')
-            ->join("member_group g",'m.groupid=g.id','LEFT')
-            ->join("member_level l",'m.level =l.id','LEFT')
             ->where($where)
             ->where(['log.balance_type' => 0])
             ->order('m.createtime DESC')
@@ -340,7 +325,7 @@ class Finance extends Common
         }
         
         if(!empty($kw)){
-            is_numeric($kw)?$where['m.mobile'] = ['like', "%{$kw}%"]:$where['m.realname'] = ['like', "%{$kw}%"];
+            $where['m.mobile'] = ['like', "%{$kw}%"];
         }
 
         if ($begin_time && $end_time) {

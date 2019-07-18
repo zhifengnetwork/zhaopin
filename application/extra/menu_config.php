@@ -192,15 +192,88 @@ return [
             ],
         ],
      ],
+    'category' => [
+        'id'    => 30000,
+        'title' => '职位管理',
+        'sort'  => 3,
+        'url'   => 'category/index',
+        'hide'  => 1,
+        'icon'  => 'glyphicon glyphicon-briefcase',
+        'child' => [
+            [
+                'id'    => 30100,
+                'title' => '职位管理',
+                'sort'  => 1,
+                'url'   => 'category/index',
+                'hide'  => 1,
+                'icon'  => 'fa-th-large',
+                'child' => [
+                    [
+                        'id'    => 30301,
+                        'title' => '分类列表',
+                        'sort'  => 1,
+                        'url'   => 'category/index',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 30302,
+                        'title' => '添加分类',
+                        'sort'  => 2,
+                        'url'   => 'category/add',
+                        'hide'  => 0,
+                    ],
+                    [
+                        'id'    => 30303,
+                        'title' => '修改分类',
+                        'sort'  => 3,
+                        'url'   => 'category/edit',
+                        'hide'  => 0,
+                    ],
 
+                ],
+            ],
+            [
+                'id'    => 31000,
+                'title' => '招聘管理',
+                'sort'  => 1,
+                'url'   => 'company/recruit_list',
+                'hide'  => 1,
+                'icon'  => 'fa-th-large',
+                'child' => [
+                    [
+                        'id'    => 31001,
+                        'title' => '招聘列表',
+                        'sort'  => 1,
+                        'url'   => 'company/recruit_list',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 31002,
+                        'title' => '添加分类',
+                        'sort'  => 2,
+                        'url'   => 'category/add',
+                        'hide'  => 0,
+                    ],
+                    [
+                        'id'    => 31003,
+                        'title' => '修改分类',
+                        'sort'  => 3,
+                        'url'   => 'category/edit',
+                        'hide'  => 0,
+                    ],
+
+                ],
+            ],
+        ],
+    ],
      //分销管理
 
 
     'user' => [
         'id'    => 90000,
-        'title' => '我的会员',
+        'title' => '用户管理',
         'sort'  => 9,
-        'url'   => 'member/index',
+        'url'   => 'company/vip_set',
         'hide'  => 1,
         'icon'  => 'glyphicon glyphicon-user',
         'child' => [
@@ -217,7 +290,7 @@ return [
                         'title' => '会员管理',
                         'sort'  => 1,
                         'url'   => 'member/index',
-                        'hide'  => 1,
+                        'hide'  => 0,
                     ],
                     [
                         'id'    => 90102,
@@ -245,7 +318,7 @@ return [
                         'title' => '会员等级',
                         'sort'  => 2,
                         'url'   => 'member/level',
-                        'hide'  => 1,
+                        'hide'  => 0,
                     ],
                     [
                         'id'    => 90106,
@@ -266,7 +339,7 @@ return [
                         'title' => '会员分组',
                         'sort'  => 4,
                         'url'   => 'member/group',
-                        'hide'  => 1,
+                        'hide'  => 0,
                     ],
                     [
                         'id'    => 90109,
@@ -294,6 +367,53 @@ return [
                         'title' => '会员详情',
                         'sort'  => 4,
                         'url'   => 'member/member_edit',
+                        'hide'  => 0,
+                    ],
+                    [
+                        'id'    => 90113,
+                        'title' => '会员等级设置',
+                        'sort'  => 4,
+                        'url'   => 'company/vip_set',
+                        'hide'  => 1,
+                    ],
+
+                ],
+            ],
+            [
+                'id'    => 91000,
+                'title' => '审核管理',
+                'sort'  => 5,
+                'url'   => 'company/index',
+                'hide'  => 1,
+                'icon'  => 'fa-th-large',
+                'child' => [
+
+                    [
+                        'id'    => 91001,
+                        'title' => '公司审核列表',
+                        'sort'  => 4,
+                        'url'   => 'company/index',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 91002,
+                        'title' => '个人审核列表',
+                        'sort'  => 4,
+                        'url'   => 'company/person_list',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 91003,
+                        'title' => '公司审核详情',
+                        'sort'  => 4,
+                        'url'   => 'company/company_details',
+                        'hide'  => 0,
+                    ],
+                    [
+                        'id'    => 91004,
+                        'title' => '个人审核详情',
+                        'sort'  => 4,
+                        'url'   => 'company/person_details',
                         'hide'  => 0,
                     ],
                 ],

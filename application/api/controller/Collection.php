@@ -4,6 +4,7 @@
  */
 namespace app\api\controller;
 use think\Db;
+use app\common\model\Region;
 
 class Collection extends ApiBase
 {
@@ -16,14 +17,18 @@ class Collection extends ApiBase
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
-
         $list = Db::table('collection')->alias('c')
-                ->join('goods g','g.goods_id=c.goods_id','LEFT')
-                ->join('goods_img gi','gi.goods_id=g.goods_id','LEFT')
-                ->field('g.goods_id,g.goods_name,g.price,gi.picture img')
-                ->where('user_id',$user_id)
-                ->where('gi.main',1)
+                ->join('recruit r','r.id=c.recruit_id','LEFT')
+                ->join('company co','co.id=r.company_id','LEFT')
+                ->join('member m','m.id=co.user_id','LEFT')
+                ->join('category ca','ca.cat_id=r.type','LEFT')
+                ->field('r.id,r.title,r.type,ca.cat_name,r.work_age,r.require_cert,co.contacts,co.city,co.district,m.avatar')
+                ->where('c.user_id',$user_id)
                 ->select();
+        foreach ($list as $key=>$value){
+            $list[$key]['city']=Region::getName($list[$key]['city']);
+            $list[$key]['district']=Region::getName($list[$key]['district']);
+        }
         $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$list]);
     }
 
@@ -36,14 +41,14 @@ class Collection extends ApiBase
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
 
-        $goods_id = input('goods_id');
-        if(!$goods_id) $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+        $recruit_id = input('recruit_id');
+        if(!$recruit_id) $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
 
-        $res = Db::table('goods')->where('goods_id',$goods_id)->find();
-        if(!$res) $this->ajaxReturn(['status' => -2 , 'msg'=>'该商品不存在！','data'=>'']);
+        $res = Db::table('recruit')->where('id',$recruit_id)->find();
+        if(!$res) $this->ajaxReturn(['status' => -2 , 'msg'=>'该职位不存在！','data'=>'']);
 
         $where['user_id'] = $user_id;
-        $where['goods_id'] = $goods_id;
+        $where['recruit_id'] = $recruit_id;
 
         $res = Db::table('collection')->where($where)->find();
 

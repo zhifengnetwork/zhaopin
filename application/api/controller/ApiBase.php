@@ -183,4 +183,24 @@ class ApiBase extends Controller
     public function _empty(){
         $this->ajaxReturn(['status' => -1 , 'msg'=>'接口不存在','data'=>null]);
     }
+
+    /**
+     * 将base64图片转换存储并返回路径
+     * @param $base64_img string base64格式的文件
+     * @return mixed|string 文件路径
+     */
+    function base64_to_img($base64_img,$up_dir = UPLOAD_PATH)
+    {
+        $image = '';
+        if (substr($base64_img, 0, 10) == 'data:image' && preg_match('/^(data:\s*image\/(\w+);base64,)/', $base64_img, $result)) {
+//            $up_dir =  UPLOAD_PATH . 'company/'; //存放目录
+            if (!file_exists(ROOT_PATH . $up_dir)) mkdir(ROOT_PATH . $up_dir, 0777);
+            $file_name = date('YmdHis_') . rand(10000, 99999) . '.' . $result[2];
+            $new_file = $up_dir . $file_name;
+            if (file_put_contents(ROOT_PATH . $new_file, base64_decode(str_replace($result[1], '', $base64_img)))) {
+                $image = '/' . $new_file;
+            }
+        }
+        return $image;
+    }
 }

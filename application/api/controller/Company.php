@@ -53,11 +53,12 @@ class Company extends ApiBase
     public function edit()
     {
         $this->getCompany();
-        $validate = $this->validate(input('get.'), 'User.company_edit');
+        $data = input();
+        $validate = $this->validate($data, 'User.company_edit');
         if (true !== $validate) {
             return $this->ajaxReturn(['status' => -2, 'msg' => $validate]);
         }
-        $data = input('get.');
+
         $data['open_time'] = implode('-', [$data['open_year'], $data['open_month'], $data['open_day']]);
         unset($data['open_year'], $data['open_month'], $data['open_day']);
         if (!$this->_com->save($data)) {
@@ -89,7 +90,7 @@ class Company extends ApiBase
                 $this->ajaxReturn(['status' => -2, 'msg' => '信息不存在！']);
             }
         }
-        $data = input('get.');
+        $data = input();
         $validate = $this->validate($data, 'Recruit.edit');
         if (true !== $validate) {
             return $this->ajaxReturn(['status' => -2, 'msg' => $validate]);
@@ -136,7 +137,14 @@ class Company extends ApiBase
     public function edit_images()
     {
         $this->getCompany();
-        if (Db::name('company')->where(['id' => $this->_id])->update(['images' => input('images')])) {
+        $images = json_decode(input('images'), true);
+        foreach ($images as &$v) {
+            $v['image'] = $this->base64_to_img($v['image'],UPLOAD_PATH . 'company/');
+            if(!$v['image']){
+                $this->ajaxReturn(['status' => -2, 'msg' => '文件格式错误！']);
+            }
+        }
+        if (Db::name('company')->where(['id' => $this->_id])->update(['images' => json_encode($images)])) {
             $this->ajaxReturn(['status' => 1, 'msg' => '保存成功']);
         }
         $this->ajaxReturn(['status' => -2, 'msg' => '保存失败']);

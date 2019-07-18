@@ -55,11 +55,12 @@ class Person extends ApiBase
     public function edit()
     {
         $this->getPerson();
-        $validate = $this->validate(input('get.'), 'User.person_edit');
+        $data = input();
+        $validate = $this->validate($data, 'User.person_edit');
         if (true !== $validate) {
             return $this->ajaxReturn(['status' => -2, 'msg' => $validate]);
         }
-        $data = input('get.');
+
         $data['daogang_time'] = implode('-',[$data['daogang_year'],$data['daogang_month'],$data['daogang_day']]);
         $data['birth'] = implode('-',[$data['birth_year'],$data['birth_month'],$data['birth_day']]);
         unset($data['daogang_year'],$data['daogang_month'],$data['daogang_day'],$data['birth_year'],$data['birth_month'],$data['birth_day']);

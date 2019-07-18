@@ -39,7 +39,8 @@ class Company extends ApiBase
     public function info()
     {
         $this->getCompany();
-        $data = $this->_com->toArray();
+        $data = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement')
+            ->where(['id'=>$this->_id])->find();
         $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
         $data['open_year'] = $open ? $open[0] : '';
         $data['open_month'] = $open ? $open[1] : '';
@@ -93,6 +94,7 @@ class Company extends ApiBase
         if (true !== $validate) {
             return $this->ajaxReturn(['status' => -2, 'msg' => $validate]);
         }
+        unset($data['token']);
         $data['status'] = 0;
         if ($id > 0) {
             if (Db::name('recruit')->where(['company_id' => $this->_id, 'id' => $id])->update($data)) {

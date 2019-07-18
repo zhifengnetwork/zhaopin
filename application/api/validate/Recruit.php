@@ -16,10 +16,10 @@ class Recruit extends Validate
     protected $rule = [
         'title' => 'require|length:2,50',
         'type' => 'require|number',
-        'work_age' => 'require|number',
-        'salary' => 'require|number',
+        'work_age' => 'require',
+        'salary' => 'require',
         'require_cert' => 'require|in:0,1',
-        'detail' => 'length:0,200',
+        'detail' => 'require|length:10,200',
     ];
 
     protected $message = [
@@ -27,13 +27,12 @@ class Recruit extends Validate
         'title.length' => '标题长度2-50',
         'type.require' => '请选择工种',
         'type.number' => '请选择正确的工种',
-        'work_age.require' => '请填写工龄',
-        'work_age.number' => '请填写正确的工龄',
-        'salary.require' => '请填写薪资',
-        'salary.number' => '请填写正确的薪资',
+        'work_age.require' => '请选择工龄',
+        'salary.require' => '请选择薪资',
         'require_cert.require' => '请选择要求证书',
         'require_cert.in' => '请选择正确的要求证书',
-        'detail.length' => '详情最大长度200',
+        'detail.require' => '请填写职位详情',
+        'detail.length' => '详情长度10-200',
     ];
 
     protected $scene = [

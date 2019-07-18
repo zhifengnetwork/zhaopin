@@ -483,6 +483,23 @@ class User extends ApiBase
         ]);
     }
 
+    public function index(){
+        $user_id = $this->get_user_id();
+        $member = Member::get($user_id);
+        if($member['regtype']==3){
+            $data = Db::name('person')->alias('p')
+                ->field('p.name,p.avatar,m.mobile,m.openid,p.status,p.reserve,p.shelf,p.pull')
+                ->join('member m','m.id = p.user_id','LEFT')
+                ->where(['p.user_id'=>$user_id])->find();
+        }else{
+            $data = Db::name('company')->alias('c')
+                ->field('c.id,c.contacts,c.logo,m.openid,c.vip_time,m.mobile,c.vip_type,c.company_name,p.shelf,p.pull,p.stauts')
+                ->join('member m','m.id = p.user_id','LEFT')
+                ->where(['c.user_id'=>$user_id])->find();
+        }
+        $this->ajaxReturn(['status' => 1, 'msg' => '注册成功！','data'=>$data]);
+    }
+
     /**
      * 上传头像
      */

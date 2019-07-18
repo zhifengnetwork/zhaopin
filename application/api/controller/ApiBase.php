@@ -46,6 +46,8 @@ class ApiBase extends Controller
             if(empty($user_id)) exit(json_encode(['code'=>10000,'msg'=>'您未登录，请登录！']));
 
         }
+        /* 设置内部字符编码为 UTF-8 */
+        mb_internal_encoding("UTF-8");
     }
 
     private  static $redis = null;

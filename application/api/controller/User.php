@@ -4,6 +4,7 @@
  */
 namespace app\api\controller;
 use app\common\model\Advertisement;
+use app\common\model\Category;
 use app\common\model\Member;
 use app\common\model\Region;
 use app\common\model\Users;
@@ -404,6 +405,9 @@ class User extends ApiBase
     // 下一步
     public function next()
     {
+        $this->ajaxReturn(['data'=>[
+            'images'=>[['image'=>'base64','name'=>'bababababb-1'],['image'=>'base64','name'=>'bababababb-2'],]
+        ]]);
         $user_id = $this->get_user_id();
         if (!$user_id || !($member = Db::name('member')->where(['id' => $user_id])->find())) {
             $this->ajaxReturn(['status' => -2, 'msg' => '用户错误']);
@@ -454,30 +458,35 @@ class User extends ApiBase
     }
 
     // 游客首页
-    public function visit(){
+    public function visit()
+    {
         $adList = Advertisement::getList();
         // 热招
         $list = Db::name('recruit')
-            ->field('c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
+            ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
             ->alias('r')
-            ->join('company c','c.id=r.company_id','LEFT')
-            ->join('member m','c.user_id=m.id','LEFT')
-            ->where(['r.is_hot'=>1,'r.status'=>1])->select();
+            ->join('company c', 'c.id=r.company_id', 'LEFT')
+            ->join('member m', 'c.user_id=m.id', 'LEFT')
+            ->where(['r.is_hot' => 1, 'r.status' => 1])->select();
 
         // 找活
         $person = Db::name('person')
             ->alias('p')
-            ->field('p.avatar,p.name,p.job_type,p.work_age,p.images')
+            ->field('p.id,p.avatar,p.name,p.job_type,p.work_age,p.images')
             ->select();
+        foreach ($person as &$v) {
+            $v['job_type'] = Category::getNameById($v['job_type']) ?: '';
+            $v['images'] = $v['images'] ? 1 : 0;
+        }
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
-            'data'=>['ad'=>$adList,'recruit'=>$list,'person'=>$person]
+            'data' => ['ad' => $adList, 'recruit' => $list, 'person' => $person]
         ]);
     }
 
     /**
      * 上传头像
      */
-    public function upload_headpic()
+        public function upload_headpic()
     {
         $file = request()->file('head_pic');
         $validate = ['size'=>config('image_upload_limit_size'),'ext'=>'jpg,png,gif,jpeg'];
@@ -586,11 +595,6 @@ class User extends ApiBase
 
         $this->ajaxReturn(['status' => 1 , 'msg'=>'修改密码成功！','data'=>$member]);
     }
-
-
-
-
-
 
     /**
      * 用户信息
@@ -719,206 +723,22 @@ class User extends ApiBase
      * +---------------------------------
     */
     public function get_address(){
-        $user_id = $this->get_user_id();
-        if(!$user_id){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在','data'=>'']);
+
+        $data = Db::name('region')->select();
+        $result = [];
+        foreach ($data as $item) {
+            $result[(int)$item['parent_id']][(int)$item['code']] = $item['area_name'];
         }
-        //第一种方法
-        //$province_list  =  Db::name('region')->field('*')->where(['area_type' => 1])->column('area_id,area_name');
-        // $city_list      =  Db::name('region')->field('*')->where(['area_type' => 2])->column('area_id,area_name');
-        // $county_list    =  Db::name('region')->field('*')->where(['area_type' => 3])->column('area_id,area_name');
-        // $data = [
-        //     'province_list' => $province_list,
-        //     'city_list'     => $city_list,
-        //     'county_list'   => $county_list,
-        // ];
-        //第二种方法
-        $list  = Db::name('region')->field('*')->select();
-        foreach($list as $v){
-           if($v['area_type'] == 1){
-              $address_list['province_list'][$v['code'] * 10000]=  $v['area_name'];
-           }
-           if($v['area_type'] == 2){
-              $address_list['city_list'][$v['code'] *100]=  $v['area_name'];
-           }
-           if($v['area_type'] == 3){
-              $address_list['county_list'][$v['code']]=  $v['area_name'];
-           }
-        }
-        $this->ajaxReturn(['status'=>1,'msg'=>'获取地址成功','data'=>$address_list]);
+
+//        $province = Db::name('region')->field('code,area_name as name')->where('area_type',1)->select();
+//        foreach($province as $k=>&$v){
+//            $province[$k]['child']=Db::name('region')->field('code,area_name as name')->where('parent_id',$v['code'])->select();
+//            foreach($province[$k]['child'] as $kk=>&$vv) {
+//                $province[$k]['child'][$kk]['child'] = Db::name('region')->field('code,area_name as name')->where('parent_id',$vv['code'])->select();
+//            }
+//        }
+        $this->ajaxReturn($result);
     }
-
-
-
-
-    /**
-     * +---------------------------------
-     * 地址管理列表
-     * +---------------------------------
-    */
-    public function address_list(){
-        $user_id = $this->get_user_id();
-        if(!$user_id){
-            $this->ajaxReturn(['status' => -2, 'msg'=>'用户不存在','data'=>'']);
-        }
-        $data        =  Db::name('user_address')->where('user_id', $user_id)->select();
-        $region_list =  Db::name('region')->field('*')->column('area_id,area_name');
-        foreach ($data as &$v) {
-            $v['province'] = $region_list[$v['province']];
-            $v['city']     = $region_list[$v['city']];
-            $district      = Db::name('region')->where(['area_id' => $v['district']])->value('code');
-            $v['code']     = $district;
-            $v['district'] = $region_list[$v['district']];
-
-            if($v['twon'] == 0){
-                $v['twon']     = '';
-            }else{
-                $v['twon'] = $region_list[$v['twon']];
-            }
-
-        }
-        unset($v);
-        $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$data]);
-    }
-
-    /**
-     * +---------------------------------
-     * 添加地址
-     * +---------------------------------
-    */
-    public function add_address()
-    {
-            $user_id   = $this->get_user_id();
-            if(!$user_id){
-                $this->ajaxReturn(['status' => -2, 'msg'=>'用户不存在','data'=>'']);
-            }
-
-            $consignee = input('consignee');
-            $longitude = input('lng');
-            $latitude = input('lat');
-            $address_district = input('address_district');
-            $address_twon = input('address_twon');
-            $address = input('address');
-            $mobile = input('mobile');
-            $is_default = input('is_default');
-
-            $address = $address_twon . $address;
-
-            $post_data['consignee'] = $consignee;
-            $post_data['longitude'] = $longitude;
-            $post_data['latitude'] = $latitude;
-            $post_data['mobile'] = $mobile;
-            $post_data['is_default'] = $is_default;
-
-            if($latitude && $longitude){
-                $url = "http://api.map.baidu.com/geocoder/v2/?ak=gOuAqF169G6cDdxGnMmB7kBgYGLj3G1j&callback=renderReverse&location={$latitude},{$longitude}&output=json";
-                $res = request_curl($url);
-                if($res){
-                    $res = explode('Reverse(',$res)[1];
-                    $res = substr($res,0,strlen($res)-1);
-                    $res = json_decode($res,true)['result']['addressComponent'];
-
-                    $post_data['province'] = Db::table('region')->where('area_name',$res['province'])->value('area_id');
-                    $post_data['city'] = Db::table('region')->where('area_name',$res['city'])->value('area_id');
-                    $post_data['district'] = Db::table('region')->where('area_name',$res['district'])->value('area_id');
-                    if($res['town']){
-                        $post_data['town'] = Db::table('region')->where('area_name',$res['town'])->value('area_id');
-                    }
-                }
-            }
-            $post_data['address'] = $address;
-
-            $addressM  = Model('UserAddr');
-            $return    = $addressM->add_address($user_id, 0, $post_data);
-            $this->ajaxReturn($return);
-    }
-
-
-
-    /**
-     * +---------------------------------
-     * 地址编辑
-     * +---------------------------------
-    */
-    public function edit_address()
-    {
-        $user_id = $this->get_user_id();
-        $id      = input('address_id');
-        $address = Db::name('user_address')->where(array('address_id' => $id, 'user_id' => $user_id))->find();
-        if(!$address){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'地址id不存在！','data'=>'']);
-        }
-
-        $consignee = input('consignee');
-        $longitude = input('lng');
-        $latitude = input('lat');
-        $address_district = input('address_district');
-        $address_twon = input('address_twon');
-        $address = input('address');
-        $mobile = input('mobile');
-        $is_default = input('is_default');
-
-        $address = $address_twon . $address;
-
-        $post_data['consignee'] = $consignee;
-        $post_data['longitude'] = $longitude;
-        $post_data['latitude'] = $latitude;
-        $post_data['mobile'] = $mobile;
-        $post_data['is_default'] = $is_default;
-
-        if($latitude && $longitude){
-            $url = "http://api.map.baidu.com/geocoder/v2/?ak=gOuAqF169G6cDdxGnMmB7kBgYGLj3G1j&callback=renderReverse&location={$latitude},{$longitude}&output=json";
-            $res = request_curl($url);
-            if($res){
-                $res = explode('Reverse(',$res)[1];
-                $res = substr($res,0,strlen($res)-1);
-                $res = json_decode($res,true)['result']['addressComponent'];
-
-                $post_data['province'] = Db::table('region')->where('area_name',$res['province'])->value('area_id');
-                $post_data['city'] = Db::table('region')->where('area_name',$res['city'])->value('area_id');
-                $post_data['district'] = Db::table('region')->where('area_name',$res['district'])->value('area_id');
-                if($res['town']){
-                    $post_data['town'] = Db::table('region')->where('area_name',$res['town'])->value('area_id');
-                }
-            }
-        }
-
-        $post_data['address'] = $address;
-
-
-
-        $addressM  = Model('UserAddr');
-        $return    = $addressM->add_address($user_id, $id, $post_data);
-        $this->ajaxReturn($return);
-    }
-
-
-
-    /**
-     * +---------------------------------
-     * 删除地址
-     * +---------------------------------
-    */
-    public function del_address()
-    {
-        $user_id = $this->get_user_id();
-        $id      = input('address_id/d',86);
-        $address = Db::name('user_address')->where(["address_id" => $id])->find();
-        if(!$address){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'地址id不存在！','data'=>'']);
-        }
-        $row =  Db::name('user_address')->where(array('user_id' => $user_id, 'address_id' => $id))->delete();
-        // 如果删除的是默认收货地址 则要把第一个地址设置为默认收货地址
-        if ($address['is_default'] == 1) {
-            $address2 = Db::name('user_address')->where(["user_id" => $user_id])->find();
-            $address2 && Db::name('user_address')->where(["address_id" => $address2['address_id']])->update(array('is_default' => 1));
-        }
-        if ($row !== false)
-            $this->ajaxReturn(['status' => 1 , 'msg'=>'删除地址成功','data'=>$row]);
-        else
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'删除失败','data'=>'']);
-    }
-
 
    /**
      * +---------------------------------
@@ -986,10 +806,12 @@ class User extends ApiBase
             $this->ajaxReturn(['status' => -2, 'msg'=>'用户不存在','data'=>'']);
         }
         $new_mobile = input('mobile');
+        if(!checkMobile($new_mobile)){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'手机号格式错误！']);
+        }
         $code       = input('code');
 
         $member = Db::table('member')->where(['id' => $user_id])->find();
-
         if($member['mobile'] == $new_mobile){
              $this->ajaxReturn(['status' => -2 , 'msg'=>'手机号不能相同！','data'=>'']);
         }
@@ -1004,43 +826,12 @@ class User extends ApiBase
         $res = Db::table('member')->where(['id' => $user_id])->update(['mobile' => $new_mobile]);
 
         if($res !== false){
-            $this->ajaxReturn(['status' => 1 , 'msg'=>'换绑成功','data'=>'']);
-        }else{
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'换绑失败','data'=>'']);
-        }
-
-    }
-
-
-   /**
-     * +---------------------------------
-     * 设置支付宝账户
-     * +---------------------------------
-    */
-    public function set_alipay(){
-        $user_id = $this->get_user_id();
-        if(!$user_id){
-            $this->ajaxReturn(['status' => -2, 'msg'=>'用户不存在','data'=>'']);
-        }
-        $alipay_name   = input('alipay_name','');
-        $alipay_number = input('alipay_number','');
-        if(empty($alipay_name) || strlen($alipay_name) > 20){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'支付宝真实姓名有误！','data'=>'']);
-        }
-
-        if(empty($alipay_number) || strlen($alipay_number) > 20){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'支付宝账号！','data'=>'']);
-        }
-
-        $res = Db::table('member')->where(['id' => $user_id])->update(['alipay' => $alipay_number,'alipay_name' => $alipay_name]);
-
-        if($res !== false){
             $this->ajaxReturn(['status' => 1 , 'msg'=>'修改成功','data'=>'']);
+        }else{
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'修改失败','data'=>'']);
         }
 
-        $this->ajaxReturn(['status' => 1 , 'msg'=>'修改失败','data'=>'']);
     }
-
 
 
 

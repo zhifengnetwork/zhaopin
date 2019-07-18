@@ -30,6 +30,7 @@ class User extends Validate
 
         'nation' => 'require|chs|length:1,6',
         'job_type' => 'require|number',
+        'work_age' => 'require|number',
         'daogang_year' => 'require|dateFormat:Y',
         'daogang_month' => 'require|dateFormat:m',
         'daogang_day' => 'require|dateFormat:d',
@@ -38,6 +39,7 @@ class User extends Validate
         'education' => 'length',
 
         'contacts' => 'require|chs|length:2,8',
+        'mobile' => 'require|checkMobile',
         'telephone' => 'require|checkTel',
         'district' => 'require|checkDistinct',
         'address' => 'require|length:4,50',
@@ -86,6 +88,8 @@ class User extends Validate
         'nation.chs' => '民族必须是中文',
         'nation.length' => '民族长度1-6',
         'job_type.require' => '请选择求职类型',
+        'work_age.require'=>'请填写工龄',
+        'work_age.number'=>'工龄必须是数字',
         'daogang_year.require' => '请选择到岗时间',
         'daogang_year.dateFormat' => '请选择正确的到岗时间',
         'daogang_month.require' => '请选择到岗时间',
@@ -100,6 +104,8 @@ class User extends Validate
 
         'contacts.require' => '请填写联系人',
         'contacts.chs' => '联系人必须是中文',
+        'mobile.require' => '请填写手机号',
+        'mobile.checkMobile' => '请填写正确的手机号',
         'telephone.require' => '请填写固定电话',
         'telephone.checkTel' => '请填写正确的固定电话',
         'district.require' => '请选择公司地区',
@@ -132,10 +138,15 @@ class User extends Validate
 
     protected $scene = [
         'person' => ['name', 'gender', 'birth_year', 'birth_month', 'birth_day', 'graduate_year', 'graduate_month', 'graduate_day', 'school', 'school_type', 'idcard_front', 'idcard_back'],
-        'company' => ['contacts', 'telephone', 'district', 'company_name', 'type', 'desc', 'c_img', 'address'],
-        'person_edit' => ['name', 'gender', 'birth_year', 'birth_month', 'birth_day', 'nation', 'job_type', 'daogang_year','daogang_month', 'daogang_day',  'salary', 'experience', 'education', 'desc'],
+        'company' => ['contacts', 'mobile', 'telephone', 'district', 'company_name', 'type', 'desc', 'c_img'],
+        'person_edit' => ['name', 'gender', 'birth_year', 'birth_month', 'birth_day', 'nation', 'job_type','work_age', 'daogang_year', 'daogang_month', 'daogang_day', 'salary', 'experience', 'education', 'desc'],
         'company_edit' => ['open_year', 'open_month', 'open_day', 'company_name', 'type', 'desc', 'contacts_scale', 'achievement', 'introduction'],
     ];
+
+    protected function checkMobile($value)
+    {
+        return checkMobile($value);
+    }
 
     protected function checkTel($value)
     {

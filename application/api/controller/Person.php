@@ -2,6 +2,7 @@
 
 namespace app\api\controller;
 
+use app\common\model\Category;
 use app\common\model\Person as PersonModel;
 use think\Db;
 
@@ -19,7 +20,7 @@ class Person extends ApiBase
      */
     private $_person;
 
-    public function __construct()
+    public function getPerson()
     {
         $this->_id = $this->get_user_id();
         if (!$this->_id || !($this->_person = PersonModel::get(['user_id'=>$this->_id]))) {
@@ -35,6 +36,7 @@ class Person extends ApiBase
     // 信息
     public function info()
     {
+        $this->getPerson();
         $data = $this->_person->toArray();
         $birth = $data['birth'] ? explode('-', $data['birth']) : [];
         $data['birth_year'] = $birth ? $birth[0] : '';
@@ -52,6 +54,7 @@ class Person extends ApiBase
     // 编辑信息
     public function edit()
     {
+        $this->getPerson();
         $validate = $this->validate(input('get.'), 'User.person_edit');
         if (true !== $validate) {
             return $this->ajaxReturn(['status' => -2, 'msg' => $validate]);
@@ -66,6 +69,7 @@ class Person extends ApiBase
         $this->ajaxReturn(['status' => 1, 'msg' => '保存成功！']);
     }
 
+    // todo 隐藏部分信息，预定？
     public function detail(){
         $id = input('id/d');
         if (!$id||!($recruit = Db::name('person')->where(['id' => $id])->find())) {
@@ -73,11 +77,32 @@ class Person extends ApiBase
         }
         $detail = Db::name('person')
             ->alias('p')
-            ->field('p.name,p.gender,p.school_type,m.mobile,p.age,p.work_age,p.images,p.job_type,p.desc,p.experience')
+            ->field('p.name,p.gender,p.avatar,p.school_type,m.mobile,p.age,p.work_age,p.images,p.job_type,p.desc,p.experience')
             ->join('member m','m.id=p.user_id','LEFT')
             ->where(['p.id' => $id])
             ->find();
+        $detail['gender'] = $detail['gender']=='female'?'女':'男';
+        $detail['images'] = $detail['images']?1:0;
+        $detail['job_type'] = Category::getNameById($detail['job_type']) ?: '';
         $this->ajaxReturn(['status' => 1, 'msg' => '保存成功','data'=>$detail]);
     }
+
+    // 资料显示
+    public function get_images()
+    {
+        $this->getPerson();
+        $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => ['image' => json_decode($this->_person->images)]]);
+    }
+
+    // 资料管理
+    public function edit_images()
+    {
+        $this->getPerson();
+        if (Db::name('person')->where(['id' => $this->_id])->update(['images' => input('images')])) {
+            $this->ajaxReturn(['status' => 1, 'msg' => '保存成功']);
+        }
+        $this->ajaxReturn(['status' => -2, 'msg' => '保存失败']);
+    }
+
 
 }

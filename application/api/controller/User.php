@@ -430,11 +430,21 @@ class User extends ApiBase
                 return $this->ajaxReturn(['status' => -2, 'msg' => $validate]);
             }
 
+            $c_img = request()->file('c_img');
+            $dir = UPLOAD_PATH . 'c_img';
+            if (!file_exists(ROOT_PATH . $dir)) mkdir(ROOT_PATH . $dir, 0777);
+            $validate = ['size' => 2000000, 'ext' => 'jpg,png,gif,jpeg'];
+            $info = $c_img->validate($validate)->move(ROOT_PATH . $dir);
+            if ($info) {
+                $data['c_img'] = DS . $dir . DS . $info->getFilename();
+            } else {
+                $this->ajaxReturn(['status' => -1, 'msg' => "营业执照:".$c_img->getError(), 'data' => $c_img->getInfo()]);
+            }
+
             $data['images'] = [];
             $images = request()->file('image');
             $dir = UPLOAD_PATH . 'company';
             if (!file_exists(ROOT_PATH . $dir)) mkdir(ROOT_PATH . $dir, 0777);
-            $validate = ['size' => 2000000, 'ext' => 'jpg,png,gif,jpeg'];
             foreach ($images as $k => $image) {
                 $info = $image->validate($validate)->move(ROOT_PATH . $dir);
                 if ($info) {
@@ -443,7 +453,7 @@ class User extends ApiBase
                         'title' => isset($data['title'][$k]) ? $data['title'][$k] : ''
                     ];
                 } else {
-                    $this->ajaxReturn(['status' => -1, 'msg' => $image->getError(), 'data' => $image->getInfo()]);
+                    $this->ajaxReturn(['status' => -1, 'msg' => "其他资料{$k}:".$image->getError(), 'data' => $image->getInfo()]);
                 }
             }
             $data['images'] = json_encode($data['images']);
@@ -463,11 +473,33 @@ class User extends ApiBase
                 return $this->ajaxReturn(['status' => -2, 'msg' => $validate]);
             }
 
+            $back = request()->file('idcard_back');
+            $dir = UPLOAD_PATH . 'idcard_back';
+            if (!file_exists(ROOT_PATH . $dir)) mkdir(ROOT_PATH . $dir, 0777);
+            $validate = ['size' => 2000000, 'ext' => 'jpg,png,gif,jpeg'];
+            $info = $back->validate($validate)->move(ROOT_PATH . $dir);
+            if ($info) {
+                $data['idcard_back'] = DS . $dir . DS . $info->getFilename();
+            } else {
+                $this->ajaxReturn(['status' => -1, 'msg' => "身份证反面:".$back->getError(), 'data' => $back->getInfo()]);
+            }
+
+            $front = request()->file('idcard_front');
+            $dir = UPLOAD_PATH . 'idcard_front';
+            if (!file_exists(ROOT_PATH . $dir)) mkdir(ROOT_PATH . $dir, 0777);
+            $info = $front->validate($validate)->move(ROOT_PATH . $dir);
+            if ($info) {
+                $data['idcard_front'] = DS . $dir . DS . $info->getFilename();
+            } else {
+                $this->ajaxReturn(['status' => -1, 'msg' => "身份证正面:".$front->getError(), 'data' => $front->getInfo()]);
+            }
+
+
+
             $data['images'] = [];
             $images = request()->file('image');
             $dir = UPLOAD_PATH . 'person';
             if (!file_exists(ROOT_PATH . $dir)) mkdir(ROOT_PATH . $dir, 0777);
-            $validate = ['size' => 2000000, 'ext' => 'jpg,png,gif,jpeg'];
             foreach ($images as $k => $image) {
                 $info = $image->validate($validate)->move(ROOT_PATH . $dir);
                 if ($info) {
@@ -476,7 +508,7 @@ class User extends ApiBase
                         'title' => isset($data['title'][$k]) ? $data['title'][$k] : ''
                     ];
                 } else {
-                    $this->ajaxReturn(['status' => -1, 'msg' => $image->getError(), 'data' => $image->getInfo()]);
+                    $this->ajaxReturn(['status' => -1, 'msg' => "职业证书{$k}:".$image->getError(), 'data' => $image->getInfo()]);
                 }
             }
             $data['images'] = json_encode($data['images']);

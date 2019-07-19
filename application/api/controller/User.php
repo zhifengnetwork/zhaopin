@@ -491,11 +491,11 @@ class User extends ApiBase
         if ($file = request()->file('file')) {
             $dir = UPLOAD_PATH . date('Ymd') . DS;
             if (!file_exists(ROOT_PATH . $dir)) mkdir(ROOT_PATH . $dir, 0777);
-            if ($file->validate(['size' => 2000000, 'ext' => 'jpg,png,gif,jpeg'])->move(ROOT_PATH . $dir)) {
+            if ($info = $file->validate(['size' => 2000000, 'ext' => 'jpg,png,gif,jpeg'])->move(ROOT_PATH . $dir)) {
                 $this->ajaxReturn([
                     'status' => 1,
                     'msg' => '上传成功',
-                    'data' => SITE_URL . DS . $dir . $file->getSaveName()
+                    'data' => SITE_URL . DS . $dir . $info->getSaveName()
                 ]);
             } else {
                 $this->ajaxReturn(['status' => -2, 'msg' => $file->getError(), 'data' => $file->getInfo()]);

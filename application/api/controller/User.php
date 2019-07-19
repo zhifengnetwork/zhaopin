@@ -493,15 +493,15 @@ class User extends ApiBase
             if (!file_exists(ROOT_PATH . $dir)) mkdir(ROOT_PATH . $dir, 0777);
             if ($file->validate(['size' => 2000000, 'ext' => 'jpg,png,gif,jpeg'])->move(ROOT_PATH . $dir)) {
                 $this->ajaxReturn([
-                    'status' => -1,
+                    'status' => 1,
                     'msg' => '上传成功',
-                    'data' => SITE_URL . DS . $dir . DS . $file->getFilename()
+                    'data' => SITE_URL . DS . $dir . DS . $file->getSaveName()
                 ]);
             } else {
-                $this->ajaxReturn(['status' => -1, 'msg' => $file->getError(), 'data' => $file->getInfo()]);
+                $this->ajaxReturn(['status' => -2, 'msg' => $file->getError(), 'data' => $file->getInfo()]);
             }
         }
-        $this->ajaxReturn(['status' => -1, 'msg' => '上传文件不存在']);
+        $this->ajaxReturn(['status' => 2, 'msg' => '上传文件不存在']);
     }
 
     // 游客首页
@@ -948,6 +948,45 @@ class User extends ApiBase
             $this->ajaxReturn(['status' => 1, 'msg' => '发送成功！']);
         }
         $this->ajaxReturn(['status' => -2, 'msg' => '发送失败，请重试！']);
+    }
+
+    public function get_images()
+    {
+        $user_id = $this->get_user_id();
+        $type = Db::name('member')->where(['id' => $user_id])->value('regtype');
+        if (!$type) $this->ajaxReturn(['status' => -2, 'msg' => '请求失败']);
+        if ($type == 3) {
+            $images = Db::name('person')->where(['id' => $user_id])->value('images');
+        } else {
+            $images= Db::name('company')->where(['id' => $user_id])->value('images');
+        }
+        if (!$images) $this->ajaxReturn(['status' => -2, 'msg' => '请求失败']);
+        $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => ['image' => json_decode($images)]]);
+    }
+
+    // 资料管理
+    public function edit_images()
+    {
+        $user_id = $this->get_user_id();
+        $type = Db::name('member')->where(['id' => $user_id])->value('regtype');
+        if (!$type) $this->ajaxReturn(['status' => -2, 'msg' => '请求失败']);
+        $table = $type == 3 ? 'person' : 'company';
+        if (!Db::name($table)->where(['user_id' => $user_id])->find()) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '保存失败']);
+        }
+        $data = input('image');
+        $title = input('title');
+        $images = [];
+        foreach ($data as $k => $image) {
+            $images[] = [
+                'path' => str_replace(SITE_URL, '', $image),
+                'title' => isset($title[$k]) ? $title[$k] : ''
+            ];
+        }
+        if (Db::name($table)->where(['user_id' => $user_id])->update(['images' => json_encode($images)])) {
+            $this->ajaxReturn(['status' => 1, 'msg' => '保存成功']);
+        }
+        $this->ajaxReturn(['status' => -2, 'msg' => '保存失败']);
     }
 
 

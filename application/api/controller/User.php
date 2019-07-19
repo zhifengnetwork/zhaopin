@@ -429,15 +429,26 @@ class User extends ApiBase
             if (true !== $validate) {
                 return $this->ajaxReturn(['status' => -2, 'msg' => $validate]);
             }
-            $images = json_decode($data['images'], true);
-            foreach ($images as &$v) {
-                $v['image'] = $this->base64_to_img($v['image'],UPLOAD_PATH . 'company/');
-                if(!$v['image']){
-                    $this->ajaxReturn(['status' => -2, 'msg' => '文件格式错误！']);
+
+            $data['images'] = [];
+            $images = request()->file('image');
+            $dir = UPLOAD_PATH . 'company';
+            if (!file_exists(ROOT_PATH . $dir)) mkdir(ROOT_PATH . $dir, 0777);
+            $validate = ['size' => 2000000, 'ext' => 'jpg,png,gif,jpeg'];
+            foreach ($images as $k => $image) {
+                $info = $image->validate($validate)->move(ROOT_PATH . $dir);
+                if ($info) {
+                    $data['images'][] = [
+                        'path' => DS . $dir . DS . $info->getFilename(),
+                        'title' => isset($data['title'][$k]) ? $data['title'][$k] : ''
+                    ];
+                } else {
+                    $this->ajaxReturn(['status' => -1, 'msg' => $image->getError(), 'data' => $image->getInfo()]);
                 }
             }
+            $data['images'] = json_encode($data['images']);
 
-            unset($data['token']);
+            unset($data['token'], $data['title'], $data['image']);
             $data['city'] = Region::getParentId($data['district']) ?: 0;
             $data['city'] > 0 && $data['province'] = Region::getParentId($data['city']) ?: 0;
             $data['user_id'] = $user_id;
@@ -452,21 +463,31 @@ class User extends ApiBase
                 return $this->ajaxReturn(['status' => -2, 'msg' => $validate]);
             }
 
-            $images = json_decode($data['images'], true);
-            foreach ($images as &$v) {
-                $v['image'] = $this->base64_to_img($v['image'],UPLOAD_PATH . 'person/');
-                if(!$v['image']){
-                    $this->ajaxReturn(['status' => -2, 'msg' => '文件格式错误！']);
+            $data['images'] = [];
+            $images = request()->file('image');
+            $dir = UPLOAD_PATH . 'person';
+            if (!file_exists(ROOT_PATH . $dir)) mkdir(ROOT_PATH . $dir, 0777);
+            $validate = ['size' => 2000000, 'ext' => 'jpg,png,gif,jpeg'];
+            foreach ($images as $k => $image) {
+                $info = $image->validate($validate)->move(ROOT_PATH . $dir);
+                if ($info) {
+                    $data['images'][] = [
+                        'path' => DS . $dir . DS . $info->getFilename(),
+                        'title' => isset($data['title'][$k]) ? $data['title'][$k] : ''
+                    ];
+                } else {
+                    $this->ajaxReturn(['status' => -1, 'msg' => $image->getError(), 'data' => $image->getInfo()]);
                 }
             }
-            $data['images'] = json_encode($images);
+            $data['images'] = json_encode($data['images']);
+
             $data['gender'] = $data['gender'] == 2 ? 'female' : 'male';
             $data['birth'] = implode('-', [$data['birth_year'], $data['birth_month'], $data['birth_day']]);
             $data['graduate_time'] = implode('-', [$data['graduate_year'], $data['graduate_month'], $data['graduate_day']]);
             $data['work_age'] = date('Y') - $data['graduate_year'];
             $data['user_id'] = $user_id;
             $data['create_time'] = time();
-            unset($data['token']);
+            unset($data['token'], $data['title'], $data['image']);
             unset($data['birth_year']);
             unset($data['birth_month']);
             unset($data['birth_day']);

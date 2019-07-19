@@ -50,7 +50,7 @@
                                 <td>{:config('config_module.'.$vo.module)}</td>
                                 <td>{$vo.title}</td>
                                 <td>{$vo.name}</td>
-                                <td>{$vo.value}</td>
+                                <td title="{$vo.value}">{$vo.value|getSubstr=0,25}</td>
                                 <td>{$vo.remark}</td>
                                 <td>
                                     <a class="btn btn-default editxz" data-id="{$vo.id}">编辑 <i class="fa fa-edit"></i></a>
@@ -101,7 +101,7 @@
                     <div class="form-group">
                         <label class="col-sm-3 control-label">参数值 </label>
                         <div class="col-sm-8">
-                            <input type="text" class="form-control" name="value" />
+                            <textarea cols="3" class="form-control" name="value"></textarea>
                         </div>
                     </div>
                     <div class="form-group">
@@ -131,6 +131,7 @@
 $(function() {
     $('#add_virtual_num').click(function() {
         $('#myModal4').find('input').val('');
+        $('#myModal4').find('textarea').val('');
     });
     $('.editxz').click(function() {
         var id = $(this).data('id');

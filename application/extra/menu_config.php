@@ -266,6 +266,66 @@ return [
             ],
         ],
     ],
+
+
+    'finance'      => [
+        'id'    => 60000,
+        'title' => '财务管理',
+        'sort'  => 2,
+        'url'   => 'finance/balance_logs',
+        'hide'  => 1,
+        'icon'  => 'glyphicon glyphicon-file',
+        'child' => [
+            [
+                'id'    => 60100,
+                'title' => '金币',
+                'sort'  => 1,
+                'url'   => 'finance/index',
+                'hide'  => 1,
+                'child' => [
+                    [
+                        'id'    => 60101,
+                        'title' => '金币记录',
+                        'sort'  => 1,
+                        'url'   => 'finance/balance_logs',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 60102,
+                        'title' => '金币设置',
+                        'sort'  => 1,
+                        'url'   => 'finance/balance_set',
+                        'hide'  => 1,
+                    ],
+                ],
+
+            ],
+            [
+                'id'    => 60200,
+                'title' => '提现',
+                'sort'  => 2,
+                'url'   => 'finance/withdrawal_list',
+                'hide'  => 1,
+                'child' => [
+                    [
+                        'id'    => 60110,
+                        'title' => '提现列表',
+                        'sort'  => 1,
+                        'url'   => 'finance/withdrawal_list',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 601111,
+                        'title' => '提现设置',
+                        'sort'  => 1,
+                        'url'   => 'finance/withdrawalset',
+                        'hide'  => 1,
+                    ],
+
+                ],
+            ],
+        ],
+    ],
      //分销管理
 
 

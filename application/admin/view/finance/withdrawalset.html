@@ -5,133 +5,85 @@
 
 {block name="content"}
 <div class="main">
-        <form id="setform" name="set"  method="post" class="form-horizontal form">
-                <div class='panel panel-default'>
-                    <div class='panel-heading'>
-                        奖金提现设置
+    <form id="setform" name="set"  method="post" class="form-horizontal form">
+        <div class='panel panel-default'>
+            <div class='panel-heading'>
+                提现设置
+            </div>
+            <div class='panel-body'>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">提现开关</label>
+                    <div class="col-sm-9">
+                        <label style="margin-top:4px; margin-right:20px;">
+                            <input type="radio" value="0" name="show" {if condition="isset($set['withdrawal']['show']) and ($set['withdrawal']['show'] eq 0)"}checked{/if} > 关
+                        </label>
+                        <label>
+                            <input type="radio" value="1" name="show" {if condition="isset($set['withdrawal']['show']) and ($set['withdrawal']['show'] neq 0)"}checked{/if} > 开
+                        </label>
                     </div>
-                    <div class='panel-body'>
-            
-            
-                        <div class="form-group">
-                            <label class="col-xs-12 col-sm-3 col-md-2 control-label">提现方式</label>
-                            <div class="col-sm-9 col-xs-12">     
-            
-                                <label class="checkbox-inline">
-                                  <input type="checkbox" name="tool[]" {if is_array($set['withdrawal']['tool']) && !empty($set['withdrawal']['tool'])  && in_array(2,$set['withdrawal']['tool'])}checked {/if}    value="2">微信
-                                </label>
-                                <label class="checkbox-inline">
-                                  <input type="checkbox" name="tool[]" {if is_array($set['withdrawal']['tool']) && !empty($set['withdrawal']['tool'])  && in_array(1,$set['withdrawal']['tool'])}checked {/if}  value="1">余额
-                                </label>
-                                <label class="checkbox-inline">
-                                  <input type="checkbox" name="tool[]" {if is_array($set['withdrawal']['tool']) && !empty($set['withdrawal']['tool'])  && in_array(3,$set['withdrawal']['tool'])}checked {/if}  value="3">银行
-                                </label>
-                                <label class="checkbox-inline">
-                                  <input type="checkbox" name="tool[]" {if is_array($set['withdrawal']['tool']) && !empty($set['withdrawal']['tool'])  && in_array(4,$set['withdrawal']['tool'])}checked {/if}  value="4">支付宝
-                                </label>
-                            </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">提现金额倍数</label>
+                    <div class="col-sm-3 col-xs-12">
+                        <input type="text" name="times" class="form-control" value="{$set['withdrawal']['times']}"  />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">每次最高提现金额</label>
+                    <div class="col-sm-3 col-xs-12">
+                        <input type="text" name="max" class="form-control" value="{$set['withdrawal']['max']}"  />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">每个用户每天最高提现金额</label>
+                    <div class="col-sm-3 col-xs-12">
+                        <div class="input-group">
+                            <input type="text" name="max_preday" class="form-control"  value="{$set['withdrawal']['max_preday']}" >
                         </div>
-            
-            
-                        <!-- <div class="form-group">
-                            <label class="col-xs-12 col-sm-3 col-md-2 control-label">启动提现</label>
-                            <div class="col-sm-9 col-xs-12">      
-            
-                                  <label class="checkbox-inline">
-                                    <input type="radio" name="ok" id="optionsRadios3" value="1" {if $set['withdrawal']['ok']} checked{/if}> 开启 
-                                  </label>
-                                  <label class="checkbox-inline">
-                                    <input type="radio" name="ok" id="optionsRadios4"  value="0" {if !$set['withdrawal']['ok']} checked{/if}  > 关闭
-                                  </label>
-            
-                                
-                            </div>
-                        </div> -->
-            
-            
-                        <div class="form-group">
-                            <label class="col-xs-12 col-sm-3 col-md-2 control-label">转账银行(用,分割)</label>
-                            <div class="col-sm-9 col-xs-12">             
-                                <input type="text" name="bank" class="form-control" value="{$set['withdrawal']['bank']}"  />
-                            </div>
-                        </div>
-            
-            
-                        <div class="form-group">
-                          <label class="col-xs-12 col-sm-3 col-md-2 control-label">提现额度</label>
-                          <div class="col-sm-9 col-xs-12">             
-                            <div class="input-group">
-                              <input type="text" name="lines" class="form-control"  value="{$set['withdrawal']['lines']}" >
-                              <div class="input-group-addon">可提现奖金达到该额度</div>
-                            </div>
-                          </div>
-                        </div>  
-             
-             
-                        <div class="form-group">
-                            <label class="col-xs-12 col-sm-3 col-md-2 control-label">最高提现金额</label>
-                            <div class="col-sm-9 col-xs-12">
-                                 <input type="text" name="max" class="form-control" value="{$set['withdrawal']['max']}"  /> 
-                            </div>
-                            <span class="help-block">(0或不填为无上限)</span>  
-                        </div>
-            
-                        <div class="form-group">
-                            <label class="col-xs-12 col-sm-3 col-md-2 control-label">复式营销1</label>
-                            <div class="col-sm-3 col-xs-12">
-                                 <input type="text" name="fushi1" class="form-control" value="{$set['withdrawal']['fushi1']}"  /> 
-                            </div>
-                            <span class="help-block"> 提现需在商城消费购买指定金额</span>  
-                        </div>
-                        <div class="form-group">
-                            <label class="col-xs-12 col-sm-3 col-md-2 control-label">复式营销2</label>
-                            <div class="col-sm-3 col-xs-12">
-                                 <input type="text" name="fushi2" class="form-control" value="{$set['withdrawal']['fushi2']}"  /> 
-                            </div>
-                            <span class="help-block">提现需在商城消费购买多少笔订单</span>  
-                        </div>
-            
-                        <div class="form-group">
-                            <label class="col-xs-12 col-sm-3 col-md-2 control-label">提现手续费</label>
-                            <div class="col-sm-3 col-xs-12">
-                                 <input type="text" name="rate" class="form-control" value="{$set['withdrawal']['rate']}"   /> 
-            
-                            </div> 
-                            <span class="help-block">提现时候扣除的手续费百分比</span> 
-                        </div>
-            
-            
-            
-                        <div class="form-group">
-                              <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
-                              <div class="col-sm-9">
-                                    <button class="btn btn-primary ajax-post col-lg-1" target-form="form-horizontal" type="submit">提交</button>
-                              </div>
-                        </div>
-            
-            
-                  </div>
-            </form>
-             
- </div>
- {/block}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">提现费率（%）</label>
+                    <div class="col-sm-3 col-xs-12">
+                        <input type="text" name="rate" class="form-control" value="{$set['withdrawal']['rate']}"   />
+
+                    </div>
+                    <span class="help-block">提现时候扣除的手续费百分比</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+                    <div class="col-sm-9">
+                        <button class="btn btn-primary ajax-post col-lg-1" target-form="form-horizontal" type="submit">提交</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{/block}
 {block name="script"}
- 
+
 <script type="text/javascript">
 
     $(document).ready(function(){
-      $(".sendmoth").click(function(){
-        interval_day();
-      });
+        $(".sendmoth").click(function(){
+            interval_day();
+        });
     });
-    
+
     function interval_day(){
-       if($('.sendmoth:checked').val()==1){
+        if($('.sendmoth:checked').val()==1){
             $(".form-interval").show();
         }else{
-           $(".form-interval").hide(); 
-        } 
+            $(".form-interval").hide();
+        }
     }
     interval_day();
-    </script>
+</script>
 {/block}

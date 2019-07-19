@@ -17,19 +17,35 @@ class Collection extends ApiBase
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
-        $list = Db::table('collection')->alias('c')
-                ->join('recruit r','r.id=c.recruit_id','LEFT')
+        $type=Db::name('member')->where('id',$user_id)->value('regtype');
+        if($type==3){
+            $list = Db::table('collection')->alias('c')
+                ->join('recruit r','r.id=c.to_id','LEFT')
                 ->join('company co','co.id=r.company_id','LEFT')
                 ->join('member m','m.id=co.user_id','LEFT')
                 ->join('category ca','ca.cat_id=r.type','LEFT')
-                ->field('r.id,r.title,r.type,ca.cat_name,r.work_age,r.require_cert,co.contacts,co.city,co.district,m.avatar')
+                ->field('r.id,r.title,ca.cat_name,r.work_age,r.require_cert,r.salary,m.avatar,m.regtype')
                 ->where('c.user_id',$user_id)
                 ->select();
-        foreach ($list as $key=>$value){
-            $list[$key]['city']=Region::getName($list[$key]['city']);
-            $list[$key]['district']=Region::getName($list[$key]['district']);
+//            foreach ($list as $key=>$value){
+//                $list[$key]['city']=Region::getName($list[$key]['city']);
+//                $list[$key]['district']=Region::getName($list[$key]['district']);
+//            }
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$list]);
+        }else{//公司类型收藏
+            $list = Db::table('collection')->alias('c')
+                ->join('person p','p.id=c.to_id','LEFT')
+                ->join('member m','m.id=p.user_id','LEFT')
+                ->join('category ca','ca.cat_id=p.job_type','LEFT')
+                ->field('p.id,p.name,p.desc,ca.cat_name,p.work_age,p.images,m.avatar')
+                ->where('c.user_id',$user_id)
+                ->select();
+            foreach ($list as $key=>$value){
+                $list[$key]['images']=$list[$key]['images']?1:0;
+            }
+            $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$list]);
         }
-        $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$list]);
+
     }
 
     /**
@@ -40,15 +56,22 @@ class Collection extends ApiBase
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
-
-        $recruit_id = input('recruit_id');
-        if(!$recruit_id) $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
-
-        $res = Db::table('recruit')->where('id',$recruit_id)->find();
-        if(!$res) $this->ajaxReturn(['status' => -2 , 'msg'=>'该职位不存在！','data'=>'']);
+        $type = input('type',1);
+        $to_id = input('to_id');
+        if(!$to_id) $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误！','data'=>'']);
+        if($type==1){
+            $res = Db::table('recruit')->where('id',$to_id)->find();
+            if(!$res) $this->ajaxReturn(['status' => -2 , 'msg'=>'该职位不存在！','data'=>'']);
+        }elseif ($type==2){
+            $res = Db::table('person')->where('id',$to_id)->find();
+            if(!$res) $this->ajaxReturn(['status' => -2 , 'msg'=>'用户不存在！','data'=>'']);
+        }else{
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'类型不存在，拖出去打一顿！','data'=>'']);
+        }
 
         $where['user_id'] = $user_id;
-        $where['recruit_id'] = $recruit_id;
+        $where['to_id'] = $to_id;
+        $where['type'] = $type;
 
         $res = Db::table('collection')->where($where)->find();
 

@@ -565,16 +565,16 @@ class User extends ApiBase
         $member = Member::get($user_id);
         if ($member['regtype'] == 3) {
             $data = Db::name('person')->alias('p')
-                ->field('p.name,p.avatar,m.mobile,m.openid,p.status,p.reserve,p.shelf,p.pull')
+                ->field('p.id,p.name,p.avatar,m.mobile,m.openid,p.status,p.reserve,p.shelf,p.pull')
                 ->join('member m', 'm.id = p.user_id', 'LEFT')
                 ->where(['p.user_id' => $user_id])->find();
         } else {
             $data = Db::name('company')->alias('c')
-                ->field('c.id,c.contacts,c.logo,m.openid,c.vip_time,m.mobile,c.vip_type,c.company_name,p.shelf,p.pull,p.stauts')
-                ->join('member m', 'm.id = p.user_id', 'LEFT')
+                ->field('c.id,c.contacts,c.logo,m.openid,c.vip_time,m.mobile,c.vip_type,c.company_name,c.status')
+                ->join('member m', 'm.id = c.user_id', 'LEFT')
                 ->where(['c.user_id' => $user_id])->find();
         }
-        $this->ajaxReturn(['status' => 1, 'msg' => '注册成功！', 'data' => $data]);
+        $this->ajaxReturn(['status' => 1, 'msg' => '获取成功！', 'data' => $data]);
     }
 
     /**
@@ -734,7 +734,7 @@ class User extends ApiBase
             $this->ajaxReturn(['status' => -2, 'msg' => '确认密码错误', 'data' => '']);
         }
         $member = Db::name('member')->where(['id' => $user_id])->field('id,password,pwd,mobile,salt')->find();
-        $type = input('type');//1登录密码 2支付密码
+        $type = input('type',1);//1登录密码 2支付密码
         $code = input('code');
         $mobile = $member['mobile'];
         $res = action('PhoneAuth/phoneAuth', [$mobile, $code]);
@@ -895,7 +895,18 @@ class User extends ApiBase
         $this->ajaxReturn(['status' => -2, 'msg' => '修改失败', 'data' => '']);
     }
 
-
+    //获取用户类型
+    public function get_user_type(){
+        $user_id = $this->get_user_id();
+        if (!$user_id) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在', 'data' => '']);
+        }
+        $member=Db::name('member')->field('regtype')->where(['id'=>$user_id])->find();
+        if(!$member){
+            $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在', 'data' => '']);
+        }
+        $this->ajaxReturn(['status' => 1, 'msg' => '获取成功', 'data' =>$member]);
+    }
     /***
      * 手机号换绑
      */
@@ -912,7 +923,10 @@ class User extends ApiBase
             $this->ajaxReturn(['status' => -2, 'msg' => '手机号格式错误！']);
         }
         $code = input('code');
-
+        $user = Db::table('member')->where(['mobile' => $new_mobile])->find();
+        if($user){
+            $this->ajaxReturn(['status' => -2, 'msg' => '该手机号已有用户！', 'data' => '']);
+        }
         $member = Db::table('member')->where(['id' => $user_id])->find();
         if ($member['mobile'] == $new_mobile) {
             $this->ajaxReturn(['status' => -2, 'msg' => '手机号不能相同！', 'data' => '']);
@@ -933,6 +947,36 @@ class User extends ApiBase
             $this->ajaxReturn(['status' => -2, 'msg' => '修改失败', 'data' => '']);
         }
 
+    }
+    // 发送验证码
+    public function send_code()
+    {
+        $mobile = input('mobile');
+        if (!checkMobile($mobile)) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '手机格式错误！']);
+        }
+        $res = Db::name('phone_auth')->field('exprie_time')->where('mobile', '=', $mobile)->order('id DESC')->find();
+        if ($res['exprie_time'] > time()) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '请求频繁请稍后重试！']);
+        }
+
+        $code = mt_rand(111111, 999999);
+
+        $data['mobile'] = $mobile;
+        $data['auth_code'] = $code;
+        $data['start_time'] = time();
+        $data['exprie_time'] = time() + 180;
+
+        $res = Db::table('phone_auth')->insert($data);
+        if (!$res) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '发送失败，请重试！']);
+        }
+
+        $ret = send_zhangjun($mobile, $code);
+        if ($ret['message'] == 'ok') {
+            $this->ajaxReturn(['status' => 1, 'msg' => '发送成功！']);
+        }
+        $this->ajaxReturn(['status' => -2, 'msg' => '发送失败，请重试！']);
     }
 
 

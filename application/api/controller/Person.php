@@ -32,7 +32,46 @@ class Person extends ApiBase
     {
 
     }
-
+    //隐私设置操作
+    public function secret(){
+        $user_id=$this->get_user_id();
+        $type=input('type');//1 允许预定  2 上架简历 3是否推送简历
+        $is_show=input('is_show');
+        $person_one=Db::name('person')->where(['user_id'=>$user_id])->find();
+        if(!$person_one){
+            $this->ajaxReturn(['status' => -2, 'msg' => '用户类型不对，请重新操作']);
+        }
+        $person=[];
+        switch ($type){
+            case 1:
+                $person['reserve']=$is_show;
+                break;
+            case 2:
+                $person['shelf']=$is_show;
+                break;
+            case 3:
+                $person['pull']=$is_show;
+                break;
+            default:
+                $this->ajaxReturn(['status' => -2, 'msg' => '类型不对，请重新设置']);
+                break;
+        }
+        $where['user_id']=$user_id;
+        $res=Db::name('person')->where($where)->update($person);
+        if($res){
+            $this->ajaxReturn(['status' => 1, 'msg' => '修改成功！']);
+        }else{
+            $this->ajaxReturn(['status' => -2, 'msg' => '修改失败！']);
+        }
+    }
+    public function secret_list(){
+        $user_id=$this->get_user_id();
+        $person_one=Db::name('person')->field('reserve,shelf,pull')->where(['user_id'=>$user_id])->find();
+        if(!$person_one){
+            $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在或者用户类型不对，请重新操作']);
+        }
+        $this->ajaxReturn(['status' => 1, 'msg' => '获取成功！','data'=>$person_one]);
+    }
     // 信息
     public function info()
     {

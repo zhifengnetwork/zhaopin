@@ -710,3 +710,30 @@ function towArraySort ($data,$key,$order = SORT_ASC) {
     }
 
 }
+
+function shadow($string)
+{
+    $string = strval($string);
+    $str = '';
+    if (isMobile($string)) {
+        $str = substr($string, 0, 3) . '******' . substr($string, -2);
+    } else if (isChineseName($string)) {
+        $str = substr($string, 0, 1) . '**';
+    }
+    return $str;
+}
+
+
+/**
+ * func 验证中文姓名
+ * @param $name
+ * @return bool
+ */
+function isChineseName($name)
+{
+    if (preg_match('/^([\xe4-\xe9][\x80-\xbf]{2}){2,4}$/', $name)) {
+        return true;
+    } else {
+        return false;
+    }
+}

@@ -2,6 +2,7 @@
 
 namespace app\admin\controller;
 
+use app\common\model\MemberBalanceLog;
 use think\Db;
 use app\common\model\Order as OrderModel;
 use app\common\model\Member as MemberModel;
@@ -31,22 +32,20 @@ class Finance extends Common
         $kw = input('realname', '');
         $source_type = input('source_type', '');
         $level = input('level', '');
-        $groupid = input('groupid', '');
         $where = [];
         if (!empty($source_type)) {
             $where['log.source_type'] = $source_type;
         }
 
-
         if (!empty($kw)) {
-            $where['m.mobile'] = ['like', "%{$kw}%"];
+            is_numeric($kw) ? $where['m.mobile'] = ['like', "%{$kw}%"] : $where['m.realname'] = ['like', "%{$kw}%"];
         }
         if ($begin_time && $end_time) {
-            $where['m.createtime'] = [['EGT', strtotime($begin_time)], ['LT', strtotime($end_time)]];
+            $where['log.create_time'] = [['EGT', strtotime($begin_time)], ['LT', strtotime($end_time)]];
         } elseif ($begin_time) {
-            $where['m.createtime'] = ['EGT', strtotime($begin_time)];
+            $where['log.create_time'] = ['EGT', strtotime($begin_time)];
         } elseif ($end_time) {
-            $where['m.createtime'] = ['LT', strtotime($end_time)];
+            $where['log.create_time'] = ['LT', strtotime($end_time)];
         }
 
         // 携带参数
@@ -54,49 +53,29 @@ class Finance extends Common
             'kw' => $kw,
             'level' => $level,
             'source_type' => $source_type,
-            'groupid' => $groupid,
             'begin_time' => $begin_time,
             'end_time' => $end_time,
         ];
 
-        $list = Db::name('menber_balance_log')->alias('log')
-            ->field('log.id,m.id as mid, log.user_id,m.avatar,m.weixin,log.note,log.source_type,m.mobile,log.old_balance,log.balance,log.create_time')
-            ->join("member m", 'm.id=log.user_id', 'LEFT')
+        $list = Db::name('member_balance_log')->alias('log')
+            ->field('m.id as mid,log.id,m.regtype,log.source_type,m.balance,log.create_time')
+            ->join('member m','log.user_id = m.id','LEFT')
             ->where($where)
-            ->where(['log.balance_type' => 1])
-            ->order('m.createtime DESC')
+            ->where(['log.balance_type' => 0])
+            ->order('log.create_time DESC')
             ->paginate(10, false, ['query' => $carryParameter]);
-        // 导出
-        $exportParam = $carryParameter;
-        $exportParam['tplType'] = 'export';
-        $tplType = input('tplType', '');
-        if ($tplType == 'export') {
-            $list = OrderModel::alias('uo')->field('uo.*,d.order_id as order_idd,d.invoice_no,a.realname')
-                ->join("delivery_doc d", 'uo.order_id=d.order_id', 'LEFT')
-                ->join("member a", 'a.id=uo.user_id', 'LEFT')
-                ->where($where)
-                ->order('uo.order_id DESC')
-                ->select();
-            $str = "订单ID,用户id,订单金额\n";
 
-            foreach ($list as $key => $val) {
-                $str .= $val['order_id'] . ',' . $val['user_id'] . ',' . $val['order_amount'] . ',';
-                $str .= "\n";
-            }
-            export_to_csv($str, '余额记录', $exportParam);
-        }
         // 模板变量赋值
         return $this->fetch('', [
             'list' => $list,
-            'exportParam' => $exportParam,
+            'exportParam' => $carryParameter,
             'kw' => $kw,
             'level' => $level,
             'source_type' => $source_type,
-            'groups' => MemberModel::getGroups(),
-            'levels' => MemberModel::getLevels(),
-            'groupid' => $groupid,
-            'begin_time' => empty($begin_time) ? date('Y-m-d') : $begin_time,
-            'end_time' => empty($end_time) ? date('Y-m-d') : $end_time,
+            'type_list' => MemberBalanceLog::$type_list,
+            'register_type' => MemberModel::$_registerType,
+            'begin_time' => empty($begin_time) ? '' : $begin_time,
+            'end_time' => empty($end_time) ? '' : $end_time,
             'meta_title' => '余额记录',
         ]);
     }
@@ -216,39 +195,18 @@ class Finance extends Common
 
     public function withdrawal_list()
     {
-        //提现方式
-        $type_list = [
-            0 => '默认全部',
-            1 => '余额',
-            2 => '微信',
-            3 => '银行',
-            4 => '支付宝',
-        ];;
         $where = array();
         $type = input('type/d', 0);
         $status = input('status');
-        $ordersn = input('ordersn');
         $kw = input('kw');
         $begin_time = input('begin_time', '');
         $end_time = input('end_time', '');
-
         $ckbegin_time = input('ckbegin_time', '');
         $ckend_time = input('ckend_time', '');
 
-        if ($type > 0) {
-            $where['w.type'] = $type;
-        }
-        if ($status != 0) {
-            $where['w.status'] = $status;
-        }
-
-        if (!empty($ordersn)) {
-            $where['w.ordersn'] = $ordersn;
-        }
-
-        if (!empty($kw)) {
-            $where['m.mobile'] = ['like', "%{$kw}%"];
-        }
+        if ($type > 0) $where['w.type'] = $type;
+        if ($status != '') $where['w.status'] = $status;
+        if (!empty($kw)) is_numeric($kw) ? $where['m.mobile'] = ['like', "%{$kw}%"] : $where['m.realname'] = ['like', "%{$kw}%"];
 
         if ($begin_time && $end_time) {
             $where['w.createtime'] = [['EGT', strtotime($begin_time)], ['LT', strtotime($end_time)]];
@@ -266,29 +224,24 @@ class Finance extends Common
             $where['w.checktime'] = ['LT', strtotime($ckend_time)];
         }
 
-
         $list = MemberWithdrawal::alias('w')
-            ->field('w.data, w.id, m.id as mid , m.groupid , m.level , m.avatar , w.money , w.rate , w.account , w.content ,w.ordersn , m.nickname , m.realname , m.mobile ,m.weixin ,w.createtime ,w.checktime ,w.type,w.status')
-            ->join("member m", 'm.openid = w.openid', 'LEFT')
+            ->field('w.*, m.id as mid,m.mobile')
+            ->join("member m", 'm.id = w.user_id', 'LEFT')
             ->where($where)
-            ->order('m.createtime DESC')
+            ->order('w.id DESC')
             ->paginate(10, false, ['query' => $where]);
-
-        $this->assign('type_list', $type_list);
-        $this->assign('list', $list);
-        $this->assign('meta_title', '提现列表');
         return $this->fetch('finance/withdrawal_list', [
             'type' => $type,
             'status' => $status,
-            'ordersn' => $ordersn,
             'kw' => $kw,
             'begin_time' => $begin_time,
             'end_time' => $end_time,
             'ckbegin_time' => $ckbegin_time,
             'ckend_time' => $ckend_time,
-            'type_list' => $type_list,
+            'type_list' => MemberWithdrawal::$type_list,
+            'status_list' => MemberWithdrawal::$status_list,
             'list' => $list,
-            'meta_title' => '提现列表',
+            'meta_title' => '余额提现列表',
         ]);
     }
 

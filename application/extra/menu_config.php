@@ -350,7 +350,7 @@ return [
                         'title' => '会员管理',
                         'sort'  => 1,
                         'url'   => 'member/index',
-                        'hide'  => 0,
+                        'hide'  => 1,
                     ],
                     [
                         'id'    => 90102,

@@ -43,7 +43,6 @@ class Index extends ApiBase
 
 
         $data = '首页数据';
-        
 
         $this->ajaxReturn(['status' => 0 , 'msg'=>'获取成功','data'=>$data]);
     }
@@ -61,9 +60,14 @@ class Index extends ApiBase
         $this->ajaxReturn(['status' => 1 , 'msg'=>'获取首页成功！','data'=>$ewei['id']]);
     }
 
-    
+    public function help()
+    {
+        $name = input('name');
+        if (in_array($name, ['shenhe', 'weigui', 'yinsi', 'qita'])) {
+            $value = Db::name('config')->where(['name' => $name])->value('value');
+            $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！', 'data' => $value]);
+        }
+        $this->ajaxReturn(['status' => -2, 'msg' => '请求失败']);
+    }
 
-    
-
-    
 }

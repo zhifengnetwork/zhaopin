@@ -64,200 +64,92 @@ class Member extends Common
      */
     public function index()
     {
-        
-     
-
-        $begin_time      = input('begin_time', '');
-        $end_time        = input('end_time', '');
-        $id              = input('mid','');
-        $kw              = input('realname', '');
-        $followed        = input('followed','');
-        $isblack         = input('isblack', '');
-        $level           = input('level','');
-        $groupid         = input('groupid','');
+        $begin_time = input('begin_time', '');
+        $end_time = input('end_time', '');
+        $id = input('mid', '');
+        $kw = input('realname', '');
+        $level = input('level', '');
         $where = [];
-        if (!empty($id)) {
-            $where['dm.id']    = $id;
+        if (!empty($id)) $where['id'] = $id;
+        if($level==1){
+        }elseif($level==2){
         }
-        if (!empty($followed)) {
-            $where['f.state']   = $followed;
-        }
-        if(!empty($isblack)){
-            $where['dm.isblack'] = $isblack;
-        }
-        if(!empty($level)){
-            $where['dm.level'] = $level;
-        }
-        if(!empty($groupid)){
-            $where['dm.groupid'] = $groupid;
-        }
+        if (!empty($kw)) is_numeric($kw) ? $where['mobile'] = $kw : $where['realname'] = $kw;
 
-        if(!empty($kw)){
-            is_numeric($kw)?$where['dm.mobile'] = $kw:$where['dm.realname'] = $kw;
-        }
         if ($begin_time && $end_time) {
-            $where['dm.createtime'] = [['EGT', strtotime($begin_time)], ['LT', strtotime($end_time)]];
+            $where['createtime'] = [['EGT', strtotime($begin_time)], ['LT', strtotime($end_time)]];
         } elseif ($begin_time) {
-            $where['dm.createtime'] = ['EGT', strtotime($begin_time)];
+            $where['createtime'] = ['EGT', strtotime($begin_time)];
         } elseif ($end_time) {
-            $where['dm.createtime'] = ['LT', strtotime($end_time)];
+            $where['createtime'] = ['LT', strtotime($end_time)];
         }
         //携带参数
         $carryParameter = [
-            'kw'               => $kw,
-            'begin_time'       => $begin_time,
-            'end_time'         => $end_time,
-            'mid'              => $id,
-            'followed'         => $followed,
-            'isblack'          => $isblack,
-            'level'            => $level,
-            'groupid'          => $groupid,
+            'kw' => $kw,
+            'begin_time' => $begin_time,
+            'end_time' => $end_time,
+            'mid' => $id,
         ];
-        
-        $list  = MemberModel::alias('dm')
-                ->field('dm.*,l.levelname,g.groupname,dm.realname,dm.realname as username,dm.nickname as agentnickname,dm.avatar as agentavatar')
-                ->join("member_group g",'dm.groupid=g.id','LEFT')
-                ->join("member_level l",'dm.level =l.id','LEFT')
-                ->join("user f",'f.openid=dm.openid','LEFT')
-                ->where($where)
-                ->order('createtime desc')
-                ->paginate(10, false, ['query' => $carryParameter]);
-                       
+
+        $list = (new MemberModel)
+            ->where($where)
+            ->order('createtime desc')
+            ->paginate(10, false, ['query' => $carryParameter]);
+
         foreach ($list as &$row) {
-            $row['levelname']  = empty($row['levelname']) ?  '普通会员' : $row['levelname'];
-            $order_info        = Db::table('order')->where(['user_id' =>$row['id'],'order_status' => 3])->field('count(order_id) as order_count,sum(goods_price) as ordermoney')->find();
-            $row['ordercount'] = $order_info['order_count'];
-            $row['ordermoney'] = empty($order_info['ordermoney'])?0:$order_info['ordermoney'];
-            $row['followed']   = UserModel::followed($row['openid']);//是否关注;
-            $row['balance']    = MemberModel::getBalance($row['id'],0);//余额
-            $row['balance1']   = MemberModel::getBalance($row['id'],1);//积分
+            $row['levelname'] = 'VIP';
         }
         unset($row);
 
-        // 导出
-        $exportParam            = $carryParameter;
-        $exportParam['tplType'] = 'export';
-        $tplType                = input('tplType', '');
-        if ($tplType == 'export') {
-            $list  = MemberModel::alias('dm')
-                ->field('dm.*,l.levelname,g.groupname,dm.realname,dm.realname as username,dm.nickname as agentnickname,dm.avatar as agentavatar')
-                ->join("member_group g",'dm.groupid=g.id','LEFT')
-                ->join("member_level l",'dm.level =l.id','LEFT')
-                ->join("user f",'f.openid=dm.openid','LEFT')
-                ->where($where)
-                ->order('createtime desc')
-                ->select();
-            $str = "会员id,会员名称\n";
-
-            foreach ($list as $key => $val) {
-                $str .= $val['id'] . ',' . $val['username'] . ',' ;
-                $str .= "\n";
-            }
-            export_to_csv($str, '用户列表', $exportParam);
-        }
-        return $this->fetch('',[ 
-            'levels'         => MemberModel::getLevels(),
-            'groups'         => MemberModel::getGroups(),
-            'list'           => $list,
-            'groupid'        => $groupid,
-            'level'          => $level,
-            'kw'             => $kw,
-            'isblack'        => $isblack,
-            'followed'       => $followed,
-            'id'             => $id,
-            'exportParam'    => $exportParam,
-            'begin_time'     => empty($begin_time)?date('Y-m-d'):$begin_time,
-            'end_time'       => empty($end_time)?date('Y-m-d'):$end_time,
-            'meta_title'     => '会员管理',
+        return $this->fetch('', [
+            'list' => $list,
+            'kw' => $kw,
+            'id' => $id,
+            'begin_time' => empty($begin_time) ? '' : $begin_time,
+            'end_time' => empty($end_time) ? '' : $end_time,
+            'register_type' =>MemberModel::$_registerType,
+            'meta_title' => '会员管理',
         ]);
     }
 
-    private function &get_where()
-    {
-        $begin_time      = input('begin_time', '');
-        $end_time        = input('end_time', '');
-        $id              = input('mid','');
-        $kw              = input('realname', '');
-        $followed        = input('followed','');
-        $isblack         = input('isblack', '');
-        $level           = input('level','');
-        $groupid         = input('groupid','');
-        $where = [];
-        if (!empty($id)) {
-            $where['dm.id']    = $id;
-        }
-        if (!empty($followed)) {
-            $where['f.state']   = $followed;
-        }
-        if(!empty($isblack)){
-            $where['dm.isblack'] = $isblack;
-        }
-        if(!empty($level)){
-            $where['dm.level'] = $level;
-        }
-        if(!empty($groupid)){
-            $where['dm.groupid'] = $groupid;
-        }
-
-        if(!empty($kw)){
-            is_numeric($kw)?$where['dm.mobile'] = $kw:$where['dm.realname'] = $kw;
-        }
-        if ($begin_time && $end_time) {
-            $where['dm.createtime'] = [['EGT', $begin_time], ['LT', $end_time]];
-        } elseif ($begin_time) {
-            $where['dm.createtime'] = ['EGT', $begin_time];
-        } elseif ($end_time) {
-            $where['dm.createtime'] = ['LT', $end_time];
-        }
-        $this->assign('kw', $kw);
-        $this->assign('id', $id);
-        $this->assign('followed', $followed);
-        $this->assign('isblack', $isblack);
-        $this->assign('level', $level);
-        $this->assign('groupid', $groupid);
-        $this->assign('begin_time', empty($begin_time)?date('Y-m-d'):$begin_time);
-        $this->assign('end_time', empty($end_time)?date('Y-m-d'):$end_time);
-        return $where;
-    }
     /***
      * 会员详情
      */
     public function member_edit(){
         $uid     = input('id');
         $member  = MemberModel::get($uid);
+        if(!$member)$this->error('找不到用户');
         if (Request::instance()->isPost()){
             $data = input('data/a');
-            if( !empty(input('password')) && !empty($uid) ){
-                //修改密码
-                $data['pwd'] = md5(input('password'));
+            $pwd= input('password');
+            if( !empty($pwd) && !empty($uid) ){//修改密码
+                $data['pwd'] = md5($member->salt.$pwd);
             }
             
-            $res = MemberModel::where(['id' => $uid])->update($data);
-
-            if($res !== false ){
+            if(MemberModel::where(['id' => $uid])->update($data) !== false ){
                 $this->success('编辑成功', url('member/index'));
             }
-                $this->error('编辑失败');
+            $this->error('编辑失败');
 
         }
-       
-       
-        $order_info        = Db::table('order')->where(['user_id' =>$member['id'],'order_status' => 3])->field('count(order_id) as order_count,sum(goods_price) as ordermoney')->find();
-        $member['self_ordercount'] = $order_info['order_count'];
-        $member['self_ordermoney'] = empty($order_info['ordermoney'])?0:$order_info['ordermoney'];
-        $member['balance']         = MemberModel::getBalance($member['id'],0);//余额
-        $member['balance1']        = MemberModel::getBalance($member['id'],1);//积分
-        // //更新数据
-        // $member && $this->dataupdate($uid);
-        $groups  =  MemberModel::getGroups();
-        $levels  =  MemberModel::getLevels();
-        $this->assign('followed', 1);
-        $this->assign('groups', $groups);
-        $this->assign('levels', $levels);
-        $this->assign('member', $member);
+        $regtype  = input('regtype');
+        $data = [];
+        if($regtype == 3){
+            $data = Db::name('member')->alias('m')
+                ->field('m.id as mid')
+                ->join('person p','m.id=p.user_id','LEFT')
+                ->where(['m.id'=>$uid])
+                ->find();
+        }else if($regtype == 1||$regtype == 2){
+            $data = Db::name('member')->alias('m')
+                ->field('m.id as mid')
+                ->join('company c','m.id=c.user_id','LEFT')
+                ->where(['m.id'=>$uid])
+                ->find();
+        }
+        $this->assign('data', $data);
         $this->assign('meta_title', '会员详情');
-        return $this->fetch();
-
+        return $this->fetch($regtype == 3?'member/person':'member/company');
     }
 
     /***

@@ -123,7 +123,7 @@ class Pay extends ApiBase
                 'create_time'  => time(),
                 'old_balance'  => $balance_info['balance']
             ];
-            $res2 = Db::table('menber_balance_log')->insert($balance_log);
+            $res2 = Db::table('member_balance_log')->insert($balance_log);
             if(!$res2){
                 Db::rollback();
             }
@@ -291,7 +291,7 @@ class Pay extends ApiBase
                 'create_time'  => time(),
                 'old_balance'  => $balance_info['balance']
             ];
-            $res2 = Db::table('menber_balance_log')->insert($balance_log);
+            $res2 = Db::table('member_balance_log')->insert($balance_log);
             if(!$res2){
                 Db::rollback();
             }

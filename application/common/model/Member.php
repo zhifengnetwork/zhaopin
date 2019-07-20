@@ -17,16 +17,17 @@ class Member extends Model
         3=>'个人'
     ];
     /***
-     * 充值积分and余额
+     * 充值余额
      */
     public static function setBalance($uid = '',$type = '',  $num = 0, $data = array()){
-            $balance_info  = get_balance($uid,$type);
-            $dephp_11      = $balance_info['balance'] + $num;
+        $balance_info = get_balance($uid, $type);
+        $dephp_11 = bcadd($balance_info['balance'], $num, 2);
+        Db::name('member')->where(['id' => $uid])->update(['balance' => $dephp_11]);
 
-            Db::name('member_balance')->where(['user_id' => $uid,'balance_type' => $balance_info['balance_type']])->update(['balance' => $dephp_11]);
-           
-            $dephp_12 = array('user_id' => $uid, 'balance_type' => $balance_info['balance_type'], 'old_balance' => $balance_info['balance'], 'balance' => $dephp_11,'create_time' => time(), 'account_id' => intval($data[0]), 'note' => $data[1]);
-            Db::name('menber_balance_log')->insert($dephp_12);
+        Db::name('member_balance')->where(['user_id' => $uid, 'balance_type' => $balance_info['balance_type']])->update(['balance' => $dephp_11]);
+
+        $dephp_12 = array('user_id' => $uid, 'balance_type' => 0, 'log_type' => 1, 'source_type' => 7, 'old_balance' => $balance_info['balance'], 'money' => $num, 'balance' => $dephp_11, 'create_time' => time(), 'account_id' => intval($data[0]), 'note' => $data[1]);
+        Db::name('member_balance_log')->insert($dephp_12);
     }
 
     public static function getBalance($uid = '',$type = ''){

@@ -390,7 +390,7 @@ class User extends ApiBase
             $this->ajaxReturn(['status' => -2, 'msg' => '手机格式错误！']);
         }
         if (Member::get(['mobile' => $mobile])) {
-            $this->ajaxReturn(['status' => -2, 'msg' => '此手机号已注册，请直接登录！']);
+            $this->ajaxReturn(['status' => -1, 'msg' => '此手机号已注册，请直接登录！']);
         }
 
         $res = action('PhoneAuth/phoneAuth', [$mobile, $code]);

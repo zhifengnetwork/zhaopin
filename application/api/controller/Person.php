@@ -6,6 +6,7 @@ use app\common\model\Category;
 use app\common\model\Company as CompanyModel;
 use app\common\model\Person as PersonModel;
 use app\common\model\Reserve;
+use app\common\model\Sysset;
 use think\Db;
 
 /**
@@ -37,6 +38,9 @@ class Person extends ApiBase
     //隐私设置操作
     public function secret(){
         $user_id=$this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
         $type=input('type');//1 允许预定  2 上架简历 3是否推送简历
         $is_show=input('is_show');
         $person_one=Db::name('person')->where(['user_id'=>$user_id])->find();
@@ -66,6 +70,19 @@ class Person extends ApiBase
             $this->ajaxReturn(['status' => -2, 'msg' => '修改失败！']);
         }
     }
+    //省市区获取
+    public function get_address(){
+        $user_id = $this->get_user_id();
+        $parent_id = input('parent_id/d',0);
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+
+        $where = $parent_id ? ['parent_id'=>$parent_id] : ['area_type'=>1];
+        $list  = Db::name('region')->field('area_id,code,parent_id,area_name')->where($where)->select();
+        $this->ajaxReturn(['status'=>1,'msg'=>'获取地址成功','data'=>$list]);
+    }
+
     public function secret_list(){
         $user_id=$this->get_user_id();
         $person_one=Db::name('person')->field('reserve,shelf,pull')->where(['user_id'=>$user_id])->find();
@@ -180,5 +197,83 @@ class Person extends ApiBase
         }
         $this->ajaxReturn(['status' => 1, 'msg' => '获取成功','data'=>$category_list]);
     }
+    public function go_withdrawal(){
+        $user_id=$this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
 
+        $member=Db::name('member')->where(['id'=>$user_id])->field('balance,openid,alipay_name,alipay')->find();
+        if(!$member){
+            $this->ajaxReturn(['status' => -2, 'msg' => '获取失败','data'=>[]]);
+        }
+        $member['max_money']=Sysset::getWDMax();
+        $member['percent']=Sysset::getWDRate();
+
+        $this->ajaxReturn(['status' => 1, 'msg' => '获取成功','data'=>$member]);
+    }
+    public function withdrawal(){
+        $user_id=$this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $pay_tpye=input('pay_tpye');
+        $money=input('money');
+        if(!$pay_tpye||!$money){
+            $this->ajaxReturn(['status' => -2, 'msg' => '参数错误','data'=>[]]);
+        }
+        $max_money=Sysset::getWDMax();
+        $percent=Sysset::getWDRate();
+        if($money>$max_money){
+            $this->ajaxReturn(['status' => -2, 'msg' => '提现金额不能大于最大金额'.$max_money,'data'=>[]]);
+        }
+        $member=Db::name('member')->where(['id'=>$user_id])->find();
+        $poundage=sprintf("%.2f",$money*$percent/100);;//手续费
+        $order_money=$money+$poundage;
+        if($order_money>$member['balance']){
+            $this->ajaxReturn(['status' => -2, 'msg' => '提现失败，余额不足'.$order_money,'data'=>[]]);
+        }
+        if($pay_tpye==2){//微信
+
+        }elseif($pay_tpye==4){//支付宝   后台审核
+            $alipay=input('alipay');
+            $alipay_name=input('alipay_name');
+            if(!$alipay||!$alipay_name){
+                $this->ajaxReturn(['status' => -2, 'msg' => '支付宝账户和名称不能为空','data'=>[]]);
+            }
+            $data['alipay']=$alipay;
+            $data['alipay_name']=$alipay_name;
+            Db::table('member')->where('id',$user_id)->update($data);
+            $data=[];
+            Db::startTrans();
+            $data['user_id']=$user_id;
+            $data['money']=$order_money;
+            $data['rate']=$percent;
+            $data['taxfee']=$poundage;
+            $data['account']=$money;
+            $data['type']=$pay_tpye;
+            $data['status']=0;
+            $data['createtime']=time();
+            $wi_id=Db::name('member_withdrawal')->insertGetId($data);
+            if($wi_id){
+                Db::table('member')->where('id',$user_id)->setDec('balance',$order_money);
+                $data=[];
+                $data['user_id']=$user_id;
+                $data['money']=$order_money;
+                $data['old_balance']=$member['balance'];
+                $data['balance']=sprintf("%.2f",$member['balance']-$order_money);
+                $data['balance_type']='支付宝提现';
+                $data['source_type']=4;
+                $data['log_type']=0;
+                $data['source_id']=$wi_id;
+                $data['create_time']=time();
+                Db::name('member_balance_log')->insertGetId($data);
+                Db::commit();
+                $this->ajaxReturn(['status' => 1, 'msg' => '已提交后台审核！','data'=>$wi_id]);
+            }else{
+                Db::rollback();
+                $this->ajaxReturn(['status' => -2, 'msg' => '提现失败','data'=>[]]);
+            }
+        }
+    }
 }

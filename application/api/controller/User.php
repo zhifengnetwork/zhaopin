@@ -587,8 +587,9 @@ class User extends ApiBase
         // }
 
         $data = Db::table("member")->where('mobile', $mobile)
-            ->field('id,password,mobile,salt')
+            ->field('id,password,mobile,salt,regtype')
             ->find();
+
 
         if (!$data) {
             $this->ajaxReturn(['status' => -2, 'msg' => '手机不存在或错误！']);
@@ -603,7 +604,6 @@ class User extends ApiBase
         unset($data['password'], $data['salt']);
         //重写
         $data['token'] = $this->create_token($data['id']);
-
         $this->ajaxReturn(['status' => 1, 'msg' => '登录成功！', 'data' => $data]);
 //        }
 

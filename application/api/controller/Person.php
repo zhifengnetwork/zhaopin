@@ -125,7 +125,7 @@ class Person extends ApiBase
 
         $detail = Db::name('person')
             ->alias('p')
-            ->field('p.name,p.gender,p.avatar,p.school_type,m.mobile,p.age,p.work_age,p.images,p.job_type,p.desc,p.experience')
+            ->field('p.id,p.name,p.gender,p.avatar,p.school_type,m.mobile,p.age,p.work_age,p.images,p.job_type,p.desc,p.experience')
             ->join('member m', 'm.id=p.user_id', 'LEFT')
             ->where(['p.id' => $id])
             ->find();
@@ -137,8 +137,48 @@ class Person extends ApiBase
         $detail['gender'] = $detail['gender'] == 'female' ? '女' : '男';
         $detail['images'] = $detail['images']!='[]' ? 1 : 0;
         $detail['job_type'] = Category::getNameById($detail['job_type']) ?: '';
-        $this->ajaxReturn(['status' => 1, 'msg' => '保存成功', 'data' => $detail]);
+        $this->ajaxReturn(['status' => 1, 'msg' => '获取成功', 'data' => $detail]);
     }
+    public function person_list(){
+        $type=input('type');//工种
+        $kw=input('kw');
+        $where = [];
+        $pageParam = ['query' => []];
+        if($type){
+            $where['p.job_type']=$type;
+            $pageParam['query']['job_type'] = $type;
+        }
+        if($kw){
+            $where['p.name|ca.cat_name'] = ['like', '%' . $kw . '%'];
+            $pageParam['query']['kw'] = $kw;
+        }
+        $list=Db::name('person')->alias('p')
+            ->join('category ca','ca.cat_id=p.job_type','LEFT')
+            ->where($where)
+            ->field('p.id,p.work_age,p.name,p.avatar,p.gender,p.images,ca.cat_name')
+            ->paginate(10,false,$pageParam);
+        if(!$list){
+            $this->ajaxReturn(['status' => -2, 'msg' => '获取失败','data'=>$list]);
+        }
+        $list=$list->toArray();
+        foreach ($list['data'] as $key=>&$value){
+            $value['images'] = $value['images']?1:0;
+            $na = $value['gender']=='female'?'女士':'先生';
+            $value['name']=mb_substr($value['name'], 0, 1, 'utf-8').$na;
+            unset($value['gender']);
+        }
+        $this->ajaxReturn(['status' => 1, 'msg' => '获取成功','data'=>$list['data']]);
 
+    }
+    public function category_list(){
+        $pid=input('pid',0);
+        $where['pid']=$pid;
+        $where['is_show']=1;
+        $category_list=Db::name('category')->where($where)->field('cat_id,cat_name')->select();
+        if(!$category_list){
+            $this->ajaxReturn(['status' => -2, 'msg' => '获取失败','data'=>$category_list]);
+        }
+        $this->ajaxReturn(['status' => 1, 'msg' => '获取成功','data'=>$category_list]);
+    }
 
 }

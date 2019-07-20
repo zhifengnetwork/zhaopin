@@ -125,7 +125,121 @@ class Company extends ApiBase
         }
         $this->ajaxReturn(['status' => 1, 'msg' => '删除成功']);
     }
+    public function recruit_list(){
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $pageParam = ['query' => []];
+        $province=input('province');
+        if($province){
+            $where['r.province']=$province;
+            $pageParam['query']['province']=$province;
+        }
+        $city=input('city');
+        if($city){
+            $where['r.city']=$city;
+            $pageParam['query']['city']=$city;
+        }
+        $district=input('district');
+        if($district){
+            $where['r.district']=$district;
+            $pageParam['query']['district']=$district;
+        }
+        $regtype=input('regtype',1);
+        $where['r.is_rcmd']=1;
+        $where['r.status']=1;
+        $where['m.regtype']=$regtype;
+        $recruit_hot=Db::name('recruit')->alias('r')
+            ->join('company co','co.id=r.company_id','LEFT')
+            ->join('member m','m.id=co.user_id','LEFT')
+            ->where($where)
+            ->field('co.logo,r.title,r.require_cert,r.salary,r.work_age')
+            ->paginate(3,false,$pageParam);
+        $recruit_hot=$recruit_hot->toArray();
+        $data['recruit_hot']=$recruit_hot['data'];
+        unset($where['r.is_rcmd']);
 
+        $where['r.is_better']=1;
+        $recruit_better=Db::name('recruit')->alias('r')
+            ->join('company co','co.id=r.company_id','LEFT')
+            ->join('member m','m.id=co.user_id','LEFT')
+            ->where($where)
+            ->field('co.logo,r.title,r.require_cert,r.salary,r.work_age')
+            ->paginate(3,false,$pageParam);
+        $recruit_better=$recruit_better->toArray();
+        $data['recruit_better']=$recruit_better['data'];
+        $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
+
+    }
+    public function recruit_better(){
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $pageParam = ['query' => []];
+        $province=input('province');
+        if($province){
+            $where['r.province']=$province;
+            $pageParam['query']['province']=$province;
+        }
+        $city=input('city');
+        if($city){
+            $where['r.city']=$city;
+            $pageParam['query']['city']=$city;
+        }
+        $district=input('district');
+        if($district){
+            $where['r.district']=$district;
+            $pageParam['query']['district']=$district;
+        }
+        $regtype=input('regtype',1);
+        $where['r.is_better']=1;
+        $where['r.status']=1;
+        $where['m.regtype']=$regtype;
+        $recruit_better=Db::name('recruit')->alias('r')
+            ->join('company co','co.id=r.company_id','LEFT')
+            ->join('member m','m.id=co.user_id','LEFT')
+            ->where($where)
+            ->field('co.logo,r.title,r.require_cert,r.salary,r.work_age')
+            ->paginate(3,false,$pageParam);
+        $recruit_better=$recruit_better->toArray();
+        $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $recruit_better['data']]);
+    }
+    public function recruit_hot(){
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $pageParam = ['query' => []];
+        $province=input('province');
+        if($province){
+            $where['r.province']=$province;
+            $pageParam['query']['province']=$province;
+        }
+        $city=input('city');
+        if($city){
+            $where['r.city']=$city;
+            $pageParam['query']['city']=$city;
+        }
+        $district=input('district');
+        if($district){
+            $where['r.district']=$district;
+            $pageParam['query']['district']=$district;
+        }
+        $regtype=input('regtype',1);
+        $where['r.is_rcmd']=1;
+        $where['r.status']=1;
+        $where['m.regtype']=$regtype;
+        $recruit_hot=Db::name('recruit')->alias('r')
+            ->join('company co','co.id=r.company_id','LEFT')
+            ->join('member m','m.id=co.user_id','LEFT')
+            ->where($where)
+            ->field('co.logo,r.title,r.require_cert,r.salary,r.work_age')
+            ->paginate(3,false,$pageParam);
+        $recruit_hot=$recruit_hot->toArray();
+        $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $recruit_hot['data']]);
+    }
     // 资料显示
     public function get_images()
     {

@@ -489,7 +489,7 @@ class User extends ApiBase
     public function upload_file()
     {
         if ($file = request()->file('file')) {
-            $dir = UPLOAD_PATH . date('Ymd') . DS;
+            $dir = UPLOAD_PATH . DS;
             if (!file_exists(ROOT_PATH . $dir)) mkdir(ROOT_PATH . $dir, 0777);
             if ($info = $file->validate(['size' => 2000000, 'ext' => 'jpg,png,gif,jpeg'])->move(ROOT_PATH . $dir)) {
                 $this->ajaxReturn([

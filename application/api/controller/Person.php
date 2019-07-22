@@ -25,7 +25,7 @@ class Person extends ApiBase
 
     public function getPerson()
     {
-        if (!$this->_id || !($this->_person = PersonModel::get(['user_id' => $this->get_user_id()]))) {
+        if (!$this->get_user_id() || !($this->_person = PersonModel::get(['user_id' => $this->get_user_id()]))) {
             $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在']);
         }
         $this->_id = $this->_person->id;

@@ -56,5 +56,23 @@ class MemberWithdrawal extends Model
         return Db::name('member_withdrawal')->where(['user_id' => $user_id, 'createtime' => [['EGT', $begin_time], ['LT', $time]]])->sum('money');
     }
 
+    public function getAvatarAttr($value, $data){
+        $regtype = Db::name('member')->where(['id' => $data['user_id']])->value('regtype');
+        if ($regtype == 3) {
+            return Db::name('person')->where(['user_id' => $data['user_id']])->value('avatar');
+        } else {
+            return Db::name('company')->where(['user_id' => $data['user_id']])->value('logo');
+        }
+    }
+
+    public function getNameAttr($value, $data){
+        $regtype = Db::name('member')->where(['id' => $data['user_id']])->value('regtype');
+        if ($regtype == 3) {
+            return Db::name('person')->where(['user_id' => $data['user_id']])->value('name');
+        } else {
+            return Db::name('company')->where(['user_id' => $data['user_id']])->value('company_name');
+        }
+    }
+
 
 }

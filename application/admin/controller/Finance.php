@@ -31,10 +31,13 @@ class Finance extends Common
         $end_time = input('end_time', '');
         $kw = input('realname', '');
         $source_type = input('source_type', '');
-        $level = input('level', '');
+        $type = input('type', '');
         $where = [];
         if (!empty($source_type)) {
             $where['log.source_type'] = $source_type;
+        }
+        if (!empty($type)) {
+            $where['m.regtype'] = $type;
         }
 
         if (!empty($kw)) {
@@ -51,14 +54,14 @@ class Finance extends Common
         // 携带参数
         $carryParameter = [
             'kw' => $kw,
-            'level' => $level,
+            'type' => $type,
             'source_type' => $source_type,
             'begin_time' => $begin_time,
             'end_time' => $end_time,
         ];
 
         $list = Db::name('member_balance_log')->alias('log')
-            ->field('m.id as mid,log.id,m.regtype,log.source_type,m.balance,log.create_time')
+            ->field('m.id as mid,log.id,m.regtype,log.source_type,m.balance,log.create_time,log.money,log.log_type')
             ->join('member m','log.user_id = m.id','LEFT')
             ->where($where)
             ->where(['log.balance_type' => 0])
@@ -70,7 +73,7 @@ class Finance extends Common
             'list' => $list,
             'exportParam' => $carryParameter,
             'kw' => $kw,
-            'level' => $level,
+            'type' => $type,
             'source_type' => $source_type,
             'type_list' => MemberBalanceLog::$type_list,
             'register_type' => MemberModel::$_registerType,
@@ -227,11 +230,20 @@ class Finance extends Common
         }
 
         $list = MemberWithdrawal::alias('w')
-            ->field('w.*, m.id as mid,m.mobile')
+            ->field('w.*, m.id as mid,m.mobile,m.regtype')
             ->join("member m", 'm.id = w.user_id', 'LEFT')
             ->where($where)
             ->order('w.id DESC')
             ->paginate(10, false, ['query' => $where]);
+        foreach ($list as &$v){
+            if ($v['regtype'] == 3) {
+                $data = Db::name('person')->where(['user_id' => $v['mid']])->field('name,avatar')->find();
+            } else {
+                $data = Db::name('company')->where(['user_id' => $v['mid']])->field('company_name as name,logo as avatar')->find();
+            }
+            $v['pic'] = isset($data['avatar']) ? $data['avatar'] : '';
+            $v['user_name'] = isset($data['name']) ? $data['name'] : '';
+        }
         return $this->fetch('finance/withdrawal_list', [
             'type' => $type,
             'status' => $status,
@@ -245,6 +257,56 @@ class Finance extends Common
             'list' => $list,
             'meta_title' => '余额提现列表',
         ]);
+    }
+
+
+    // 提现审核操作
+    public function withdrawal()
+    {
+        $status = input('status/d');
+        if ($status != -1 && $status != 1) {
+            $this->error('状态错误');
+        }
+        $id = input('id/d');
+        $withdrawal = MemberWithdrawal::get($id);
+        if (!$withdrawal || $withdrawal->status != 0) {
+            $this->error('数据没有找到或不能操作');
+        }
+        $content = input('content');
+        if ($status == -1 && !$content) {
+            $this->error('内容不能为空');
+        }
+        Db::startTrans();
+        $res = $withdrawal->save(['status' => $status, 'content' => $content, 'checktime' => time()]);
+        if (!$res) {
+            Db::rollback();
+            $this->error('操作失败');
+        }
+        // 审核失败，退回余额
+        if ($status == -1) {
+            $member = Db::name('member')->where(['id' => $withdrawal->user_id])->find();
+            $balance = bcadd($member['balance'], $withdrawal->money, 2);
+            $res = Db::name('member')->where(['id' => $withdrawal->user_id])->update(['balance' => $balance]);
+            $res && $res = Db::name('member_balance_log')->insert([
+                'user_id' => $withdrawal->user_id,
+                'balance_type' => 0,
+                'log_type' => 1,
+                'source_type' => 5,
+                'source_id' => $withdrawal->id,
+                'money' => $withdrawal->money,
+                'old_balance' => $member['balance'],
+                'balance' => $balance,
+                'create_time' => time(),
+                'note' => '提现审核失败返还'
+            ]);
+            if (!$res) {
+                Db::rollback();
+                $this->error('操作失败');
+            }
+        }
+
+        Db::commit();
+        $this->success('操作成功', url('finance/withdrawal_list'));
     }
 
 

@@ -23,10 +23,12 @@
 
         <div class="col-sm-2">
             <div class="form-group">
-                <label class="control-label" for="status">会员等级</label>
-                <select name='level' class='form-control' style="width:150px;">
+                <label class="control-label" for="status">注册类型</label>
+                <select name='type' class='form-control' style="width:150px;">
                     <option value=''>默认全部</option>
-
+                    {foreach $register_type as $key => $vo}
+                    <option value='{$key}' {if $type==$key}selected{/if}>{$vo}</option>
+                    {/foreach}
                 </select>
             </div>
         </div>
@@ -79,7 +81,7 @@
                             <tr><th>编号</th>
                                 <th>会员ID</th>
                                 <th>注册类型</th>
-                                <th>会员分组</th>
+                                <th>操作余额</th>
                                 <th>剩余余额</th>
                                 <th>记录时间</th>
                                 <th>来源方式</th>
@@ -93,11 +95,13 @@
                                 <td>{$row['id']}</td>
                                 <td>{$row['mid']}</td>
                                 <td>{$register_type[$row['regtype']]}</td>
-                                <td class='hidden-xs'><td>{$row['balance']}</td></td>
+                                <td class='hidden-xs'>{if $row['log_type']==0}-{/if}{$row['money']}</td>
+                                <td class='hidden-xs'>{$row['balance']}</td>
                                 <td class='hidden-xs'>{$row['create_time']|date='Y-m-d H:i:s',###}</td>
                                 <td><span class='label label-primary'>{$type_list[$row['source_type']]}</span></td>
                                 <td>
-                                    <a class='btn btn-default' href="{:url('member/member_edit',array('id' => $row['mid']));}" style="background-color: #7DBAEF; color: #fff;">用户信息</a>
+                                    <a class='btn btn-default' href="{if $row['regtype'] eq 3 }{:url('company/person_details',array('id' => $row['mid']))}
+                                {else/}{:url('company/company_details',array('id' => $row['mid']))}{/if}" style="background-color: #7DBAEF; color: #fff;">用户信息</a>
                                 </td>
                             </tr>
                             {/volist}

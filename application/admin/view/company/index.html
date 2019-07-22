@@ -105,7 +105,7 @@
 
                     <td>
 
-                        <a class="btn btn-default" href="{:url('company/company_details',['id'=>$row.id])}"><i class="fa fa-list"></i> 查看详情</a>
+                        <a class="btn btn-default" href="{:url('company/company_details',['id'=>$row.user_id])}"><i class="fa fa-list"></i> 查看详情</a>
                         {if $row['status'] == -1}
                         <a class='btn btn-default' data-toggle="modal" data-target="#myModal{$row['id']}"   style=" margin-top: 6px; background-color: #ff5858; color:#fff;">
                             不通过审批的理由

@@ -164,32 +164,7 @@ return [
                         'hide'  => 1,
                     ],
                 ],
-            ],
-            [
-                'id'    => 210400,
-                'title' => '微信管理',
-                'sort'  => 1,
-                'url'   => 'wxfans/index',
-                'hide'  => 1,
-                'icon'  => 'fa-th-large',
-                'child' => [
-                   
-                    [
-                        'id'    => 210401,
-                        'title' => '粉丝列表',
-                        'sort'  => 1,
-                        'url'   => 'wxfans/index',
-                        'hide'  => 1,
-                    ],
-                    [
-                        'id'    => 210402,
-                        'title' => '微信菜单',
-                        'sort'  => 2,
-                        'url'   => 'wxmenu/index',
-                        'hide'  => 1,
-                    ],
-                ],
-            ],
+            ]
         ],
      ],
     'category' => [
@@ -278,25 +253,18 @@ return [
         'child' => [
             [
                 'id'    => 60100,
-                'title' => '金币',
+                'title' => '余额',
                 'sort'  => 1,
                 'url'   => 'finance/index',
                 'hide'  => 1,
                 'child' => [
                     [
                         'id'    => 60101,
-                        'title' => '金币记录',
+                        'title' => '余额记录',
                         'sort'  => 1,
                         'url'   => 'finance/balance_logs',
                         'hide'  => 1,
-                    ],
-                    [
-                        'id'    => 60102,
-                        'title' => '金币设置',
-                        'sort'  => 1,
-                        'url'   => 'finance/balance_set',
-                        'hide'  => 1,
-                    ],
+                    ]
                 ],
 
             ],

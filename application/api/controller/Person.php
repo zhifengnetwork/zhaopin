@@ -101,11 +101,6 @@ class Person extends ApiBase
         $data['birth_month'] = $birth ? $birth[1] : '';
         $data['birth_day'] = $birth ? $birth[2] : '';
 
-        $daogang = $data['daogang_time'] ? explode('-', $data['daogang_time']) : [];
-        $data['daogang_year'] = $daogang ? $daogang[0] : '';
-        $data['daogang_month'] = $daogang ? $daogang[1] : '';
-        $data['daogang_day'] = $daogang ? $daogang[2] : '';
-
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
     }
 
@@ -119,9 +114,10 @@ class Person extends ApiBase
             return $this->ajaxReturn(['status' => -2, 'msg' => $validate]);
         }
 
-        $data['daogang_time'] = implode('-',[$data['daogang_year'],$data['daogang_month'],$data['daogang_day']]);
         $data['birth'] = implode('-',[$data['birth_year'],$data['birth_month'],$data['birth_day']]);
-        unset($data['daogang_year'],$data['daogang_month'],$data['daogang_day'],$data['birth_year'],$data['birth_month'],$data['birth_day']);
+        unset($data['birth_year'],$data['birth_month'],$data['birth_day']);
+        $data['status'] = 0;
+        $data['remark'] = '';
         if (!$this->_person->save($data)) {
             $this->ajaxReturn(['status' => -2, 'msg' => '保存失败！']);
         }

@@ -61,6 +61,8 @@ class Company extends ApiBase
 
         $data['open_time'] = implode('-', [$data['open_year'], $data['open_month'], $data['open_day']]);
         unset($data['open_year'], $data['open_month'], $data['open_day']);
+        $data['status'] = 0;
+        $data['remark'] = '';
         if (!$this->_com->save($data)) {
             $this->ajaxReturn(['status' => -2, 'msg' => '保存失败！']);
         }

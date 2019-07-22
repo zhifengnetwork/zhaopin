@@ -85,8 +85,8 @@
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th class="col-lg-2">粉丝</th>
-                    <th>会员信息</th>
+                    <th class="col-lg-2">会员信息</th>
+                    <th>手机号</th>
                     <th>提现金额</th>
                     <th>实际到账金额</th>
                     <th>手续费率/手续费</th>
@@ -103,10 +103,12 @@
                 <tr>
                     <td>{$row['id']}</td>
                     <td>
+                        {if $row['pic']}
                         <a href="{:url('member/member_edit',array('id' => $row['mid']));}" style="color: #003CB3;">
-                            <img src='' style='width:30px;height:30px;padding1px;border:1px solid #ccc' />
-
+                            <img src='{$row['avatar']}' style='width:30px;height:30px;padding1px;border:1px solid #ccc' />
                         </a>
+                        {/if}
+                        {$row['user_name']}
                     </td>
                     <td><br/>{$row['mobile']}</td>
 

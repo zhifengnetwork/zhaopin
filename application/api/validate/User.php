@@ -34,9 +34,9 @@ class User extends Validate
         'work_age' => 'require',
         'daogang_time' => 'require',
         'salary' => 'require|number',
-        'experience' => 'length',
-        'education' => 'length',
-        'person_desc' => 'require|length:10,100',
+        'experience' => 'length:10,500',
+        'education' => 'length:10,500',
+        'person_desc' => 'require|length:10,300',
 
         'contacts' => 'require|chs|length:2,8',
         'mobile' => 'require|checkMobile',
@@ -45,15 +45,15 @@ class User extends Validate
         'address' => 'require|length:4,50',
         'type' => 'require',
         'company_name' => 'require|chs|length:8,40',
-        'desc' => 'require|length:10,100',
+        'desc' => 'require|length:10,300',
         'c_img' => 'require',
 
         'open_year' => 'require|dateFormat:Y',
         'open_month' => 'require|dateFormat:m',
         'open_day' => 'require|dateFormat:d',
         'contacts_scale' => 'require|number',
-        'achievement' => 'length:0,150',
-        'introduction' => 'length:0,150',
+        'achievement' => 'length:10,300',
+        'introduction' => 'length:10,300',
 
     ];
 
@@ -94,10 +94,10 @@ class User extends Validate
         'daogang_time.require' => '请选择到岗时间',
         'salary.require' => '请填写薪资要求',
         'salary.number' => '薪资要求必须数字',
-        'experience.length' => '工作经历最多200字符',
-        'education.length' => '教育经历最多200字符',
+        'experience.length' => '工作经历10-500字符',
+        'education.length' => '教育经历10-200字符',
         'person_desc.require' => '请填写个人说明',
-        'person_desc.length' => '个人说明长度10-100',
+        'person_desc.length' => '个人说明长度10-300',
 
 
         'contacts.require' => '请填写联系人',
@@ -115,7 +115,7 @@ class User extends Validate
         'type.require' => '请选择公司类型',
         'type.number' => '请选择正确的公司类型',
         'desc.require' => '请填写公司介绍',
-        'desc.length' => '公司介绍长度10-100',
+        'desc.length' => '公司介绍长度10-300',
         'c_img.require' => '请上传营业执照',
 
         'open_year.require' => '请选择成立时间',
@@ -127,9 +127,9 @@ class User extends Validate
         'contacts_scale.require' => '请填写公司规模',
         'contacts_scale.number' => '公司规模必须为数字',
         'achievement.require' => '请填写成就',
-        'achievement.length' => '成就最多150个字符',
+        'achievement.length' => '成就最多300个字符',
         'introduction.require' => '请填写名人介绍',
-        'introduction.length' => '名人介绍最多150个字符',
+        'introduction.length' => '名人介绍最多300个字符',
 
     ];
 

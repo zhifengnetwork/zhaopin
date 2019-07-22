@@ -608,8 +608,21 @@ class User extends ApiBase
         }
 
         unset($data['password'], $data['salt']);
+
         //重写
         $data['token'] = $this->create_token($data['id']);
+        if($data['regtype']==1||$data['regtype']==2){
+            $company=Db::name('company')->where(['user_id'=>$data['id']])->find();
+            if(!$company){
+                $this->ajaxReturn(['status' => 3, 'msg' => '继续填写！', 'data' => $data]);
+            }
+        }elseif ($data['regtype']==3){
+            $person=Db::name('person')->where(['user_id'=>$data['id']])->find();
+            if(!$person){
+                $this->ajaxReturn(['status' => 3, 'msg' => '继续填写！', 'data' => $data]);
+            }
+        }
+
         $this->ajaxReturn(['status' => 1, 'msg' => '登录成功！', 'data' => $data]);
 //        }
 

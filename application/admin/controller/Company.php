@@ -15,21 +15,39 @@ class Company extends Common
     public function index()
     {
         $status  = input('status',2);
-        $where=[];
-        $pageParam = ['query' => []];
-        if($status != 2){
-            $where['status'] =  $status;
-            $pageParam['query']['status'] = $status;
-        }
-        $list=Db::name('company')
-            ->where($where)
-            ->paginate(10,false,$pageParam);
-
+        $list = $this->company_list(1);
 
         return $this->fetch('company/index',[
             'status'       => $status,
             'list'         =>$list,
             'meta_title'   => '公司审核列表',
+        ]);
+
+    }
+
+    function company_list($regtype){
+        $status  = input('status',2);
+        $where['m.regtype'] =  $regtype;
+        $pageParam['query']['m.regtype'] = $regtype;
+        if($status != 2){
+            $where['c.status'] =  $status;
+            $pageParam['query']['c.status'] = $status;
+        }
+        return Db::name('company')->alias('c')->field('c.*')
+            ->join('member m','c.user_id=m.id','LEFT')
+            ->where($where)
+            ->paginate(10,false,$pageParam);
+    }
+
+    public function third()
+    {
+        $status  = input('status',2);
+        $list = $this->company_list(2);
+
+        return $this->fetch('company/index',[
+            'status'       => $status,
+            'list'         =>$list,
+            'meta_title'   => '第三方审核列表',
         ]);
 
     }
@@ -102,16 +120,32 @@ class Company extends Common
         $data['remark']=$content;
         $data['check_user']=UID;
         $data['check_time']=time();
+        if($person['edit']==0)$data['edit']=1;
         $res=Db::name('person')->update($data);
 
         if(!$res){
             Db::rollback();
             $this->error('审核失败！');
         }else{
-            if($status==1){
-                $member=Db::name('member')->where(['id'=>$person['user_id']])->find();
-                $member['balance']=Db::name('category')->where(['cat_id'=>$person['job_type']])->value('money');
-                Db::name('member')->update($member);
+            if($status==1&&$person['edit']==0){
+                $balance=Db::name('member')->where(['id'=>$person['user_id']])->value('balance');
+                $money= Db::name('category')->where(['cat_id'=>$person['job_type']])->value('money');
+                $member_balance=bcadd($balance,$money);
+                $res = Db::name('member')->update(['balance'=>$member_balance]);
+                if(!$res){
+                    Db::rollback();
+                    $this->error('审核失败！');
+                }
+
+                // 余额记录
+                $res = Db::name('member_balance_log')->insert([
+                    'user_id'=>$person['user_id'],'money'=>$money,'old_balance'=>$balance,'balance'=>$member_balance,
+                    'source_type'=>8,'log_type'=>1,'source_id'=>$person['user_id'],'note'=>'注册成功','create_time'=>time()
+                ]);
+                if(!$res){
+                    Db::rollback();
+                    $this->error('审核失败！');
+                }
             }
             Db::commit();
             $this->success('操作成功', url('company/person_list'));

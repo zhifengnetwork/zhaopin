@@ -553,17 +553,20 @@ class User extends ApiBase
      */
     public function upload_headpic()
     {
-        $file = request()->file('head_pic');
-        $validate = ['size' => config('image_upload_limit_size'), 'ext' => 'jpg,png,gif,jpeg'];
-        $dir = UPLOAD_PATH . 'head_pic/';
-        if (!($_exists = file_exists($dir))) mkdir($dir);
-        $info = $file->validate($validate)->move($dir, true);
-        if ($info) {
-            $pic_path = '/' . $dir . '/' . $info->getFilename();
+        $pic = input('head_pic');
+        if (!$pic) $this->ajaxReturn(['status' => -2, 'msg' => '路径不能为空']);
+        $user_id = $this->get_user_id();
+        $regtype = Db::name('member')->where(['id' => $user_id])->value('regtype');
+        if (!$user_id || !$regtype) $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在']);
+        if ($regtype == 3) {
+            $res = Db::name('person')->where(['user_id' => $user_id])->update(['avatar' => $pic]);
         } else {
-            return ['status' => -1, 'msg' => $file->getError()];
+            $res = Db::name('company')->where(['user_id' => $user_id])->update(['logo' => $pic]);
         }
-        $this->ajaxReturn(['status' => 1, 'msg' => '上传成功', 'result' => $pic_path]);
+        if ($res) {
+            $this->ajaxReturn(['status' => 1, 'msg' => '修改成功！']);
+        }
+        $this->ajaxReturn(['status' => -2, 'msg' => '修改失败！']);
     }
 
     /*

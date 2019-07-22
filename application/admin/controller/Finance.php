@@ -104,8 +104,18 @@ class Finance extends Common
      */
     public function balance_recharge()
     {
-        $uid = input('id/d', 27);
+        $uid = input('id/d');
         $profile = MemberModel::get($uid);
+        if(!$profile)$this->error('用户不存在');
+        if($profile->regtype==3){
+            $data = Db::name('person')->where(['user_id'=>$uid])->field('name')->find();
+            if(!$data)$this->error('用户不存在');
+            $profile['text'] = "姓名：{$data['name']}";
+        }else{
+            $data = Db::name('company')->where(['user_id'=>$uid])->field('company_name,contacts')->find();
+            if(!$data)$this->error('用户不存在');
+            $profile['text'] = "公司名称：{$data['company_name']} / 联系人：{$data['contacts']} ";
+        }
         $balance_info = get_balance($uid, 0);
         if (Request::instance()->isPost()) {
             $num = input('num/f');
@@ -117,6 +127,7 @@ class Finance extends Common
             $this->success('充值成功', url('member/member_edit', ['id' => $profile['id']]));
         }
         $profile['balance'] = $balance_info['balance'];
+        $this->assign('register_type', \app\common\model\Member::$_registerType);
         $this->assign('profile', $profile);
         $this->assign('meta_title', '余额充值');
         return $this->fetch();
@@ -156,18 +167,10 @@ class Finance extends Common
 
         if (Request::instance()->isPost()) {
             $max = input('max/d', 0);
-
             if ($max > 0) {
                 $set['withdrawal']['max'] = $max;//最大提现金额
             } else {
                 $this->error('每次最高提现金额不能少于0');
-            }
-
-            $max_preday = input('max_preday/d', 0);
-            if ($max_preday > 0) {
-                $set['withdrawal']['max_preday'] = $max_preday;//最大提现金额
-            } else {
-                $this->error('每个用户每天最高提现金额不能少于0');
             }
 
             $rate = bcadd(input('rate'), 0, 2);
@@ -175,7 +178,6 @@ class Finance extends Common
                 $this->error('提现手续费0.01-100');
             }
             $set['withdrawal']['rate'] = $rate;
-            $set['withdrawal']['times'] = input('times/d', 0);
             $set['withdrawal']['show'] = input('show/d');
             $res = Db::name('sysset')->where(['id' => 1])->update(['sets' => serialize($set)]);
             if ($res !== false) {

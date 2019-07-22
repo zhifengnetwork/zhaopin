@@ -16,6 +16,7 @@ class MemberBalanceLog extends Model
         5 => '申请提现失败返还',
         6 => '退款返还',
         7 => '后台充值',
+        8 => '个人注册成功',
     ];
 
     public static function getTypeTextBy($value)

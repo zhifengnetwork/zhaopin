@@ -40,7 +40,7 @@ class User extends Validate
 
         'contacts' => 'require|chs|length:2,8',
         'mobile' => 'require|checkMobile',
-        'telephone' => 'require|checkTel',
+        'telephone' => 'checkTel',
         'district' => 'require|checkDistinct',
         'address' => 'require|length:4,50',
         'type' => 'require',
@@ -106,7 +106,6 @@ class User extends Validate
         'contacts.chs' => '联系人必须是中文',
         'mobile.require' => '请填写手机号',
         'mobile.checkMobile' => '请填写正确的手机号',
-        'telephone.require' => '请填写固定电话',
         'telephone.checkTel' => '请填写正确的固定电话',
         'district.require' => '请选择公司地区',
         'district.checkDistinct' => '请选择正确的公司地区',
@@ -150,7 +149,7 @@ class User extends Validate
 
     protected function checkTel($value)
     {
-        return isTel($value);
+        return $value ? isTel($value) : true;
     }
 
     protected function checkDistinct($value)

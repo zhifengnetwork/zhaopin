@@ -35,27 +35,13 @@
                             </td>
                             <td class="col-lg-1 active text-right">公司介绍</td>
                             <td class="col-lg-2">
-                                {$company.desc}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="col-lg-1 active text-right">营业执照</td>
-                            <td class="col-lg-2">
-                                {$company.c_img}
-                            </td>
-                            <td class="col-lg-1 active text-right">其他证书</td>
-                            <td class="col-lg-2">
-                                {$company.images}
+                                <p title="{$company.desc}">{$company.desc|getSubstr=0,30}</p>
                             </td>
                         </tr>
                         <tr>
                             <td class="col-lg-1 active text-right">是否VIP</td>
                             <td class="col-lg-2">
-                                {if $company['is_vip']==1}
-                                是
-                                {else /}
-                                否
-                                {/if}
+                                {if $company['is_vip']==0}否 {else/} 是{/if}
                             </td>
                             <td class="col-lg-1 active text-right">vip类型</td>
                             <td class="col-lg-2">
@@ -71,10 +57,12 @@
                             </td>
                         </tr>
                         <tr>
+                            {if $company['is_vip']==1}
                             <td class="col-lg-1 active text-right">vip到期时间</td>
                             <td class="col-lg-2">
                                 {$company.vip_time|date='Y-m-d H:i:s',###}
                             </td>
+                            {/if}
                             <td class="col-lg-1 active text-right">公司成立时间</td>
                             <td class="col-lg-2">
                                 {$company.open_time}
@@ -98,6 +86,21 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="m-b-md">
+                    <h3>照片</h3>
+                </div>
+                <div>
+                    <img src="{$company.c_img}">
+                    营业执照
+                    {volist name="$company.images|json_decode" id="vo"}
+                    <img src="{$vo.path}">
+                    {$vo.title}
+                    {/volist}
+                </div>
             </div>
         </div>
         <div class="row">
@@ -130,10 +133,7 @@
                     不通过审批的理由
                 </a>
                 <br />
-
-
                 <div class="modal fade" id="myModal{$company['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -145,34 +145,25 @@
                                 </h4>
                             </div>
                             <div class="modal-body">
-                                                                <textarea class="form-control" name='content' rows="3">
-                                                                     {$company['remark']}
-                                                                </textarea>
+                                <textarea class="form-control" name='content' rows="3">
+                                    {$company['remark']}
+                                </textarea>
                             </div>
                             <div class="modal-footer">
 
                             </div>
                         </div><!-- /.modal-content -->
                     </div>
-
-
-
-
                     {/if}
                 {if $company['status'] == 0}
                 <a class='btn btn-default' onclick="return confirm('通过审批')" href="{:url('company/audit',array('status'=>'1','id' => $company['id']));}" style="background-color: #ffb034; color:#fff;">
                     通过审批
                 </a>
                 <br />
-
-
-
                 <a class='btn btn-default' data-toggle="modal" data-target="#myModal{$company['id']}"  style=" margin-top: 6px; background-color: #ff5858; color:#fff;">
                     不通过审批
                 </a>
                 <br />
-
-
                 <div class="modal fade" id="myModal{$company['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                     <form action="{:url('company/audit',array('status'=>'-1','id' => $company['id']));}" method="post">
                         <div class="modal-dialog">

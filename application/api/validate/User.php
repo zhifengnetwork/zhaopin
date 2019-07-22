@@ -29,8 +29,9 @@ class User extends Validate
         'idcard_back' => 'require',
 
         'nation' => 'require|chs|length:1,6',
+        'age' => 'require|number',
         'job_type' => 'require|number',
-        'work_age' => 'require|number',
+        'work_age' => 'require',
         'daogang_time' => 'require',
         'salary' => 'require|number',
         'experience' => 'length',
@@ -86,8 +87,9 @@ class User extends Validate
         'nation.chs' => '民族必须是中文',
         'nation.length' => '民族长度1-6',
         'job_type.require' => '请选择求职类型',
+        'age.require' => '请填写年龄',
+        'age.number' => '年龄必须是数字',
         'work_age.require' => '请填写工龄',
-        'work_age.number' => '工龄必须是数字',
         'daogang_time.require' => '请选择到岗时间',
         'salary.require' => '请填写薪资要求',
         'salary.number' => '薪资要求必须数字',
@@ -131,7 +133,7 @@ class User extends Validate
     protected $scene = [
         'person' => ['name', 'gender', 'birth_year', 'birth_month', 'birth_day', 'graduate_year', 'graduate_month', 'graduate_day', 'school', 'school_type', 'idcard_front', 'idcard_back'],
         'company' => ['contacts', 'mobile', 'telephone', 'district', 'company_name', 'type', 'desc', 'c_img'],
-        'person_edit' => ['name', 'gender', 'birth_year', 'birth_month', 'birth_day', 'nation', 'job_type', 'work_age', 'daogang_time', 'salary', 'experience', 'education', 'desc'],
+        'person_edit' => ['name', 'gender', 'age', 'nation', 'job_type', 'work_age', 'daogang_time', 'salary', 'experience', 'education'],
         'company_edit' => ['open_year', 'open_month', 'open_day', 'company_name', 'type', 'desc', 'contacts_scale', 'achievement', 'introduction'],
     ];
 

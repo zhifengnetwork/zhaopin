@@ -114,8 +114,6 @@ class Person extends ApiBase
             return $this->ajaxReturn(['status' => -2, 'msg' => $validate]);
         }
 
-        $data['birth'] = implode('-',[$data['birth_year'],$data['birth_month'],$data['birth_day']]);
-        unset($data['birth_year'],$data['birth_month'],$data['birth_day']);
         $data['status'] = 0;
         $data['remark'] = '';
         if (!$this->_person->save($data)) {

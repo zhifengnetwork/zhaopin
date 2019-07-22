@@ -17,6 +17,10 @@ class Collection extends ApiBase
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
+        $regtype=input('regtype');
+        if(!$regtype){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'参数错误','data'=>'']);
+        }
         $type=Db::name('member')->where('id',$user_id)->value('regtype');
         if($type==3){
             $list = Db::table('collection')->alias('c')
@@ -24,8 +28,9 @@ class Collection extends ApiBase
                 ->join('company co','co.id=r.company_id','LEFT')
                 ->join('member m','m.id=co.user_id','LEFT')
                 ->join('category ca','ca.cat_id=r.type','LEFT')
-                ->field('r.id,r.title,ca.cat_name,r.work_age,r.require_cert,r.salary,m.avatar,m.regtype')
+                ->field('r.id,r.title,ca.cat_name,r.work_age,r.require_cert,r.salary,co.logo,m.regtype')
                 ->where('c.user_id',$user_id)
+                ->where('m.regtype',$regtype)
                 ->select();
 //            foreach ($list as $key=>$value){
 //                $list[$key]['city']=Region::getName($list[$key]['city']);
@@ -37,8 +42,9 @@ class Collection extends ApiBase
                 ->join('person p','p.id=c.to_id','LEFT')
                 ->join('member m','m.id=p.user_id','LEFT')
                 ->join('category ca','ca.cat_id=p.job_type','LEFT')
-                ->field('p.id,p.name,p.desc,ca.cat_name,p.work_age,p.images,m.avatar')
+                ->field('p.id,p.name,p.desc,ca.cat_name,p.work_age,p.images,p.avatar,m.regtype')
                 ->where('c.user_id',$user_id)
+                ->where('m.regtype',$regtype)
                 ->select();
             foreach ($list as $key=>$value){
                 $list[$key]['images']=$list[$key]['images']?1:0;

@@ -555,6 +555,7 @@ class User extends ApiBase
     {
         $pic = input('head_pic');
         if (!$pic) $this->ajaxReturn(['status' => -2, 'msg' => '路径不能为空']);
+        $pic = str_replace(SITE_URL, '', $pic);
         $user_id = $this->get_user_id();
         $regtype = Db::name('member')->where(['id' => $user_id])->value('regtype');
         if (!$user_id || !$regtype) $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在']);

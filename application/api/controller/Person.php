@@ -347,6 +347,7 @@ class Person extends ApiBase
             Db::startTrans();
             Db::table('member')->where('id',$user_id)->setDec('balance',$money);
             $data['is_vip']=1;
+            $data['vip_type']=$vip_type;
             $data['vip_time']=$vip_time;
             $res=Db::name('company')->where(['user_id'=>$user_id])->update($data);
             if(!$res){

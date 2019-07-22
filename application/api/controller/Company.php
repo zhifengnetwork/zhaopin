@@ -275,7 +275,7 @@ class Company extends ApiBase
         }
         $detail = Db::name('recruit')
             ->alias('r')
-            ->field('r.title,r.salary,r.work_age,c.province,c.logo,c.company_name,c.city,c.district,r.detail')
+            ->field('r.id,r.title,r.salary,r.work_age,c.province,c.logo,c.company_name,c.city,c.district,r.detail')
             ->join('company c', 'c.id=r.company_id', 'LEFT')
             ->where(['r.id' => $id])
             ->find();
@@ -315,13 +315,40 @@ class Company extends ApiBase
         if(!Db::name('person')->where(['id'=>$id])->find()){
             $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在']);
         }
-        if(!Reserve::getBy($this->_id,$id)){
-            if(Db::name('reserve')->insert(['company_id'=>$this->_id,'person_id'=>$id,'create_time'=>time()])){
-                $this->ajaxReturn(['status' => 1, 'msg' => '操作成功']);
+        $num=$this->look_num($this->_id);//可预约人数
+        if($num>0){
+            if(!Reserve::getBy($this->_id,$id)){
+                if(Db::name('reserve')->insert(['company_id'=>$this->_id,'person_id'=>$id,'create_time'=>time()])){
+                    $this->ajaxReturn(['status' => 1, 'msg' => '操作成功']);
+                }
             }
+        }else{
+            //TODO   预约支付
+            $this->ajaxReturn(['status' => -2, 'msg' => '可预约人数不足，请充值或者购买VIP']);
         }
         $this->ajaxReturn(['status' => -2, 'msg' => '操作失败']);
     }
-
+    //查询该公司还有多少可查看（预约）人数
+    public function look_num($company_id){
+        $vip_type=Db::name('company')->where(['id'=>$company_id])->value('vip_type');
+        $sysset = Db::table('sysset')->field('*')->find();
+        $set =json_decode($sysset['vip'], true);
+        $re_num=Db::name('reserve')->where(['company_id'=>$company_id])->count();
+        switch ($vip_type){
+            case 1:
+                $num=$set['month']-$re_num;
+                break;
+            case 2:
+                $num=$set['quarter']-$re_num;
+                break;
+            case 3:
+                $num=$set['year']-$re_num;
+                break;
+            default:
+                $num=0;
+                break;
+        }
+        return $num;
+    }
 
 }

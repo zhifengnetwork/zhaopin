@@ -82,7 +82,7 @@ class Person extends ApiBase
         $list  = Db::name('region')->field('area_id,code,parent_id,area_name')->where($where)->select();
         $this->ajaxReturn(['status'=>1,'msg'=>'获取地址成功','data'=>$list]);
     }
-
+    //隐私列表
     public function secret_list(){
         $user_id=$this->get_user_id();
         $person_one=Db::name('person')->field('reserve,shelf,pull')->where(['user_id'=>$user_id])->find();
@@ -127,7 +127,24 @@ class Person extends ApiBase
         }
         $this->ajaxReturn(['status' => 1, 'msg' => '保存成功！']);
     }
+    //我的钱包
+    public function my_wallet(){
+        $user_id=$this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $sysset = Db::table('sysset')->field('*')->find();
+        $set =json_decode($sysset['vip'], true);
 
+        $member=Db::name('member')->where(['id'=>$user_id])->field('id,balance,regtype')->find();
+        if(!$member){
+            $this->ajaxReturn(['status' => -2, 'msg' => '获取失败','data'=>[]]);
+        }
+        $member['month_money']=$set['month_money'];
+        $member['quarter_money']=$set['quarter_money'];
+        $member['year_money']=$set['year_money'];
+        $this->ajaxReturn(['status' => 1, 'msg' => '获取成功','data'=>$member]);
+    }
     // 个人信息
     public function detail()
     {
@@ -156,6 +173,7 @@ class Person extends ApiBase
         $detail['job_type'] = Category::getNameById($detail['job_type']) ?: '';
         $this->ajaxReturn(['status' => 1, 'msg' => '获取成功', 'data' => $detail]);
     }
+    //个人列表
     public function person_list(){
         $type=input('type');//工种
         $kw=input('kw');
@@ -187,6 +205,7 @@ class Person extends ApiBase
         $this->ajaxReturn(['status' => 1, 'msg' => '获取成功','data'=>$list['data']]);
 
     }
+    //分类列表
     public function category_list(){
         $pid=input('pid',0);
         $where['pid']=$pid;
@@ -197,6 +216,7 @@ class Person extends ApiBase
         }
         $this->ajaxReturn(['status' => 1, 'msg' => '获取成功','data'=>$category_list]);
     }
+    //去提现页面
     public function go_withdrawal(){
         $user_id=$this->get_user_id();
         if(!$user_id){
@@ -212,6 +232,7 @@ class Person extends ApiBase
 
         $this->ajaxReturn(['status' => 1, 'msg' => '获取成功','data'=>$member]);
     }
+    //提现
     public function withdrawal(){
         $user_id=$this->get_user_id();
         if(!$user_id){
@@ -274,6 +295,82 @@ class Person extends ApiBase
                 Db::rollback();
                 $this->ajaxReturn(['status' => -2, 'msg' => '提现失败','data'=>[]]);
             }
+        }
+    }
+    public function recharge(){
+        $user_id=$this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $money=input('moeny');
+
+    }
+    public function buy_vip(){
+        $user_id=$this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $vip_type=input('vip_type');
+        $pay_type=input('pay_type');
+        if(!$vip_type||!$pay_type) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '参数错误','data'=>[]]);
+        }
+        $sysset = Db::table('sysset')->field('*')->find();
+        $set =json_decode($sysset['vip'], true);
+        $member['month_money']=$set['month_money'];
+        $member['quarter_money']=$set['quarter_money'];
+        $member['year_money']=$set['year_money'];
+        $money=0;
+        $vip_time=time();
+        switch ($vip_type){
+            case 1:
+                $money=$set['month_money'];
+                $vip_time=strtotime("+1 month");
+                break;
+            case 2:
+                $money=$set['quarter_money'];
+                $vip_time=strtotime("+3 month");
+                break;
+            case 3:
+                $money=$set['year_money'];
+                $vip_time=strtotime("+12 month");
+                break;
+            default:
+                $this->ajaxReturn(['status' => -2, 'msg' => '会员类型不存在','data'=>[]]);
+                break;
+        }
+        if($money==0){
+            $this->ajaxReturn(['status' => -2, 'msg' => '金额错误，开通失败','data'=>[]]);
+        }
+        $member=Db::name('member')->where(['id'=>$user_id])->find();
+
+        if($pay_type==1){//余额支付
+            if($money>$member){
+                $this->ajaxReturn(['status' => -2, 'msg' => '余额不足，开通失败','data'=>[]]);
+            }
+            Db::startTrans();
+            Db::table('member')->where('id',$user_id)->setDec('balance',$money);
+            $data['is_vip']=1;
+            $data['vip_time']=$vip_time;
+            $res=Db::name('company')->where(['user_id'=>$user_id])->update($data);
+            if(!$res){
+                Db::rollback();
+                $this->ajaxReturn(['status' => -2, 'msg' => '开通失败!','data'=>[]]);
+            }
+            $data=[];
+            $data['user_id']=$user_id;
+            $data['money']=$money;
+            $data['old_balance']=$member['balance'];
+            $data['balance']=sprintf("%.2f",$member['balance']-$money);
+            $data['balance_type']='VIP购买';
+            $data['source_type']=4;
+            $data['log_type']=0;
+            $data['source_id']=$user_id;
+            $data['create_time']=time();
+            Db::name('member_balance_log')->insertGetId($data);
+            Db::commit();
+        }elseif ($pay_type==2){//微信支付
+
         }
     }
 }

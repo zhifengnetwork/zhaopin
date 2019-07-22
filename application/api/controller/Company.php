@@ -40,7 +40,11 @@ class Company extends ApiBase
     {
         $this->getCompany();
         $data = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement')
-            ->where(['id'=>$this->_id])->find();
+            ->where(['user_id' => $this->get_user_id()])->find();
+        if (!$data) {
+            return $this->ajaxReturn(['status' => -2, 'msg' => '不存在的信息']);
+        }
+        $data['logo'] = SITE_URL . $data['logo'];
         $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
         $data['open_year'] = $open ? $open[0] : '';
         $data['open_month'] = $open ? $open[1] : '';

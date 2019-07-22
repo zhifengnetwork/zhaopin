@@ -36,6 +36,7 @@ class User extends Validate
         'salary' => 'require|number',
         'experience' => 'length',
         'education' => 'length',
+        'person_desc' => 'require|length:10,100',
 
         'contacts' => 'require|chs|length:2,8',
         'mobile' => 'require|checkMobile',
@@ -95,6 +96,8 @@ class User extends Validate
         'salary.number' => '薪资要求必须数字',
         'experience.length' => '工作经历最多200字符',
         'education.length' => '教育经历最多200字符',
+        'person_desc.require' => '请填写个人说明',
+        'person_desc.length' => '个人说明长度10-100',
 
 
         'contacts.require' => '请填写联系人',
@@ -133,7 +136,7 @@ class User extends Validate
     protected $scene = [
         'person' => ['name', 'gender', 'birth_year', 'birth_month', 'birth_day', 'graduate_year', 'graduate_month', 'graduate_day', 'school', 'school_type', 'idcard_front', 'idcard_back'],
         'company' => ['contacts', 'mobile', 'telephone', 'district', 'company_name', 'type', 'desc', 'c_img'],
-        'person_edit' => ['name', 'gender', 'age', 'nation', 'job_type', 'work_age', 'daogang_time', 'salary', 'experience', 'education'],
+        'person_edit' => ['name', 'gender', 'age', 'nation', 'job_type', 'work_age', 'daogang_time', 'salary', 'experience', 'education','person_desc'],
         'company_edit' => ['open_year', 'open_month', 'open_day', 'company_name', 'type', 'desc', 'contacts_scale', 'achievement', 'introduction'],
     ];
 

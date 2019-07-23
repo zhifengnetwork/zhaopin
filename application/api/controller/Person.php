@@ -158,14 +158,14 @@ class Person extends ApiBase
             ->join('member m', 'm.id=p.user_id', 'LEFT')
             ->where(['p.id' => $id])
             ->find();
-        // 非预定，隐藏信息
-        if(!(Reserve::getBy($this->_com->id,$id))){
-            $detail['name'] =shadow($detail['name']);
-            $detail['mobile'] =shadow($detail['mobile']);
-        }
+//        if(!(Reserve::getBy($this->_com->id,$id))){
+//            $detail['name'] =shadow($detail['name']);
+//            $detail['mobile'] =shadow($detail['mobile']);
+//        }
         $detail['gender'] = $detail['gender'] == 'female' ? '女' : '男';
         $detail['images'] = $detail['images']!='[]' ? 1 : 0;
         $detail['job_type'] = Category::getNameById($detail['job_type']) ?: '';
+
         $this->ajaxReturn(['status' => 1, 'msg' => '获取成功', 'data' => $detail]);
     }
     //个人列表

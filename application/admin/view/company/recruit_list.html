@@ -26,9 +26,6 @@
                     <th>企业名称</th>
                     <th>标题</th>
                     <th>工种</th>
-                    <th>工龄</th>
-                    <th>薪资</th>
-                    <th>是否需要证书</th>
                     <th>时间</th>
                     <th>当前热招</th>
                     <th>热门推荐</th>
@@ -49,17 +46,7 @@
                         {$row['title']}
                     </td>
 
-                    <td>{$row['type']}</td>
-                    <td>{$row['work_age']}</td>
-                    <td>
-                        {$row['salary']}
-                    <td>
-                        {if $row['require_cert']==1}
-                        是
-                        {else /}
-                        否
-                        {/if}
-                    </td>
+                    <td>{$row['type']|cate}</td>
                     <td>
                         {$row['create_time']|date="y-m-d H:i:s",###}
                     </td>
@@ -110,6 +97,9 @@
                         {/if}
                     </td>
                     <td>
+
+                        <a class='btn btn-default' data-toggle="modal" data-target="#dataModal{$row['id']}">
+                            <i class='fa fa-edit'></i> 查看详情</a>
                         {if $row['status'] == -1}
                         <a class='btn btn-default' data-toggle="modal" data-target="#myModal{$row['id']}"   style=" margin-top: 6px; background-color: #ff5858; color:#fff;">
                             不通过审批的理由
@@ -130,63 +120,47 @@
                                         </h4>
                                     </div>
                                     <div class="modal-body">
-                                                                <textarea class="form-control" name='content' rows="3">
-                                                                     {$row['remark']}
-                                                                </textarea>
+                                        <textarea class="form-control" name='content' rows="3">
+                                            {$row['remark']}
+                                        </textarea>
                                     </div>
                                     <div class="modal-footer">
 
                                     </div>
                                 </div><!-- /.modal-content -->
                             </div>
-
-
-
-
-                            {/if}
-
-                            {if $row['status'] == 0}
-                            <a class='btn btn-default' onclick="return confirm('通过审批')" href="{:url('company/recruit_audit',array('status'=>'1','id' => $row['id']));}" style="background-color: #ffb034; color:#fff;">
-                                通过审批
-                            </a>
-                            <br />
-
-
-
-                            <a class='btn btn-default' data-toggle="modal" data-target="#myModal{$row['id']}"  style=" margin-top: 6px; background-color: #ff5858; color:#fff;">
-                                不通过审批
-                            </a>
-                            <br />
-
-
-                            <div class="modal fade" id="myModal{$row['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                                <form action="{:url('company/recruit_audit',array('status'=>'-1','id' => $row['id']));}" method="post">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                                                    &times;
-                                                </button>
-                                                <h4 class="modal-title" id="myModalLabel">
-                                                    审批不通过原因
-                                                </h4>
-                                            </div>
-                                            <div class="modal-body">
-                                                <textarea class="form-control" name='content' rows="3"></textarea>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
-                                                </button>
-                                                <button   type="submit" class="btn btn-primary">
-                                                    提交更改
-                                                </button>
-                                            </div>
-                                        </div><!-- /.modal-content -->
-                                    </div><!-- /.modal -->
-                                </form>
+                        </div>
+                        {/if}
+                        <div class="modal fade" id="dataModal{$row['id']}" tabindex="-1" role="dialog" aria-labelledby="dataModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title" id="dataModal">
+                                                审核信息
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <ul>
+                                                <li>标题 : {$row['title']}</li>
+                                                <li>工种 : {$row['type']|cate}</li>
+                                                <li>工龄 : {$row['work_age']}</li>
+                                                <li>薪资 : {$row['salary']}</li>
+                                                <li>证书要求 : {if $row['require_cert'] eq 1}需要{else/}不需要{/if}</li>
+                                                <li>职位详情 : {$row['detail']}</li>
+                                            </ul>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                                            </button>
+                                        </div>
+                                    </div><!-- /.modal-content -->
+                                </div><!-- /.modal -->
 
                             </div>
-                            {/if}
+
                     </td>
                 </tr>
                 {/volist}

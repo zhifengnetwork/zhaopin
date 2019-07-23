@@ -105,7 +105,7 @@ class Company extends ApiBase
         $id = input('id/d');
         if ($id > 0) {
             $recruit = Db::name('recruit')->where(array('company_id' => $this->_id, 'id' => $id))->find();
-            if (!($recruit) || $recruit['status'] != 2) {
+            if (!($recruit) || $recruit['status'] == 0) {
                 $this->ajaxReturn(['status' => -2, 'msg' => '信息不存在！']);
             }
         }
@@ -119,7 +119,7 @@ class Company extends ApiBase
 
         Db::startTrans();
         if ($id > 0) {
-            if (!Db::name('recruit')->where(['company_id' => $this->_id, 'id' => $id])->update($data)) {
+            if ($recruit['edit'] == 0 && !Db::name('recruit')->where(['company_id' => $this->_id, 'id' => $id])->update(['edit' => 1])) {
                 Db::rollback();
                 $this->ajaxReturn(['status' => -2, 'msg' => '保存失败']);
             }

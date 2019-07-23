@@ -158,32 +158,7 @@ class Company extends Common
         }
 
     }
-    public function recruit_audit(){
 
-        $status = input('status/d');
-        if ($status != -1 && $status != 1) {
-            $this->error('状态错误');
-        }
-        $id = input('id/d');
-
-        $company=Db::name('recruit')->where(['id'=>$id])->find();
-        if (!$company || $company['status'] != 0) {
-            $this->error('数据没有找到或不能操作');
-        }
-        $content = input('content');
-        if ($status == -1 && !$content) {
-            $this->error('内容不能为空');
-        }
-        $data['status']=$status;
-        $data['id']=$id;
-        $data['remark']=$content;
-        $data['check_time']=time();
-        $res=Db::name('recruit')->update($data);
-        if(!$res){
-            $this->error('审核失败！');
-        }
-        $this->success('操作成功', url('company/recruit_list'));
-    }
     public function vip_set()
     {
         $sysset = Db::table('sysset')->field('*')->find();
@@ -237,11 +212,11 @@ class Company extends Common
      */
     public function recruit_list()
     {
-
-        $pageParam = ['query' => []];
+        $where = ['r.status'=>['neq',0]];
+        $pageParam = ['query' => $where];
         $list=Db::name('recruit')->alias('r')
             ->join('company c','c.id=r.company_id','LEFT')
-            ->field('r.*,c.company_name')
+            ->field('r.*,c.company_name')->where($where)->order('id desc')
             ->paginate(10,false,$pageParam);
 
         return $this->fetch('company/recruit_list',[
@@ -249,6 +224,63 @@ class Company extends Common
             'meta_title'   => '职位列表',
         ]);
 
+    }
+    /*
+     * 职位审核管理
+     */
+    public function audit_list()
+    {
+        $where =  ['type'=>4,'status'=>0];
+        $pageParam['query']=['regtype'=>4,'status'=>0];
+        $list=Audit::where($where)->order('id desc')
+            ->paginate(10,false,$pageParam);
+
+        return $this->fetch('',[
+            'list'         =>$list,
+            'meta_title'   => '职位审核列表',
+        ]);
+
+    }
+    public function recruit_audit(){
+
+        $status = input('status/d');
+        if ($status != -1 && $status != 1) {
+            $this->error('状态错误');
+        }
+        $id = input('id/d');
+
+        $audit=Db::name('audit')->where(['id'=>$id])->find();
+        if (!$audit || $audit['status'] != 0) {
+            $this->error('数据没有找到或不能操作');
+        }
+        $recruit=Db::name('recruit')->where(['id'=>$audit['content_id']])->find();
+        if (!$recruit) {
+            $this->error('数据没有找到');
+        }
+        $content = input('content');
+        if ($status == -1 && !$content) {
+            $this->error('内容不能为空');
+        }
+        Db::startTrans();
+        if ($recruit['edit'] == 1 && $status == 1){
+            $data = json_decode($audit['data'],true);
+        }
+        $data['status']=$status;
+        $data['id']=$audit['content_id'];
+        $data['remark']=$content;
+        $data['check_time']=time();
+        $res=Db::name('recruit')->update($data);
+        if(!$res){
+            Db::rollback();
+            $this->error('审核失败！');
+        }
+        $res=Db::name('audit')->where(['id'=>$id])->update(['status'=>$status]);
+        if(!$res){
+            Db::rollback();
+            $this->error('审核失败！');
+        }
+        Db::commit();
+        $this->success('操作成功', url('company/recruit_list'));
     }
     public function recruit_exit(){
         $id=input('id');

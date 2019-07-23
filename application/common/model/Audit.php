@@ -20,9 +20,12 @@ class Audit extends Model
     }
 
     public function getRecruitDataAttr($value, $data){
-        return Db::name('recruit')->where(['id'=>$data['content_id']])->find();
+        return Db::name('audit')->alias('a')
+            ->field('c.id as c_id,c.company_name,r.id as r_id')
+            ->join('recruit r','r.id = a.content_id','LEFT')
+            ->join('company c','r.company_id = c.id','LEFT')
+            ->where(['a.id'=>$data['content_id']])->find();
     }
-
 
     public function getMemberDataAttr($value, $data){
         return Db::name('member')->where(['id'=>$data['content_id']])->find();

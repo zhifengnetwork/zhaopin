@@ -1,0 +1,138 @@
+{extend name="common:base" /}
+{block name="style"}
+<style type="text/css">
+    .table>thead>tr>th {
+        text-align: center;
+    }
+
+    .fant {
+        font-weight: 600;
+    }
+</style>
+{/block}
+{block name="content"}
+<div class="row wrapper border-bottom white-bg page-heading">
+
+    <div class="col-lg-2">
+
+    </div>
+
+    <div class="ibox-content">
+        <div class="table-responsive">
+            <table class="table  table-bordered table-hover text-center">
+                <thead>
+                <tr>
+                    <th>职位编号</th>
+                    <th>企业编号</th>
+                    <th>企业名称</th>
+                    <th>标题</th>
+                    <th>工种</th>
+                    <th>时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {notempty name="list"}
+                {volist name="list" id="row"}
+                <tr>
+                    <td>
+                        {$row['recruit_data']['r_id']}
+                    </td>
+                    <td>
+                        {$row['recruit_data']['c_id']}
+                    </td>
+                    <td>
+                        {$row['recruit_data']['company_name']}
+                    </td>
+                    <td   class='hidden-xs'>
+                        {$row['data_array']['title']}
+                    </td>
+
+                    <td>{$row['data_array']['type']|cate}</td>
+                    <td>
+                        {$row['create_time']}
+                    </td>
+                    <td>
+                        <a class='btn btn-default' data-toggle="modal" data-target="#dataModal{$row['id']}">
+                            <i class='fa fa-edit'></i> 查看详情</a>
+                        <a class='btn btn-default' onclick="return confirm('通过审批')" href="{:url('company/recruit_audit',array('status'=>'1','id' => $row['id']));}" style="background-color: #ffb034; color:#fff;">
+                            通过审批
+                        </a>
+                        <br />
+
+                        <a class='btn btn-default' data-toggle="modal" data-target="#myModal{$row['id']}"  style=" margin-top: 6px; background-color: #ff5858; color:#fff;">
+                            不通过审批
+                        </a>
+                        <br />
+
+                        <div class="modal fade" id="myModal{$row['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <form action="{:url('company/recruit_audit',array('status'=>'-1','id' => $row['id']));}" method="post">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel">
+                                                审批不通过原因
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <textarea class="form-control" name='content' rows="3"></textarea>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                                            </button>
+                                            <button   type="submit" class="btn btn-primary">
+                                                提交更改
+                                            </button>
+                                        </div>
+                                    </div><!-- /.modal-content -->
+                                </div><!-- /.modal -->
+                            </form>
+
+                        </div>
+
+                        <div class="modal fade" id="dataModal{$row['id']}" tabindex="-1" role="dialog" aria-labelledby="dataModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                            &times;
+                                        </button>
+                                        <h4 class="modal-title" id="dataModal">
+                                            审核信息
+                                        </h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul>
+                                            <li>标题 : {$row['data_array']['title']}</li>
+                                            <li>工种 : {$row['data_array']['type']|cate}</li>
+                                            <li>工龄 : {$row['data_array']['work_age']}</li>
+                                            <li>薪资 : {$row['data_array']['salary']}</li>
+                                            <li>证书要求 : {if $row['data_array']['require_cert'] eq 1}需要{else/}不需要{/if}</li>
+                                            <li>职位详情 : {$row['data_array']['detail']}</li>
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                                        </button>
+                                    </div>
+                                </div><!-- /.modal-content -->
+                            </div><!-- /.modal -->
+
+                        </div>
+
+                    </td>
+                </tr>
+                {/volist}
+                {/notempty}
+                </tbody>
+            </table>
+            {$list->render()}
+        </div>
+    </div>
+</div>
+{/block}
+{block name='script'}
+{/block}

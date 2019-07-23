@@ -224,10 +224,10 @@ return [
                     ],
                     [
                         'id'    => 31002,
-                        'title' => '添加分类',
+                        'title' => '招聘审核',
                         'sort'  => 2,
-                        'url'   => 'category/add',
-                        'hide'  => 0,
+                        'url'   => 'company/audit_list',
+                        'hide'  => 1,
                     ],
                     [
                         'id'    => 31003,

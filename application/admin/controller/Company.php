@@ -215,6 +215,9 @@ class Company extends Common
         $id=input('id');
         $where['user_id']=$id;
         $company=Db::name('company')->where($where)->find();
+        if(!$company){
+            $this->error('未填写注册信息');
+        }
         $this->assign('company', $company);
         return $this->fetch();
     }
@@ -222,6 +225,9 @@ class Company extends Common
         $id=input('id');
         $where['user_id']=$id;
         $person=Db::name('person')->where($where)->find();
+        if(!$person){
+            $this->error('未填写注册信息');
+        }
         $person['job_type']=Db::name('category')->where(['cat_id'=>$person['job_type']])->value('cat_name');
         $this->assign('person', $person);
         return $this->fetch();

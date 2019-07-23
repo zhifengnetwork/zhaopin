@@ -114,12 +114,25 @@ class Person extends ApiBase
             return $this->ajaxReturn(['status' => -2, 'msg' => $validate]);
         }
         $data['desc'] = $data['person_desc'];
-        $data['status'] = 0;
-        $data['remark'] = '';
-        unset($data['token'],$data['person_desc']);
-        if (!$this->_person->save($data)) {
+        unset($data['token'], $data['person_desc']);
+
+        Db::startTrans();
+        if (!$this->_person->daogang_time && !$this->_person->save($data)) {
+            Db::rollback();
             $this->ajaxReturn(['status' => -2, 'msg' => '保存失败！']);
         }
+        $res = Db::name('audit')->insert([
+            'type' => 3,
+            'content_id' => $this->_person->user_id,
+            'data' => json_encode($data,JSON_UNESCAPED_UNICODE),
+            'create_time'=>time()
+        ]);
+        if (!$res) {
+            Db::rollback();
+            $this->ajaxReturn(['status' => -2, 'msg' => '保存失败！']);
+        }
+
+        Db::commit();
         $this->ajaxReturn(['status' => 1, 'msg' => '保存成功！']);
     }
     //我的钱包

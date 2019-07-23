@@ -24,7 +24,6 @@ class User extends Validate
         'graduate_year' => 'require|dateFormat:Y',
         'graduate_month' => 'require|dateFormat:m',
         'graduate_day' => 'require|dateFormat:d',
-        'careers' => 'require',
         'idcard_front' => 'require',
         'idcard_back' => 'require',
 
@@ -44,7 +43,7 @@ class User extends Validate
         'district' => 'require|checkDistinct',
         'address' => 'require|length:4,50',
         'type' => 'require',
-        'company_name' => 'require|chs|length:8,40',
+        'company_name' => 'require|chs|length:4,40',
         'desc' => 'require|length:10,300',
         'c_img' => 'require',
 
@@ -80,7 +79,6 @@ class User extends Validate
         'graduate_month.dateFormat' => '请选择正确的毕业时间',
         'graduate_day.require' => '请选择毕业时间',
         'graduate_day.dateFormat' => '请选择正确的毕业时间',
-        'careers.require' => '请选择职业',
         'idcard_front.require' => '请上传身份证正面',
         'idcard_back.require' => '请上传身份证反面',
 
@@ -97,7 +95,7 @@ class User extends Validate
         'experience.require' => '请填写工作经历',
         'education.require' => '请填写教育经历',
         'experience.length' => '工作经历10-500字符',
-        'education.length' => '教育经历10-200字符',
+        'education.length' => '教育经历10-500字符',
         'person_desc.require' => '请填写个人说明',
         'person_desc.length' => '个人说明长度10-300',
 
@@ -111,7 +109,7 @@ class User extends Validate
         'district.checkDistinct' => '请选择正确的公司地区',
         'company_name.require' => '请填写公司名称',
         'company_name.chs' => '公司名称必须是中文',
-        'company_name.length' => '公司名称长度8-40',
+        'company_name.length' => '公司名称长度4-40',
         'address.require' => '请填写公司地址',
         'address.length' => '公司地址长度4-50',
         'type.require' => '请选择公司类型',
@@ -136,9 +134,9 @@ class User extends Validate
     ];
 
     protected $scene = [
-        'person' => ['name', 'gender', 'birth_year', 'birth_month', 'birth_day', 'graduate_year', 'graduate_month', 'graduate_day', 'school', 'school_type', 'idcard_front', 'idcard_back'],
+        'person' => ['name', 'gender', 'birth_year', 'birth_month', 'birth_day', 'graduate_year', 'graduate_month', 'graduate_day', 'school', 'school_type', 'idcard_front', 'idcard_back', 'job_type'],
         'company' => ['contacts', 'mobile', 'telephone', 'district', 'company_name', 'type', 'desc', 'c_img'],
-        'person_edit' => ['name', 'gender', 'age', 'nation', 'job_type', 'work_age', 'daogang_time', 'salary', 'experience', 'education','person_desc'],
+        'person_edit' => ['name', 'gender', 'age', 'nation', 'job_type', 'work_age', 'daogang_time', 'salary', 'experience', 'education', 'person_desc'],
         'company_edit' => ['open_year', 'open_month', 'open_day', 'company_name', 'type', 'desc', 'contacts_scale', 'achievement', 'introduction'],
     ];
 

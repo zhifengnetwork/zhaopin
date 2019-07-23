@@ -737,3 +737,11 @@ function isChineseName($name)
         return false;
     }
 }
+
+function cate($id){
+    return \app\common\model\Category::getNameById($id);
+}
+
+function region($id){
+    return \app\common\model\Region::getName($id);
+}

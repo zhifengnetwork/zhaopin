@@ -403,6 +403,7 @@ class User extends ApiBase
         $data['password'] = md5($data['salt'] . $pwd);
         $data['regtype'] = $type;
         $data['mobile'] = $mobile;
+        $data['createtime'] = time();
         $id = Db::name('member')->insertGetId($data);
         if (!$id) {
             $this->ajaxReturn(['status' => -2, 'msg' => '注册失败，请重试！', 'data' => '']);
@@ -417,13 +418,14 @@ class User extends ApiBase
     public function next()
     {
         $user_id = $this->get_user_id();
-        if (!$user_id || !($member = Db::name('member')->where(['id' => $user_id])->find())) {
+        if (!$user_id || !($member = Db::name('member')->where(['id' => $user_id])->find())||!in_array($member['regtype'],[1,2,3])) {
             $this->ajaxReturn(['status' => -2, 'msg' => '用户错误']);
         }
         if (!$member['mobile']) {
             $this->ajaxReturn(['status' => -2, 'msg' => '请先注册手机号']);
         }
         $data = input();
+        Db::startTrans();
         if ($member['regtype'] == 1 || $member['regtype'] == 2) {// 公司，第三方
             $validate = $this->validate($data, 'User.company');
             $co=Db::name('company')->where(['user_id'=>$user_id])->find();
@@ -444,15 +446,16 @@ class User extends ApiBase
                     ];
                 }
             }
-            $data['images'] = json_encode($images);
+            $data['images'] = json_encode($images,JSON_UNESCAPED_UNICODE);
 
             unset($data['token'], $data['title'], $data['image']);
             $data['city'] = Region::getParentId($data['district']) ?: 0;
             $data['city'] > 0 && $data['province'] = Region::getParentId($data['city']) ?: 0;
             $data['user_id'] = $user_id;
             $data['add_time'] = time();
-            if (Db::name('company')->insert($data)) {
-                $this->ajaxReturn(['status' => 1, 'msg' => '注册成功！']);
+            if (!Db::name('company')->insert($data)) {
+                Db::rollback();
+                $this->ajaxReturn(['status' => -2, 'msg' => '注册失败！']);
             }
         } elseif ($member['regtype'] == 3) {// 个人
 
@@ -475,7 +478,8 @@ class User extends ApiBase
                     ];
                 }
             }
-            $data['images'] = json_encode($images);
+
+            $data['images'] = json_encode($images,JSON_UNESCAPED_UNICODE);
 
             $data['gender'] = $data['gender'] == 2 ? 'female' : 'male';
             $data['birth'] = implode('-', [$data['birth_year'], $data['birth_month'], $data['birth_day']]);
@@ -490,11 +494,23 @@ class User extends ApiBase
             unset($data['graduate_year']);
             unset($data['graduate_month']);
             unset($data['graduate_day']);
-            if (Db::name('person')->insert($data)) {
-                $this->ajaxReturn(['status' => 1, 'msg' => '注册成功！']);
+            if (!Db::name('person')->insert($data)) {
+                Db::rollback();
+                $this->ajaxReturn(['status' => -2, 'msg' => '注册失败！']);
             }
         }
-        $this->ajaxReturn(['status' => -2, 'msg' => '注册失败！']);
+        $res = Db::name('audit')->insert([
+            'type'=>$member['regtype'],
+            'content_id'=>$user_id,
+            'data'=>json_encode($data,JSON_UNESCAPED_UNICODE),
+            'create_time'=>time()
+        ]);
+        if(!$res){
+            Db::rollback();
+            $this->ajaxReturn(['status' => -2, 'msg' => '注册失败！']);
+        }
+        Db::commit();
+        $this->ajaxReturn(['status' => 1, 'msg' => '注册成功！']);
     }
 
     public function upload_file()
@@ -1013,7 +1029,7 @@ class User extends ApiBase
                 'title' => isset($title[$k]) ? $title[$k] : ''
             ];
         }
-        if (Db::name($table)->where(['user_id' => $user_id])->update(['images' => json_encode($images)])) {
+        if (Db::name($table)->where(['user_id' => $user_id])->update(['images' => json_encode($images,JSON_UNESCAPED_UNICODE)])) {
             $this->ajaxReturn(['status' => 1, 'msg' => '保存成功']);
         }
         $this->ajaxReturn(['status' => -2, 'msg' => '保存失败']);

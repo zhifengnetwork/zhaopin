@@ -1,6 +1,7 @@
 <?php
 namespace app\admin\controller;
 
+use app\common\model\Audit;
 use think\Db;
 use think\Loader;
 use think\Request;
@@ -14,11 +15,9 @@ class Company extends Common
      */
     public function index()
     {
-        $status  = input('status',2);
         $list = $this->company_list(1);
 
         return $this->fetch('company/index',[
-            'status'       => $status,
             'list'         =>$list,
             'meta_title'   => '公司审核列表',
         ]);
@@ -26,26 +25,17 @@ class Company extends Common
     }
 
     function company_list($regtype){
-        $status  = input('status',2);
-        $where['m.regtype'] =  $regtype;
-        $pageParam['query']['m.regtype'] = $regtype;
-        if($status != 2){
-            $where['c.status'] =  $status;
-            $pageParam['query']['c.status'] = $status;
-        }
-        return Db::name('company')->alias('c')->field('c.*')
-            ->join('member m','c.user_id=m.id','LEFT')
-            ->where($where)
+        $where =  ['type'=>$regtype,'status'=>0];
+        $pageParam['query']=['regtype'=>$regtype,'status'=>0];
+        return Audit::where($where)
             ->paginate(10,false,$pageParam);
     }
 
     public function third()
     {
-        $status  = input('status',2);
         $list = $this->company_list(2);
 
         return $this->fetch('company/index',[
-            'status'       => $status,
             'list'         =>$list,
             'meta_title'   => '第三方审核列表',
         ]);
@@ -57,42 +47,48 @@ class Company extends Common
         if ($status != -1 && $status != 1) {
             $this->error('状态错误');
         }
-        $id = input('id/d');
+        $id = input('id/d');//audit表的id
 
-        $company=Db::name('company')->where(['id'=>$id])->find();
-        if (!$company || $company['status'] != 0) {
+        $audit=Db::name('audit')->where(['id'=>$id])->find();
+        if (!$audit || $audit['status'] != 0) {
             $this->error('数据没有找到或不能操作');
         }
         $content = input('content');
         if ($status == -1 && !$content) {
             $this->error('内容不能为空');
         }
+        Db::startTrans();
+        if ($status == 1){
+            $data = json_decode($audit['data'],true);
+        }
         $data['status']=$status;
-        $data['id']=$id;
+        $data['id']=$audit['content_id'];
         $data['remark']=$content;
         $data['auditor']=UID;
         $data['examination']=time();
+        // 更新数据
         $res=Db::name('company')->update($data);
         if(!$res){
+            Db::rollback();
             $this->error('审核失败！');
         }
+        $res=Db::name('audit')->where(['id'=>$id])->update([
+            'status'=>$status
+        ]);
+        if(!$res){
+            Db::rollback();
+            $this->error('审核失败！');
+        }
+        Db::commit();
         $this->success('操作成功', url('company/index'));
     }
     public function person_list(){
-        $status  = input('status',2);
-        $where=[];
-        $pageParam = ['query' => []];
-        if($status != 2){
-            $where['p.status'] =  $status;
-            $pageParam['query']['p.status'] = $status;
-        }
-        $list=Db::name('person')->alias('p')
-            ->join('category c','c.cat_id=p.job_type','LEFT')
-            ->where($where)
-            ->field('p.*,c.cat_name')
+        $where=['type'=>3,'status'=>0];
+        $pageParam = ['query' => ['type'=>3,'status'=>0]];
+        $list=Audit::where($where)
+//            ->field('p.*,c.cat_name')
             ->paginate(10,false,$pageParam);
         return $this->fetch('company/person_list',[
-            'status'       => $status,
             'list'         => $list,
             'meta_title'   => '个人审核列表',
         ]);
@@ -105,36 +101,39 @@ class Company extends Common
         }
         $id = input('id/d');
 
-        $person=Db::name('person')->where(['id'=>$id])->find();
-        if (!$person || $person['status'] != 0) {
+        $audit=Db::name('audit')->where(['id'=>$id])->find();
+        if (!$audit || $audit['status'] != 0) {
             $this->error('数据没有找到或不能操作');
         }
         $content = input('content');
         if ($status == -1 && !$content) {
             $this->error('内容不能为空');
         }
-        Db::startTrans();
 
+        Db::startTrans();
+        if ($status == 1){
+            $data = json_decode($audit['data'],true);
+        }
         $data['status']=$status;
-        $data['id']=$id;
         $data['remark']=$content;
         $data['check_user']=UID;
         $data['check_time']=time();
+        $person = Db::name('person')->where(['user_id'=>$audit['content_id']])->field('edit,user_id,job_type')->find();
         if($person['edit']==0)$data['edit']=1;
-        $res=Db::name('person')->update($data);
+        $res=Db::name('person')->where(['user_id'=>$audit['content_id']])->update($data);
 
         if(!$res){
             Db::rollback();
-            $this->error('审核失败！');
+            $this->error('审核失败!');
         }else{
             if($status==1&&$person['edit']==0){
                 $balance=Db::name('member')->where(['id'=>$person['user_id']])->value('balance');
                 $money= Db::name('category')->where(['cat_id'=>$person['job_type']])->value('money');
                 $member_balance=bcadd($balance,$money);
-                $res = Db::name('member')->update(['balance'=>$member_balance]);
-                if(!$res){
+                $res = Db::name('member')->where(['id'=>$person['user_id']])->update(['balance'=>$member_balance]);
+                if($money > 0 && !$res){
                     Db::rollback();
-                    $this->error('审核失败！');
+                    $this->error('审核失败!');
                 }
 
                 // 余额记录
@@ -144,8 +143,15 @@ class Company extends Common
                 ]);
                 if(!$res){
                     Db::rollback();
-                    $this->error('审核失败！');
+                    $this->error('审核失败3！');
                 }
+            }
+            $res=Db::name('audit')->where(['id'=>$id])->update([
+                'status'=>$status
+            ]);
+            if(!$res){
+                Db::rollback();
+                $this->error('审核失败4！');
             }
             Db::commit();
             $this->success('操作成功', url('company/person_list'));

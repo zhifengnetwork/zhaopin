@@ -33,10 +33,7 @@
                             <td class="col-lg-2">
                                 {$company.type}
                             </td>
-                            <td class="col-lg-1 active text-right">公司介绍</td>
-                            <td class="col-lg-2">
-                                <p title="{$company.desc}">{$company.desc|getSubstr=0,30}</p>
-                            </td>
+
                         </tr>
                         <tr>
                             <td class="col-lg-1 active text-right">是否VIP</td>
@@ -94,12 +91,22 @@
                     <h3>照片</h3>
                 </div>
                 <div>
-                    <img src="{$company.c_img}">
+                    <img width="100px" height="100px" src="{$company.c_img}">
                     营业执照
-                    {volist name="$company.images|json_decode" id="vo"}
-                    <img src="{$vo.path}">
+                    {volist name="$company.images|json_decode=true" id="vo"}
+                    <img width="100px" height="100px" src="{$vo.path}">
                     {$vo.title}
                     {/volist}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="m-b-md">
+                    <h3>公司介绍</h3>
+                </div>
+                <div>
+                    {$company.desc}
                 </div>
             </div>
         </div>
@@ -154,42 +161,6 @@
                             </div>
                         </div><!-- /.modal-content -->
                     </div>
-                    {/if}
-                {if $company['status'] == 0}
-                <a class='btn btn-default' onclick="return confirm('通过审批')" href="{:url('company/audit',array('status'=>'1','id' => $company['id']));}" style="background-color: #ffb034; color:#fff;">
-                    通过审批
-                </a>
-                <br />
-                <a class='btn btn-default' data-toggle="modal" data-target="#myModal{$company['id']}"  style=" margin-top: 6px; background-color: #ff5858; color:#fff;">
-                    不通过审批
-                </a>
-                <br />
-                <div class="modal fade" id="myModal{$company['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                    <form action="{:url('company/audit',array('status'=>'-1','id' => $company['id']));}" method="post">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                                        &times;
-                                    </button>
-                                    <h4 class="modal-title" id="myModalLabel">
-                                        审批不通过原因
-                                    </h4>
-                                </div>
-                                <div class="modal-body">
-                                    <textarea class="form-control" name='content' rows="3"></textarea>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
-                                    </button>
-                                    <button   type="submit" class="btn btn-primary">
-                                        提交更改
-                                    </button>
-                                </div>
-                            </div><!-- /.modal-content -->
-                        </div><!-- /.modal -->
-                    </form>
-
                 </div>
                 {/if}
 

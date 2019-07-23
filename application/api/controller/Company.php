@@ -64,12 +64,25 @@ class Company extends ApiBase
         }
 
         $data['open_time'] = implode('-', [$data['open_year'], $data['open_month'], $data['open_day']]);
-        unset($data['open_year'], $data['open_month'], $data['open_day']);
-        $data['status'] = 0;
-        $data['remark'] = '';
-        if (!$this->_com->save($data)) {
+        unset($data['token'],$data['open_year'], $data['open_month'], $data['open_day']);
+        $data['edit'] = 1;
+        Db::startTrans();
+        if (!$this->_com->company_name && !$this->_com->type && !$this->_com->save($data)) {
+            Db::rollback();
             $this->ajaxReturn(['status' => -2, 'msg' => '保存失败！']);
         }
+        $res = Db::name('audit')->insert([
+            'type'=>Db::name('member')->where(['id'=>$this->_com->user_id])->value('regtype'),
+            'content_id'=>$this->_com->user_id,
+            'data'=>json_encode($data,JSON_UNESCAPED_UNICODE),
+            'create_time'=>time()
+        ]);
+        if (!$res) {
+            Db::rollback();
+            $this->ajaxReturn(['status' => -2, 'msg' => '保存失败！']);
+        }
+
+        Db::commit();
         $this->ajaxReturn(['status' => 1, 'msg' => '保存成功！']);
     }
 
@@ -103,18 +116,35 @@ class Company extends ApiBase
         }
         unset($data['token']);
         $data['status'] = 0;
+
+        Db::startTrans();
         if ($id > 0) {
-            if (Db::name('recruit')->where(['company_id' => $this->_id, 'id' => $id])->update($data)) {
-                $this->ajaxReturn(['status' => 1, 'msg' => '保存成功']);
+            if (!Db::name('recruit')->where(['company_id' => $this->_id, 'id' => $id])->update($data)) {
+                Db::rollback();
+                $this->ajaxReturn(['status' => -2, 'msg' => '保存失败']);
             }
         } else {
             $data['company_id'] = $this->_id;
             $data['create_time'] = time();
-            if (Db::name('recruit')->insert($data)) {
-                $this->ajaxReturn(['status' => 1, 'msg' => '保存成功']);
+            if (!($id = Db::name('recruit')->insertGetId($data))) {
+                Db::rollback();
+                $this->ajaxReturn(['status' => -2, 'msg' => '保存失败']);
             }
         }
-        $this->ajaxReturn(['status' => -2, 'msg' => '保存失败']);
+        $res = Db::name('audit')->insert([
+            'type' => 4,
+            'content_id' => $id,
+            'data' => json_encode($data,JSON_UNESCAPED_UNICODE),
+            'create_time'=>time()
+        ]);
+        if (!$res) {
+            Db::rollback();
+            $this->ajaxReturn(['status' => -2, 'msg' => '保存失败！']);
+        }
+
+        Db::commit();
+        $this->ajaxReturn(['status' => 1, 'msg' => '保存成功']);
+
     }
 
     // 删除招聘
@@ -264,7 +294,7 @@ class Company extends ApiBase
                 $this->ajaxReturn(['status' => -2, 'msg' => '文件格式错误！']);
             }
         }
-        if (Db::name('company')->where(['id' => $this->_id])->update(['images' => json_encode($images)])) {
+        if (Db::name('company')->where(['id' => $this->_id])->update(['images' => json_encode($images,JSON_UNESCAPED_UNICODE)])) {
             $this->ajaxReturn(['status' => 1, 'msg' => '保存成功']);
         }
         $this->ajaxReturn(['status' => -2, 'msg' => '保存失败']);

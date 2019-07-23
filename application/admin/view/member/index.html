@@ -28,11 +28,12 @@
 
                 <div class="col-sm-2">
                     <div class="form-group">
-                        <label class="control-label" for="status">会员等级</label>
-                        <select name='level' class='form-control' style="width:150px;">
+                        <label class="control-label" for="status">注册类型</label>
+                        <select name='type' class='form-control' style="width:150px;">
                             <option value=''>默认全部</option>
-                            <option value='1'>普通会员</option>
-                            <option value='2'>vip</option>
+                            {foreach $register_type as $key => $vo}
+                            <option value='{$key}' {if $type==$key}selected{/if}>{$vo}</option>
+                            {/foreach}
                         </select>
                     </div>
                 </div>
@@ -90,7 +91,8 @@
                             <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" href="javascript:;">操作 <span class="caret"></span></a>
                             <ul class="dropdown-menu dropdown-menu-left" role="menu" style='z-index: 9999'>
 
-                                <li><a href="{:url('member/member_edit',array('id' => $vo['id'],'regtype' => $vo['regtype']));}" title="会员详情"><i class='fa fa-edit'></i> 会员详情</a></li>
+                                <li><a href="{if $vo['regtype'] eq 3 }{:url('company/person_details',array('id' => $vo['id']))}
+                                {else/}{:url('company/company_details',array('id' => $vo['id']))}{/if}" title="会员详情"><i class='fa fa-edit'></i> 会员详情</a></li>
                                 <li><a href="{:url('finance/balance_recharge', array('id'=>$vo['id']))}" title='充值余额'><i class='fa fa-money'></i> 充值余额 </a></li>
 
                                 <li><a  href="javascript:void(0);" title='删除会员' class="delete" id = "{$vo['id']}"><i class='fa fa-remove'></i> 删除会员</a></li>

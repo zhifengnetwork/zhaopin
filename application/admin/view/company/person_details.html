@@ -45,33 +45,13 @@
                             </td>
                         </tr>
                         <tr>
-                            <td class="col-lg-1 active text-right">身份证正面照</td>
-                            <td class="col-lg-2">
-                                {$person.idcard_front}
-                            </td>
-                            <td class="col-lg-1 active text-right">身份证反面照</td>
-                            <td class="col-lg-2">
-                                {$person.idcard_back}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="col-lg-1 active text-right">其他证书</td>
-                            <td class="col-lg-2">
-                                {$person.images}
-                            </td>
-                            <td class="col-lg-1 active text-right">求职类型</td>
-                            <td class="col-lg-2">
-                                {$person.job_type}
-                            </td>
-                        </tr>
-                        <tr>
                             <td class="col-lg-1 active text-right">薪资</td>
                             <td class="col-lg-2">
                                 {$person.salary}
                             </td>
-                            <td class="col-lg-1 active text-right">说明</td>
+                            <td class="col-lg-1 active text-right">求职类型</td>
                             <td class="col-lg-2">
-                                {$person.desc}
+                                {$person.job_type}
                             </td>
                         </tr>
                         <tr>
@@ -92,6 +72,33 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="m-b-md">
+                    <h3>照片</h3>
+                </div>
+                <div>
+                    <img width="100px" height="100px" src="{$person.idcard_front}">
+                    正面照
+                    <img width="100px" height="100px"  src="{$person.idcard_back}">
+                    反面照
+                    {volist name="$person.images|json_decode=true" id="vo"}
+                    <img width="100px" height="100px" src="{$vo.path}">
+                    {$vo.title}
+                    {/volist}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="m-b-md">
+                    <h3>说明</h3>
+                </div>
+                <div>
+                    {$person.desc}
+                </div>
             </div>
         </div>
         <div class="row">
@@ -124,8 +131,6 @@
                     不通过审批的理由
                 </a>
                 <br />
-
-
                 <div class="modal fade" id="myModal{$person['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 
                     <div class="modal-dialog">
@@ -139,60 +144,15 @@
                                 </h4>
                             </div>
                             <div class="modal-body">
-                                                                <textarea class="form-control" name='content' rows="3">
-                                                                     {$person['remark']}
-                                                                </textarea>
+                                <textarea class="form-control" name='content' rows="3">
+                                    {$person['remark']}
+                                </textarea>
                             </div>
                             <div class="modal-footer">
 
                             </div>
                         </div><!-- /.modal-content -->
                     </div>
-
-
-
-
-                    {/if}
-                {if $person['status'] == 0}
-                <a class='btn btn-default' onclick="return confirm('通过审批')" href="{:url('company/person_audit',array('status'=>'1','id' => $person['id']));}" style="background-color: #ffb034; color:#fff;">
-                    通过审批
-                </a>
-                <br />
-
-
-
-                <a class='btn btn-default' data-toggle="modal" data-target="#myModal{$person['id']}"  style=" margin-top: 6px; background-color: #ff5858; color:#fff;">
-                    不通过审批
-                </a>
-                <br />
-
-
-                <div class="modal fade" id="myModal{$person['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                    <form action="{:url('company/person_audit',array('status'=>'-1','id' => $person['id']));}" method="post">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                                        &times;
-                                    </button>
-                                    <h4 class="modal-title" id="myModalLabel">
-                                        审批不通过原因
-                                    </h4>
-                                </div>
-                                <div class="modal-body">
-                                    <textarea class="form-control" name='content' rows="3"></textarea>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭
-                                    </button>
-                                    <button   type="submit" class="btn btn-primary">
-                                        提交更改
-                                    </button>
-                                </div>
-                            </div><!-- /.modal-content -->
-                        </div><!-- /.modal -->
-                    </form>
-
                 </div>
                 {/if}
 

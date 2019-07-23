@@ -13,53 +13,23 @@
 {block name="content"}
 <div class="ibox-content m-b-sm border-bottom">
     <div class="row">
-        <form  method="get" action="{:url()}">
-
-            <div class="col-sm-4">
-                <div class="form-group">
-                    <label class="control-label" for="status">审核状态</label>
-                    <select name='status' class='form-control' style="width:150px;">
-                        <option value='2' {if $status=='2'}selected{/if}>默认全部</option>
-                        <option value='0' {if $status=='0'}selected{/if}>待审批</option>
-                        <option value='1' {if $status=='1'}selected{/if}>通过审批</option>
-                        <option value='-1' {if $status=='-1'}selected{/if}>审核不通过</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="col-sm-2">
-                <div class="form-group">
-                    <div>
-                        <button class="btn btn-primary">搜索</button>
-                    </div>
-                </div>
-            </div>
-
-    </div>
-    </form>
 </div>
 
 <div class="row wrapper border-bottom white-bg page-heading">
-
-    <div class="col-lg-2">
-
-    </div>
-
     <div class="ibox-content">
         <div class="table-responsive">
             <table class="table  table-bordered table-hover text-center">
                 <thead>
                 <tr>
-                    <th>企业编号</th>
+                    <th>编号</th>
+                    <th>用户id</th>
+                    <th>企业id</th>
                     <th>企业名称</th>
-                    <!--<th>企业logo</th>-->
                     <th>联系人</th>
+                    <th>手机号</th>
                     <th>公司类型</th>
-                    <th>营业执照</th>
-                    <th>是否vip</th>
-                    <th>添加时间</th>
-                    <th>审批时间</th>
-                    <th>状态</th>
+                    <th>审核类型</th>
+                    <th>申请时间</th>
                     <th>操作</th>
                 </tr>
                 </thead>
@@ -68,86 +38,30 @@
                 {volist name="list" id="row"}
                 <tr>
                     <td> {$row['id']}</td>
+                    <td> {$row['company_data']['user_id']}</td>
+                    <td> {$row['company_data']['id']}</td>
                     <td>
-                        {$row['company_name']}
-                    </td>
-                    <!--<td>-->
-                        <!--{$row['logo']}-->
-                    <!--</td>-->
-                    <td   class='hidden-xs'>
-                        {$row['contacts']}
+                        {$row['company_data']['company_name']}
                     </td>
 
-                    <td>{$row['type']}</td>
-                    <td>{$row['c_img']}</td>
-                    <td>
-                        {if $row['is_vip']==1}
-                        是
-                        {else /}
-                        否
-                        {/if}
-                    <td>
-
-                        {$row['add_time']|date="y-m-d H:i:s",###}
+                    <td class='hidden-xs'>
+                        {$row['company_data']['contacts']}
                     </td>
-                    <td>{if $row['status']!=0}
-                    {$row['examination']|date="y-m-d H:i:s",###}
-                    {/if} </td>
                     <td>
-                        {if $row['status']==0}
-                        <span class='label label-default'>待审批</span>
-                        {elseif $row['status']==1 /}
-                        <span class='label label-success'>通过审批</span>
-                        {elseif $row['status']== -1 /}
-                        <span class='label label-success'>不通过审批</span>
-                        {/if}
+                        {$row['company_data']['mobile']}
                     </td>
-
+                    <td>{$row['company_data']['type']}</td>
+                    <td>{if $row['company_data']['edit'] eq 0}注册用户审核{else/}编辑信息审核{/if}</td>
+                    <th>{$row['create_time']}</th>
                     <td>
 
-                        <a class="btn btn-default" href="{:url('company/company_details',['id'=>$row.user_id])}"><i class="fa fa-list"></i> 查看详情</a>
-                        {if $row['status'] == -1}
-                        <a class='btn btn-default' data-toggle="modal" data-target="#myModal{$row['id']}"   style=" margin-top: 6px; background-color: #ff5858; color:#fff;">
-                            不通过审批的理由
+                        <a class='btn btn-default' data-toggle="modal" data-target="#dataModal{$row['content_id']}"  style=" margin-top: 6px;">
+                            查看详情
                         </a>
-                        <br />
-
-
-                        <div class="modal fade" id="myModal{$row['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                                            &times;
-                                        </button>
-                                        <h4 class="modal-title" id="myModalLabel">
-                                            审批不通过原因
-                                        </h4>
-                                    </div>
-                                    <div class="modal-body">
-                                                                <textarea class="form-control" name='content' rows="3">
-                                                                     {$row['remark']}
-                                                                </textarea>
-                                    </div>
-                                    <div class="modal-footer">
-
-                                    </div>
-                                </div><!-- /.modal-content -->
-                            </div>
-
-
-
-
-                            {/if}
-
-                            {if $row['status'] == 0}
-                            <a class='btn btn-default' onclick="return confirm('通过审批')" href="{:url('company/audit',array('status'=>'1','id' => $row['id']));}" style="background-color: #ffb034; color:#fff;">
+                        <a class='btn btn-default' onclick="return confirm('通过审批')" href="{:url('company/audit',array('status'=>'1','id' => $row['id']));}" style="background-color: #ffb034; color:#fff;">
                                 通过审批
                             </a>
                             <br />
-
-
 
                             <a class='btn btn-default' data-toggle="modal" data-target="#myModal{$row['id']}"  style=" margin-top: 6px; background-color: #ff5858; color:#fff;">
                                 不通过审批
@@ -182,10 +96,55 @@
                                 </form>
 
                             </div>
-                            {/if}
 
                     </td>
                 </tr>
+                <div class="modal fade" id="dataModal{$row['content_id']}" tabindex="-1" role="dialog" aria-labelledby="dataModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                    &times;
+                                </button>
+                                <h4 class="modal-title" id="dataModal">
+                                    审核信息
+                                </h4>
+                            </div>
+                            <div class="modal-body">
+                                <ul>
+                                    {if $row['company_data']['edit'] eq 0 }
+                                    <li>联系人 : {$row['data_array']['contacts']}</li>
+                                    <li>手机号 : {$row['data_array']['mobile']}</li>
+                                    <li>固定电话 : {if $row['data_array']['telephone'] }{/if}</li>
+                                    <li>地区 : {$row['data_array']['province']|region} {$row['data_array']['city']|region} {$row['data_array']['district']|region}</li>
+                                    <li>公司名称 : {$row['data_array']['company_name']}</li>
+                                    <li>公司类型 : {$row['data_array']['type']}</li>
+                                    <li>公司介绍 : {$row['data_array']['desc']}</li>
+                                    <li>营业执照：<img src="{$row['data_array']['c_img']}"></li>
+                                    {volist name="row['data_array']['images']" id="row"  key="k"}
+                                    {if $k%2 neq 0}<li><img src="{$row}"></li>{/if}
+                                    {/volist}
+
+                                    {else/}
+                                    <li>公司名称 : {$row['data_array']['company_name']}</li>
+                                    <li>公司类型 : {$row['data_array']['type']}</li>
+                                    <li>成立时间 : {$row['data_array']['open_time']}</li>
+                                    <li>公司规模 : {$row['data_array']['contacts_scale']}</li>
+                                    <li>公司介绍 : {$row['data_array']['desc']}</li>
+                                    <li>名人介绍 : {$row['data_array']['introduction']}</li>
+                                    <li>公司成就 : {$row['data_array']['achievement']}</li>
+                                    {/if}
+
+                                </ul>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                                </button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal -->
+
+                </div>
                 {/volist}
                 {/notempty}
                 </tbody>

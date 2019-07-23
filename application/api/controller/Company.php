@@ -160,7 +160,7 @@ class Company extends ApiBase
             ->join('company co','co.id=r.company_id','LEFT')
             ->join('member m','m.id=co.user_id','LEFT')
             ->where($where)
-            ->field('co.logo,r.title,r.require_cert,r.salary,r.work_age')
+            ->field('co.logo,r.id,r.title,r.require_cert,r.salary,r.work_age')
             ->paginate(3,false,$pageParam);
         $recruit_hot=$recruit_hot->toArray();
         $data['recruit_hot']=$recruit_hot['data'];
@@ -171,7 +171,7 @@ class Company extends ApiBase
             ->join('company co','co.id=r.company_id','LEFT')
             ->join('member m','m.id=co.user_id','LEFT')
             ->where($where)
-            ->field('co.logo,r.title,r.require_cert,r.salary,r.work_age')
+            ->field('co.logo,r.id,r.title,r.require_cert,r.salary,r.work_age')
             ->paginate(3,false,$pageParam);
         $recruit_better=$recruit_better->toArray();
         $data['recruit_better']=$recruit_better['data'];
@@ -207,7 +207,7 @@ class Company extends ApiBase
             ->join('company co','co.id=r.company_id','LEFT')
             ->join('member m','m.id=co.user_id','LEFT')
             ->where($where)
-            ->field('co.logo,r.title,r.require_cert,r.salary,r.work_age')
+            ->field('co.logo,r.id,r.title,r.require_cert,r.salary,r.work_age')
             ->paginate(3,false,$pageParam);
         $recruit_better=$recruit_better->toArray();
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $recruit_better['data']]);
@@ -241,7 +241,7 @@ class Company extends ApiBase
             ->join('company co','co.id=r.company_id','LEFT')
             ->join('member m','m.id=co.user_id','LEFT')
             ->where($where)
-            ->field('co.logo,r.title,r.require_cert,r.salary,r.work_age')
+            ->field('co.logo,r.id,r.title,r.require_cert,r.salary,r.work_age')
             ->paginate(3,false,$pageParam);
         $recruit_hot=$recruit_hot->toArray();
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $recruit_hot['data']]);
@@ -323,14 +323,23 @@ class Company extends ApiBase
         if($num>0){
             if(!Reserve::getBy($this->_id,$id)){
                 if(Db::name('reserve')->insert(['company_id'=>$this->_id,'person_id'=>$id,'create_time'=>time()])){
-                    $this->ajaxReturn(['status' => 1, 'msg' => '操作成功']);
+                    $this->ajaxReturn(['status' => 1, 'msg' => '预约成功']);
                 }
             }
         }else{
-            //TODO   预约支付
+            $money=Db::name('config')->where(['name'=>'reserve_money'])->value('value');
+            $recharge['recharge_sn'] = date('YmdHis',time()) . mt_rand(1000,9999);
+            $recharge['money'] = $money;
+            $recharge['user_id'] = $this->get_user_id();
+            $recharge['type'] = 3;//预约支付
+            $recharge['c_time'] = time();
+            $recharge_id=Db::name('recharge')->insertGetId($recharge);
+            if($recharge_id){
+                $this->ajaxReturn(['status' => 5, 'msg' => '请支付','data'=>$recharge_id]);
+            }
             $this->ajaxReturn(['status' => -2, 'msg' => '可预约人数不足，请充值或者购买VIP']);
         }
-        $this->ajaxReturn(['status' => -2, 'msg' => '操作失败']);
+        $this->ajaxReturn(['status' => -2, 'msg' => '预约失败']);
     }
     //查询该公司还有多少可查看（预约）人数
     public function look_num($company_id){

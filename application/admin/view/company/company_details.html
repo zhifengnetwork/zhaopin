@@ -33,7 +33,24 @@
                             <td class="col-lg-2">
                                 {$company.type}
                             </td>
-
+                            <td class="col-lg-1 active text-right">所在地区</td>
+                            <td class="col-lg-2">
+                                {$company.province|region} {$company.city|region} {$company.district|region}
+                            </td>
+                        </tr>
+                        <tr>
+                            {if $company['open_time']}
+                            <td class="col-lg-1 active text-right">成立时间</td>
+                            <td class="col-lg-2">
+                                {$company.open_time}
+                            </td>
+                            {/if}
+                            {if $company['contacts_scale']}
+                            <td class="col-lg-1 active text-right">规模</td>
+                            <td class="col-lg-2">
+                                {$company.contacts_scale}人
+                            </td>
+                            {/if}
                         </tr>
                         <tr>
                             <td class="col-lg-1 active text-right">是否VIP</td>
@@ -60,12 +77,6 @@
                                 {$company.vip_time|date='Y-m-d H:i:s',###}
                             </td>
                             {/if}
-                            <td class="col-lg-1 active text-right">公司成立时间</td>
-                            <td class="col-lg-2">
-                                {$company.open_time}
-                            </td>
-                        </tr>
-                        <tr>
                             <td class="col-lg-1 active text-right">状态</td>
                             <td class="col-lg-2">
                                 {if $company['status']==0}
@@ -75,10 +86,6 @@
                                 {elseif $company['status']== -1 /}
                                 <span class='label label-success'>不通过审批</span>
                                 {/if}
-                            </td>
-                            <td class="col-lg-1 active text-right">公司规模</td>
-                            <td class="col-lg-2">
-                                {$company.contacts_scale}
                             </td>
                         </tr>
                     </tbody>
@@ -91,6 +98,10 @@
                     <h3>照片</h3>
                 </div>
                 <div>
+                    {if $company.logo}
+                    <img width="100px" height="100px" src="{$company.logo}">
+                    LOGO
+                    {/if}
                     <img width="100px" height="100px" src="{$company.c_img}">
                     营业执照
                     {volist name="$company.images|json_decode=true" id="vo"}
@@ -100,6 +111,7 @@
                 </div>
             </div>
         </div>
+        {if $company.desc}
         <div class="row">
             <div class="col-lg-12">
                 <div class="m-b-md">
@@ -110,6 +122,8 @@
                 </div>
             </div>
         </div>
+        {/if}
+        {if $company.achievement}
         <div class="row">
             <div class="col-lg-12">
                 <div class="m-b-md">
@@ -120,6 +134,8 @@
                 </div>
             </div>
         </div>
+        {/if}
+        {if $company.introduction}
         <div class="row">
             <div class="col-lg-12">
                 <div class="m-b-md">
@@ -130,42 +146,20 @@
                 </div>
             </div>
         </div>
+        {/if}
+        {if $company['status'] == -1}
         <div class="row">
             <div class="col-lg-12">
                 <div class="m-b-md">
-                    <h3>审核信息</h3>
+                    <h3>不通过审批的理由</h3>
                 </div>
-                {if $company['status'] == -1}
-                <a class='btn btn-default' data-toggle="modal" data-target="#myModal{$company['id']}"   style=" margin-top: 6px; background-color: #ff5858; color:#fff;">
-                    不通过审批的理由
-                </a>
-                <br />
-                <div class="modal fade" id="myModal{$company['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                                    &times;
-                                </button>
-                                <h4 class="modal-title" id="myModalLabel">
-                                    审批不通过原因
-                                </h4>
-                            </div>
-                            <div class="modal-body">
-                                <textarea class="form-control" name='content' rows="3">
-                                    {$company['remark']}
-                                </textarea>
-                            </div>
-                            <div class="modal-footer">
-
-                            </div>
-                        </div><!-- /.modal-content -->
-                    </div>
+                <div>
+                    {$company['remark']}
                 </div>
-                {/if}
-
             </div>
         </div>
+    </div>
+    {/if}
 
     </div>
 </div>

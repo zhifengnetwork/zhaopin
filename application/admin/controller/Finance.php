@@ -110,15 +110,6 @@ class Finance extends Common
         $uid = input('id/d');
         $profile = MemberModel::get($uid);
         if(!$profile)$this->error('用户不存在');
-        if($profile->regtype==3){
-            $data = Db::name('person')->where(['user_id'=>$uid])->field('name')->find();
-            if(!$data)$this->error('用户不存在');
-            $profile['text'] = "姓名：{$data['name']}";
-        }else{
-            $data = Db::name('company')->where(['user_id'=>$uid])->field('company_name,contacts')->find();
-            if(!$data)$this->error('用户不存在');
-            $profile['text'] = "公司名称：{$data['company_name']} / 联系人：{$data['contacts']} ";
-        }
         $balance_info = get_balance($uid, 0);
         if (Request::instance()->isPost()) {
             $num = input('num/f');
@@ -127,7 +118,7 @@ class Finance extends Common
             }
 
             MemberModel::setBalance($uid, 0, $num, array(UID, '余额充值'));
-            $this->success('充值成功', url('member/member_edit', ['id' => $profile['id']]));
+            $this->success('充值成功', url('finance/balance_recharge', ['id' => $profile['id']]));
         }
         $profile['balance'] = $balance_info['balance'];
         $this->assign('register_type', \app\common\model\Member::$_registerType);

@@ -17,7 +17,7 @@
                 <table class="table  table-bordered" align="right">
                     <tbody>
                         <tr>
-                            <td class="col-lg-1 active text-right">名字</td>
+                            <td class="col-lg-1 active text-right">姓名</td>
                             <td class="col-lg-2">{$person.name}</td>
                             <td class="col-lg-1 active text-right">性别</td>
                             <td class="col-lg-2">
@@ -29,30 +29,56 @@
                             </td>
                         </tr>
                         <tr>
+                            <td class="col-lg-1 active text-right">出生日期</td>
+                            <td class="col-lg-2">{$person.birth}</td>
+                            <td class="col-lg-1 active text-right">毕业时间</td>
+                            <td class="col-lg-2">{$person.graduate_time}</td>
+                        </tr>
+                        <tr>
                             <td class="col-lg-1 active text-right">学校类型</td>
                             <td class="col-lg-2">{$person.school_type}</td>
                             <td class="col-lg-1 active text-right">学校名称</td>
                             <td class="col-lg-2">{$person.school}</td>
                         </tr>
                         <tr>
-                            <td class="col-lg-1 active text-right">工龄</td>
-                            <td class="col-lg-2">
-                                {$person.work_age}
-                            </td>
-                            <td class="col-lg-1 active text-right">职业</td>
-                            <td class="col-lg-2">
-                                {$person.careers}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="col-lg-1 active text-right">薪资</td>
-                            <td class="col-lg-2">
-                                {$person.salary}
-                            </td>
                             <td class="col-lg-1 active text-right">求职类型</td>
                             <td class="col-lg-2">
                                 {$person.job_type}
                             </td>
+                            {if $person.work_age}
+                            <td class="col-lg-1 active text-right">工龄</td>
+                            <td class="col-lg-2">
+                                {$person.work_age}
+                            </td>
+                            {/if}
+                        </tr>
+                        <tr>
+                            {if $person.salary}
+                            <td class="col-lg-1 active text-right">薪资</td>
+                            <td class="col-lg-2">
+                                {$person.salary}
+                            </td>
+                            {/if}
+                            {if $person.daogang_time}
+                            <td class="col-lg-1 active text-right">到岗时间</td>
+                            <td class="col-lg-2">
+                                {$person.daogang_time}
+                            </td>
+                            {/if}
+                        </tr>
+                        <tr>
+                            {if $person.age}
+                            <td class="col-lg-1 active text-right">年龄</td>
+                            <td class="col-lg-2">
+                                {$person.age}
+                            </td>
+                            {/if}
+                            {if $person.nation}
+                            <td class="col-lg-1 active text-right">民族</td>
+                            <td class="col-lg-2">
+                                {$person.nation}
+                            </td>
+                            {/if}
                         </tr>
                         <tr>
                             <td class="col-lg-1 active text-right">状态</td>
@@ -65,10 +91,6 @@
                                 <span class='label label-success'>不通过审批</span>
                                 {/if}
                             </td>
-                            <td class="col-lg-1 active text-right">年龄</td>
-                            <td class="col-lg-2">
-                                {$person.age}
-                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -80,6 +102,10 @@
                     <h3>照片</h3>
                 </div>
                 <div>
+                    {if $person.avatar}
+                    <img width="100px" height="100px" src="{$person.avatar}">
+                    头像
+                    {/if}
                     <img width="100px" height="100px" src="{$person.idcard_front}">
                     正面照
                     <img width="100px" height="100px"  src="{$person.idcard_back}">
@@ -101,6 +127,7 @@
                 </div>
             </div>
         </div>
+        {if $person.experience}
         <div class="row">
             <div class="col-lg-12">
                 <div class="m-b-md">
@@ -111,6 +138,8 @@
                 </div>
             </div>
         </div>
+        {/if}
+        {if $person.education}
         <div class="row">
             <div class="col-lg-12">
                 <div class="m-b-md">
@@ -121,43 +150,20 @@
                 </div>
             </div>
         </div>
+        {/if}
+        {if $person['status'] == -1}
         <div class="row">
             <div class="col-lg-12">
                 <div class="m-b-md">
-                    <h3>审核信息</h3>
+                    <h3>不通过审批的理由</h3>
                 </div>
-                {if $person['status'] == -1}
-                <a class='btn btn-default' data-toggle="modal" data-target="#myModal{$person['id']}"   style=" margin-top: 6px; background-color: #ff5858; color:#fff;">
-                    不通过审批的理由
-                </a>
-                <br />
-                <div class="modal fade" id="myModal{$person['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                                    &times;
-                                </button>
-                                <h4 class="modal-title" id="myModalLabel">
-                                    审批不通过原因
-                                </h4>
-                            </div>
-                            <div class="modal-body">
-                                <textarea class="form-control" name='content' rows="3">
-                                    {$person['remark']}
-                                </textarea>
-                            </div>
-                            <div class="modal-footer">
-
-                            </div>
-                        </div><!-- /.modal-content -->
-                    </div>
+                <div>
+                    {$person['remark']}
                 </div>
-                {/if}
-
+            </div>
             </div>
         </div>
+        {/if}
 
     </div>
 </div>

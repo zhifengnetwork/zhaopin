@@ -214,6 +214,7 @@ class Company extends ApiBase
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
         $pageParam = ['query' => []];
+        $rows=input('rows',10);
         $province=input('province');
         if($province){
             $where['r.province']=$province;
@@ -238,7 +239,7 @@ class Company extends ApiBase
             ->join('member m','m.id=co.user_id','LEFT')
             ->where($where)
             ->field('co.logo,r.id,r.title,r.require_cert,r.salary,r.work_age')
-            ->paginate(10,false,$pageParam);
+            ->paginate($rows,false,$pageParam);
         $recruit_better=$recruit_better->toArray();
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $recruit_better['data']]);
     }
@@ -248,6 +249,7 @@ class Company extends ApiBase
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
         $pageParam = ['query' => []];
+        $rows=input('rows',10);
         $province=input('province');
         if($province){
             $where['r.province']=$province;
@@ -272,7 +274,7 @@ class Company extends ApiBase
             ->join('member m','m.id=co.user_id','LEFT')
             ->where($where)
             ->field('co.logo,r.id,r.title,r.require_cert,r.salary,r.work_age')
-            ->paginate(10,false,$pageParam);
+            ->paginate($rows,false,$pageParam);
         $recruit_hot=$recruit_hot->toArray();
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $recruit_hot['data']]);
     }

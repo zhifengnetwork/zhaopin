@@ -298,7 +298,17 @@ class Person extends ApiBase
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
         $money=input('moeny');
-
+        $recharge['recharge_sn'] = date('YmdHis',time()) . mt_rand(1000,9999);
+        $recharge['money'] = $money;
+        $recharge['user_id'] = $user_id;
+        $recharge['type'] = 2;//预约支付
+        $recharge['c_time'] = time();
+        $recharge_id=Db::name('recharge')->insertGetId($recharge);
+        if($recharge_id){
+            $this->ajaxReturn(['status' => 5, 'msg' => '请支付','data'=>$recharge_id]);
+        }else{
+            $this->ajaxReturn(['status' => -2, 'msg' => '充值失败!','data'=>[]]);
+        }
     }
     public function buy_vip(){
         $user_id=$this->get_user_id();
@@ -366,7 +376,18 @@ class Person extends ApiBase
             Db::name('member_balance_log')->insertGetId($data);
             Db::commit();
         }elseif ($pay_type==2){//微信支付
-
+            $recharge['recharge_sn'] = date('YmdHis',time()) . mt_rand(1000,9999);
+            $recharge['money'] = $money;
+            $recharge['user_id'] = $user_id;
+            $recharge['type'] = 2;//预约支付
+            $recharge['c_time'] = time();
+            $recharge_id=Db::name('recharge')->insertGetId($recharge);
+            if($recharge_id){
+                $this->ajaxReturn(['status' => 5, 'msg' => '请支付','data'=>$recharge_id]);
+            }else{
+                $this->ajaxReturn(['status' => -2, 'msg' => '充值失败!','data'=>[]]);
+            }
         }
+        $this->ajaxReturn(['status' => 1, 'msg' => '开通VIP成功','data'=>[]]);
     }
 }

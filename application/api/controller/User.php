@@ -426,7 +426,7 @@ class User extends ApiBase
         $data = input();
         if ($member['regtype'] == 1 || $member['regtype'] == 2) {// 公司，第三方
             $validate = $this->validate($data, 'User.company');
-            $co=Db::name('company')->where(['user_id'=>$user_id]);
+            $co=Db::name('company')->where(['user_id'=>$user_id])->find();
             if($co){
                 $this->ajaxReturn(['status' => -1, 'msg' => '该账户已注册，请登陆']);
             }
@@ -436,11 +436,13 @@ class User extends ApiBase
 
             $data['c_img'] = str_replace(SITE_URL, '', $data['c_img']);
             $images = [];
-            foreach ($data['image'] as $k => $image) {
-                $images[] = [
-                    'path' => str_replace(SITE_URL, '', $image),
-                    'title' => isset($data['title'][$k]) ? $data['title'][$k] : ''
-                ];
+            if(isset($data['image'])&&!$data['image']){
+                foreach ($data['image'] as $k => $image) {
+                    $images[] = [
+                        'path' => str_replace(SITE_URL, '', $image),
+                        'title' => isset($data['title'][$k]) ? $data['title'][$k] : ''
+                    ];
+                }
             }
             $data['images'] = json_encode($images);
 
@@ -458,18 +460,20 @@ class User extends ApiBase
             if (true !== $validate) {
                 return $this->ajaxReturn(['status' => -2, 'msg' => $validate]);
             }
-            $pe=Db::name('person')->where(['user_id'=>$user_id]);
+            $pe=Db::name('person')->where(['user_id'=>$user_id])->find();
             if($pe){
                 $this->ajaxReturn(['status' => -1, 'msg' => '该账户已注册，请登陆']);
             }
             $data['idcard_back'] = str_replace(SITE_URL, '', $data['idcard_back']);
             $data['idcard_front'] = str_replace(SITE_URL, '', $data['idcard_front']);
             $images = [];
-            foreach ($data['image'] as $k => $image) {
-                $images[] = [
-                    'path' => str_replace(SITE_URL, '', $image),
-                    'title' => isset($data['title'][$k]) ? $data['title'][$k] : ''
-                ];
+            if(isset($data['image'])&&!$data['image']){
+                foreach ($data['image'] as $k => $image) {
+                    $images[] = [
+                        'path' => str_replace(SITE_URL, '', $image),
+                        'title' => isset($data['title'][$k]) ? $data['title'][$k] : ''
+                    ];
+                }
             }
             $data['images'] = json_encode($images);
 

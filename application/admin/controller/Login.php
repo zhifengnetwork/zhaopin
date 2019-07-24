@@ -44,7 +44,7 @@ class Login extends \think\Controller
                 // 记录用户登录信息
                 Session::set('admin_user_auth', $session);
                 define('UID', $user_info['mgid']);
-                $this->success('登陆成功！', url('index/index'));
+                $this->success('登陆成功！', url('member/index'));
             }
             $this->error('密码错误！');
 

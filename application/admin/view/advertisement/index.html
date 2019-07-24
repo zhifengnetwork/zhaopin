@@ -43,7 +43,7 @@
                         {$vo['status'] == 1?'关闭':'启用'}
                     </a>
                     <a class="btn btn-default" href="{:url('advertisement/page_edit',['id'=>$vo.id])}"><i class="fa fa-edit"></i> 编辑</a>
-                    <a class="btn btn-default" href="{:url('advertisement/list',['page_id'=>$vo.id])}"><i class="fa fa-edit"></i> 查看</a>
+                    <a class="btn btn-default" href="{:url('advertisement/list1',['page_id'=>$vo.id])}"><i class="fa fa-edit"></i> 查看</a>
                     <a class="btn btn-default" href="{:url('advertisement/edit',['page_id'=>$vo.id])}"><i class="fa fa-edit"></i> 添加</a>
                     <a class="btn btn-default" onclick="del(this,{$vo.id},-1)" href="javascript:;">
                         <i class="fa fa-trash-o"></i>

@@ -69,7 +69,7 @@ class Advertisement extends Common
             if ($id) {
                 $Advertise = new Advertise;
                 if ($Advertise->save($data, ['id' => $id]) !== false) {
-                    $this->success('编辑成功', url('advertisement/list', ['page_id' => $page_id]));
+                    $this->success('编辑成功', url('advertisement/list1', ['page_id' => $page_id]));
                 }
                 $this->error('编辑失败');
             }
@@ -78,7 +78,7 @@ class Advertisement extends Common
             !$file && $this->error('图片不能为空');
             $Advertise = new Advertise($data);
             if ($Advertise->save()) {
-                $this->success('添加成功', url('advertisement/list', ['page_id' => $page_id]));
+                $this->success('添加成功', url('advertisement/list1', ['page_id' => $page_id]));
             }
             $this->error('添加失败');
         }

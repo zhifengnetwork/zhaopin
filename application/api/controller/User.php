@@ -394,11 +394,11 @@ class User extends ApiBase
         }
 
         $res = action('PhoneAuth/phoneAuth', [$mobile, $code]);
-//        if ($res === '-1') {
-//            $this->ajaxReturn(['status' => -2, 'msg' => '验证码已过期！', 'data' => '']);
-//        } else if (!$res) {
-//            $this->ajaxReturn(['status' => -2, 'msg' => '验证码错误！', 'data' => '']);
-//        }
+        if ($res === '-1') {
+            $this->ajaxReturn(['status' => -2, 'msg' => '验证码已过期！', 'data' => '']);
+        } else if (!$res) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '验证码错误！', 'data' => '']);
+        }
         $data['salt'] = create_salt();
         $data['password'] = md5($data['salt'] . $pwd);
         $data['regtype'] = $type;
@@ -535,6 +535,37 @@ class User extends ApiBase
     public function visit()
     {
         $adList = Advertisement::getList();
+        // 热招
+        $list = Db::name('recruit')
+            ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
+            ->alias('r')
+            ->join('company c', 'c.id=r.company_id', 'LEFT')
+            ->join('member m', 'c.user_id=m.id', 'LEFT')
+            ->where(['r.is_hot' => 1, 'r.status' => 1])->select();
+
+        // 找活
+        $person = Db::name('person')
+            ->alias('p')
+            ->field('p.id,p.avatar,p.name,p.job_type,p.work_age,p.images')
+            ->select();
+        foreach ($person as &$v) {
+            $v['job_type'] = Category::getNameById($v['job_type']) ?: '';
+            $v['images'] = $v['images'] ? 1 : 0;
+        }
+        $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
+            'data' => ['ad' => $adList, 'recruit' => $list, 'person' => $person]
+        ]);
+    }
+
+    // 首页
+    public function user_visit()
+    {
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $adList = Advertisement::getList();
+        $member=Db::name('member')->where(['id'=>$user_id])->find();
         // 热招
         $list = Db::name('recruit')
             ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')

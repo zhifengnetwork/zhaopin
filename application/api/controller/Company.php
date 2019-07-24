@@ -25,7 +25,7 @@ class Company extends ApiBase
     public function getCompany()
     {
         if (!$this->get_user_id() || !($this->_com = CompanyModel::get(['user_id' => $this->get_user_id()]))) {
-            $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在']);
+            $this->ajaxReturn(['status' => -1, 'msg' => '用户不存在']);
         }
         $this->_id = $this->_com->id;
     }

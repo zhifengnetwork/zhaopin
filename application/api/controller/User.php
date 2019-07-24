@@ -541,12 +541,14 @@ class User extends ApiBase
             ->alias('r')
             ->join('company c', 'c.id=r.company_id', 'LEFT')
             ->join('member m', 'c.user_id=m.id', 'LEFT')
+            ->limit(6)
             ->where(['r.is_hot' => 1, 'r.status' => 1])->select();
 
         // 找活
         $person = Db::name('person')
             ->alias('p')
             ->field('p.id,p.avatar,p.name,p.job_type,p.work_age,p.images')
+            ->limit(6)
             ->select();
         foreach ($person as &$v) {
             $v['job_type'] = Category::getNameById($v['job_type']) ?: '';
@@ -566,26 +568,77 @@ class User extends ApiBase
         }
         $adList = Advertisement::getList();
         $member=Db::name('member')->where(['id'=>$user_id])->find();
-        // 热招
-        $list = Db::name('recruit')
-            ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
-            ->alias('r')
-            ->join('company c', 'c.id=r.company_id', 'LEFT')
-            ->join('member m', 'c.user_id=m.id', 'LEFT')
-            ->where(['r.is_hot' => 1, 'r.status' => 1])->select();
+        $regtype=$member['regtype'];
+        if($regtype==1||$regtype==2){
+            // 热招
 
-        // 找活
-        $person = Db::name('person')
-            ->alias('p')
-            ->field('p.id,p.avatar,p.name,p.job_type,p.work_age,p.images')
-            ->select();
-        foreach ($person as &$v) {
-            $v['job_type'] = Category::getNameById($v['job_type']) ?: '';
-            $v['images'] = $v['images'] ? 1 : 0;
+            if($regtype==1){
+                $rt=2;
+            }else{
+                $rt=1;
+            }
+            $list = Db::name('recruit')
+                ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
+                ->alias('r')
+                ->join('company c', 'c.id=r.company_id', 'LEFT')
+                ->join('member m', 'c.user_id=m.id', 'LEFT')
+                ->limit(6)
+                ->where(['r.is_hot' => 1, 'r.status' => 1,'m.regtype'=>$rt])->select();
+            $job_type=input('job_type');
+            $where=[];
+            if($job_type){
+                $where['p.job_type']=$job_type;
+            }
+            $where['p.status']=1;
+            // 找活
+            $person = Db::name('person')
+                ->alias('p')
+                ->field('p.id,p.avatar,p.name,p.job_type,p.work_age,p.images')
+                ->where($where)
+                ->limit(6)
+                ->select();
+            foreach ($person as &$v) {
+                $v['job_type'] = Category::getNameById($v['job_type']) ?: '';
+                $v['images'] = $v['images'] ? 1 : 0;
+            }
+            $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
+                'data' => ['ad' => $adList, 'recruit' => $list, 'person' => $person]
+            ]);
+        }elseif ($regtype==3){
+            $where=[];
+            $province=input('province');
+            if($province){
+                $where['r.province']=$province;
+            }
+            $city=input('city');
+            if($city){
+                $where['r.city']=$city;
+            }
+            $district=input('district');
+            if($district){
+                $where['r.district']=$district;
+            }
+            $list = Db::name('recruit')
+                ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
+                ->alias('r')
+                ->join('company c', 'c.id=r.company_id', 'LEFT')
+                ->join('member m', 'c.user_id=m.id', 'LEFT')
+                ->where($where)
+                ->limit(6)
+                ->where(['r.is_hot' => 1, 'r.status' => 1,'m.regtype'=>1])->select();
+            $person = Db::name('recruit')
+                ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
+                ->alias('r')
+                ->join('company c', 'c.id=r.company_id', 'LEFT')
+                ->join('member m', 'c.user_id=m.id', 'LEFT')
+                ->where($where)
+                ->limit(6)
+                ->where(['r.is_hot' => 1, 'r.status' => 1,'m.regtype'=>2])->select();
+            $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
+                'data' => ['ad' => $adList, 'recruit' => $list, 'person' => $person]
+            ]);
         }
-        $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
-            'data' => ['ad' => $adList, 'recruit' => $list, 'person' => $person]
-        ]);
+
     }
 
     public function index()

@@ -208,7 +208,7 @@ class Person extends ApiBase
         }
         $list=$list->toArray();
         foreach ($list['data'] as $key=>&$value){
-            $value['images'] = $value['images']?1:0;
+            $value['images'] = $value['images']!='[]'?1:0;
             $na = $value['gender']=='female'?'女士':'先生';
             $value['name']=mb_substr($value['name'], 0, 1, 'utf-8').$na;
             unset($value['gender']);

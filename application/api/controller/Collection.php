@@ -65,7 +65,7 @@ class Collection extends ApiBase
                 ->where('m.regtype',$regtype)
                 ->select();
             foreach ($list as $key=>$value){
-                $list[$key]['images']=$list[$key]['images']?1:0;
+                $list[$key]['images']=$list[$key]['images']!='[]'?1:0;
             }
             $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$list]);
         }

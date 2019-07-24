@@ -553,7 +553,7 @@ class User extends ApiBase
             ->select();
         foreach ($person as &$v) {
             $v['job_type'] = Category::getNameById($v['job_type']) ?: '';
-            $v['images'] = $v['images'] ? 1 : 0;
+            $v['images'] = $v['images']!='[]' ? 1 : 0;
         }
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
             'data' => ['ad' => $adList, 'recruit' => $list, 'person' => $person]
@@ -601,7 +601,7 @@ class User extends ApiBase
                 ->select();
             foreach ($person as &$v) {
                 $v['job_type'] = Category::getNameById($v['job_type']) ?: '';
-                $v['images'] = $v['images'] ? 1 : 0;
+                $v['images'] = $v['images']!='[]' ? 1 : 0;
             }
             $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
                 'data' => ['ad' => $adList, 'recruit' => $list, 'person' => $person]

@@ -334,7 +334,7 @@ class Company extends ApiBase
 
         $list=$list->toArray();
         foreach ($list['data'] as &$v) {
-            $v['images'] = $v['images'] ? 1 : 0;
+            $v['images'] = $v['images']!='[]' ? 1 : 0;
             $v['job_type'] = Category::getNameById($v['job_type']) ?: '';
         }
         $this->ajaxReturn(['status' => 1, 'msg' => '获取成功', 'data' => $list['data']]);

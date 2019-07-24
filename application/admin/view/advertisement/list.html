@@ -36,7 +36,7 @@
             <tr>
                 <td>{$vo.id}</td>
                 <td>{$vo.title}</td>
-                <td><img src="{$vo.picture}" style="height: 150px;width: 150px;"></td>
+                <td><img src="/public{$vo.picture}" style="height: 150px;width: 150px;"></td>
                 <td>{eq name="vo['type']" value="1"}广告{else /}轮播{/eq}</td>
                 <td>{eq name="vo['state']" value="1"}显示{else /}不显示{/eq}</td>
                 <td>

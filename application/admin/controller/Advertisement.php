@@ -28,7 +28,7 @@ class Advertisement extends Common
         $list = Db::table('advertisement')->where(['state'=>['<>',-1],'page_id'=>$page_id])->order('type asc sort asc')->select();
         $this->assign('list',$list);
         $this->assign('page_id',$page_id);
-        return $this->fetch();
+        return $this->fetch('list');
     }
 
     /**

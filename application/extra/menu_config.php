@@ -51,7 +51,7 @@ return [
                         'id'    => 50401,
                         'title' => '广告轮播列表',
                         'sort'  => 1,
-                        'url'   => 'advertisement/list',
+                        'url'   => 'advertisement/list1',
                         'hide'  => 0,
                     ],
                 ],

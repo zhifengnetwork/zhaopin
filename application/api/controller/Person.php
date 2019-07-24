@@ -311,7 +311,7 @@ class Person extends ApiBase
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
         $money=input('moeny');
-        $recharge['recharge_sn'] = date('YmdHis',time()) . mt_rand(1000,9999);
+        $recharge['recharge_sn'] = 'R'.date('YmdHis',time()) . mt_rand(1000,9999);
         $recharge['money'] = $money;
         $recharge['user_id'] = $user_id;
         $recharge['type'] = 2;//预约支付
@@ -339,19 +339,26 @@ class Person extends ApiBase
         $member['quarter_money']=$set['quarter_money'];
         $member['year_money']=$set['year_money'];
         $money=0;
-        $vip_time=time();
+        $company=Db::name('company')->where(['user_id'=>$user_id])->find();
+        if(!$company){
+            $this->ajaxReturn(['status' => -2, 'msg' => '该用户不存在','data'=>[]]);
+        }
+        $vip_time=$company['$vip_time'];
+        if($vip_time<time()){
+            $vip_time=time();
+        }
         switch ($vip_type){
             case 1:
                 $money=$set['month_money'];
-                $vip_time=strtotime("+1 month");
+                $vip_time=strtotime("+1 month",$vip_time);
                 break;
             case 2:
                 $money=$set['quarter_money'];
-                $vip_time=strtotime("+3 month");
+                $vip_time=strtotime("+3 month",$vip_time);
                 break;
             case 3:
                 $money=$set['year_money'];
-                $vip_time=strtotime("+12 month");
+                $vip_time=strtotime("+12 month",$vip_time);
                 break;
             default:
                 $this->ajaxReturn(['status' => -2, 'msg' => '会员类型不存在','data'=>[]]);
@@ -389,9 +396,10 @@ class Person extends ApiBase
             Db::name('member_balance_log')->insertGetId($data);
             Db::commit();
         }elseif ($pay_type==2){//微信支付
-            $recharge['recharge_sn'] = date('YmdHis',time()) . mt_rand(1000,9999);
+            $recharge['recharge_sn'] = 'V'.date('YmdHis',time()) . mt_rand(1000,9999);
             $recharge['money'] = $money;
             $recharge['user_id'] = $user_id;
+            $recharge['for_id'] = $vip_type;//vip类型
             $recharge['type'] = 2;//预约支付
             $recharge['c_time'] = time();
             $recharge_id=Db::name('recharge')->insertGetId($recharge);

@@ -360,7 +360,7 @@ class Company extends ApiBase
             }
         }else{
             $money=Db::name('config')->where(['name'=>'reserve_money'])->value('value');
-            $recharge['recharge_sn'] = date('YmdHis',time()) . mt_rand(1000,9999);
+            $recharge['recharge_sn'] = 'Y'.date('YmdHis',time()) . mt_rand(1000,9999);
             $recharge['money'] = $money;
             $recharge['user_id'] = $this->get_user_id();
             $recharge['type'] = 3;//预约支付

@@ -23,7 +23,7 @@ class Advertisement extends Common
     /**
      *  页面广告轮播列表
      */
-    public function list() {
+    public function list1() {
         $page_id = request()->param('page_id',0);
         $list = Db::table('advertisement')->where(['state'=>['<>',-1],'page_id'=>$page_id])->order('type asc sort asc')->select();
         $this->assign('list',$list);

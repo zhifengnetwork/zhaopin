@@ -343,7 +343,7 @@ class Person extends ApiBase
         if(!$company){
             $this->ajaxReturn(['status' => -2, 'msg' => '该用户不存在','data'=>[]]);
         }
-        $vip_time=$company['$vip_time'];
+        $vip_time=$company['vip_time'];
         if($vip_time<time()){
             $vip_time=time();
         }

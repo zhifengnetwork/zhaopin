@@ -171,10 +171,10 @@ class Person extends ApiBase
             ->join('member m', 'm.id=p.user_id', 'LEFT')
             ->where(['p.id' => $id])
             ->find();
-//        if(!(Reserve::getBy($this->_com->id,$id))){
-//            $detail['name'] =shadow($detail['name']);
-//            $detail['mobile'] =shadow($detail['mobile']);
-//        }
+        if(!(Reserve::getBy($this->_com->id,$id))){
+            $detail['name'] =shadow($detail['name']);
+            $detail['mobile'] =shadow($detail['mobile']);
+        }
         $detail['gender'] = $detail['gender'] == 'female' ? '女' : '男';
         $detail['images'] = $detail['images']!='[]' ? 1 : 0;
         $detail['job_type'] = Category::getNameById($detail['job_type']) ?: '';

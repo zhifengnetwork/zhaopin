@@ -716,9 +716,9 @@ function shadow($string)
     $string = strval($string);
     $str = '';
     if (isMobile($string)) {
-        $str = substr($string, 0, 3) . '******' . substr($string, -2);
+        $str = mb_substr($string, 0, 3) . '******' . substr($string, -2);
     } else if (isChineseName($string)) {
-        $str = substr($string, 0, 1) . '**';
+        $str = mb_substr($string, 0, 1) . '**';
     }
     return $str;
 }

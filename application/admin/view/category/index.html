@@ -36,7 +36,7 @@
                                         <td>{$vo.money}</td>
                                         <!-- <td>{eq name="vo['is_show']" value="1"}显示{else /}隐藏{/eq}</td> -->
                                         <td>
-                                            <a class="a" href="{:url('category/add',['pid'=>$vo.cat_id],false)}">添加子分类</a>
+                                            <!--<a class="a" href="{:url('category/add',['pid'=>$vo.cat_id],false)}">添加子分类</a>-->
                                             <a class="a" href="{:url('category/edit',['cat_id'=>$vo.cat_id],false)}">编辑</a>
                                             <a class="a" cat_id="{$vo.cat_id}" onclick="del(this)" href="javascript:;">删除</a>
                                         </td>
@@ -49,7 +49,7 @@
                                             <td>{$v.money}</td>
                                             <!-- <td>{eq name="v['is_show']" value="1"}显示{else /}隐藏{/eq}</td> -->
                                             <td>
-                                                <a class="a" href="{:url('category/add',['pid'=>$v.cat_id],false)}">添加子分类</a>
+                                                <!--<a class="a" href="{:url('category/add',['pid'=>$v.cat_id],false)}">添加子分类</a>-->
                                                 <a class="a" href="{:url('category/edit',['cat_id'=>$v.cat_id],false)}">编辑</a>
                                                 <a class="a" cat_id="{$v.cat_id}" onclick="del(this)" href="javascript:;">删除</a>
                                             </td>
@@ -62,7 +62,7 @@
                                                 <td>{$v1.money}</td>
                                                 <!-- <td>{eq name="v1['is_show']" value="1"}显示{else /}隐藏{/eq}</td> -->
                                                 <td>
-                                                    <a class="a" href="{:url('category/add',['pid'=>$v1.cat_id],false)}">添加子分类</a>
+                                                    <!--<a class="a" href="{:url('category/add',['pid'=>$v1.cat_id],false)}">添加子分类</a>-->
                                                     <a class="a" href="{:url('category/edit',['cat_id'=>$v1.cat_id],false)}">编辑</a>
                                                     <a class="a" cat_id="{$v1.cat_id}" onclick="del(this)" href="javascript:;">删除</a>
                                                 </td>

@@ -5,7 +5,6 @@ namespace app\api\controller;
 use app\common\model\Category;
 use app\common\model\Company as CompanyModel;
 use app\common\model\Person as PersonModel;
-use app\common\model\Reserve;
 use app\common\model\Sysset;
 use think\Db;
 
@@ -153,27 +152,28 @@ class Person extends ApiBase
         $member['year_money']=$set['year_money'];
         $this->ajaxReturn(['status' => 1, 'msg' => '获取成功','data'=>$member]);
     }
-    // 个人信息
+    // 个人信息:没被预约都隐藏，被预约其他人看不到，本公司看全部
     public function detail()
     {
         $id = input('id/d');
-        if (!$id || !($recruit = Db::name('person')->where(['id' => $id])->find())) {
-            $this->ajaxReturn(['status' => -2, 'msg' => '信息不存在！']);
-        }
-        $this->get_user_id();
-        if (!$this->get_user_id() || !($this->_com = CompanyModel::get(['user_id' => $this->get_user_id()]))) {
-            $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在']);
-        }
+        if (!$id) $this->ajaxReturn(['status' => -2, 'msg' => '信息不存在！']);
 
         $detail = Db::name('person')
-            ->alias('p')
-            ->field('p.id,p.name,p.gender,p.avatar,p.school_type,m.mobile,p.age,p.work_age,p.images,p.job_type,p.desc,p.experience')
-            ->join('member m', 'm.id=p.user_id', 'LEFT')
-            ->where(['p.id' => $id])
-            ->find();
-        if(!(Reserve::getBy($this->_com->id,$id))){
-            $detail['name'] =shadow($detail['name']);
-            $detail['mobile'] =shadow($detail['mobile']);
+            ->field('id,user_id,name,gender,avatar,school_type,age,work_age,images,job_type,desc,experience,reserve_c')
+            ->where(['id' => $id,'status'=>1])->find();
+        if (!$detail) $this->ajaxReturn(['status' => -2, 'msg' => '信息不存在！']);
+
+        $this->get_user_id();
+        if (!$this->get_user_id() || !($company = CompanyModel::get(['user_id' => $this->get_user_id()]))) {
+            $this->ajaxReturn(['status' => -1, 'msg' => '用户不存在']);
+        }
+        $detail['mobile'] = Db::name('member')->where(['id'=>$detail['user_id']])->value('mobile');
+        if ($detail['reserve_c'] > 0 && $detail['reserve_c'] != $company->id) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '该用户已被预约，无法显示']);
+
+        } elseif ($detail['reserve_c'] == 0) {// 不是当前公司第三方的预约，隐藏信息
+            $detail['name'] = shadow($detail['name']);
+            $detail['mobile'] = shadow($detail['mobile']);
         }
         $detail['gender'] = $detail['gender'] == 'female' ? '女' : '男';
         $detail['images'] = $detail['images']!='[]' ? 1 : 0;
@@ -181,12 +181,15 @@ class Person extends ApiBase
 
         $this->ajaxReturn(['status' => 1, 'msg' => '获取成功', 'data' => $detail]);
     }
-    //个人列表
+    // 个人列表
     public function person_list(){
+        if (!$this->get_user_id() || !($this->_com = CompanyModel::get(['user_id' => $this->get_user_id()]))) {
+            $this->ajaxReturn(['status' => -1, 'msg' => '用户不存在']);
+        }
         $type=input('type');//工种
         $kw=input('kw');
-        $where = [];
-        $pageParam = ['query' => []];
+        $where = ['p.status'=>1,'p.reserve_c' => [['=', 0], ['=', $this->_com->id], 'or']];
+        $pageParam = ['query' => ['p.status'=>1,'p.reserve_c' => [['=', 0], ['=', $this->_com->id], 'or']]];
         if($type){
             $where['p.job_type']=$type;
             $pageParam['query']['job_type'] = $type;
@@ -198,7 +201,7 @@ class Person extends ApiBase
         $list=Db::name('person')->alias('p')
             ->join('category ca','ca.cat_id=p.job_type','LEFT')
             ->where($where)
-            ->field('p.id,p.work_age,p.name,p.avatar,p.gender,p.images,ca.cat_name')
+            ->field('p.id,p.work_age,p.name,p.avatar,p.gender,p.images,ca.cat_name,p.status,p.reserve_c')
             ->paginate(10,false,$pageParam);
         if(!$list){
             $this->ajaxReturn(['status' => -2, 'msg' => '获取失败','data'=>$list]);

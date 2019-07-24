@@ -5,7 +5,6 @@ namespace app\api\controller;
 use app\common\model\Category;
 use app\common\model\Company as CompanyModel;
 use app\common\model\Region;
-use app\common\model\Reserve;
 use think\Db;
 
 /**
@@ -326,11 +325,10 @@ class Company extends ApiBase
     public function reserve_list()
     {
         $this->getCompany();
-        $where = ['r.company_id' => $this->_id];
-        $param['query']['r.company_id'] = $this->_id;
-        $list = Db::name('reserve')->alias('r')
-            ->field('r.id,r.person_id,p.name,p.avatar,p.work_age,p.images,p.job_type')
-            ->join('person p', 'p.id = r.person_id', 'LEFT')
+        $where = ['reserve_c' => $this->_id];
+        $param['query']['reserve_c'] = $this->_id;
+        $list = Db::name('person')
+            ->field('id as person_id,name,avatar,work_age,images,job_type')
             ->where($where)
             ->paginate(10, false, $param);
 
@@ -348,15 +346,20 @@ class Company extends ApiBase
     {
         $this->getCompany();
         $id = input('id/d');
-        if(!Db::name('person')->where(['id'=>$id])->find()){
+        if(!($person = Db::name('person')->where(['id'=>$id])->field('id,reserve_c')->find())){
             $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在']);
         }
+        if ($person['reserve_c'] == $this->_id)
+            $this->ajaxReturn(['status' => -2, 'msg' => '您已预约该应聘者']);
+        if ($person['reserve_c'] != $this->_id && $person['reserve_c'] > 0)
+            $this->ajaxReturn(['status' => -2, 'msg' => '已被预约']);
+
         $num=$this->look_num($this->_id);//可预约人数
         if($num>0){
-            if(!Reserve::getBy($this->_id,$id)){
-                if(Db::name('reserve')->insert(['company_id'=>$this->_id,'person_id'=>$id,'create_time'=>time()])){
-                    $this->ajaxReturn(['status' => 1, 'msg' => '预约成功']);
-                }
+            if (Db::name('person')->where(['id' => $id])->update(['reserve_c' =>$this->_id])) {
+                //删除收藏该应聘者的数据，除了预约的第三方或公司
+                Db::name('collection')->where(['type' => 2, 'to_id' => $id, 'user_id' => ['neq', $this->_id]])->delete();
+                $this->ajaxReturn(['status' => 1, 'msg' => '预约成功']);
             }
         }else{
             $money=Db::name('config')->where(['name'=>'reserve_money'])->value('value');
@@ -378,7 +381,7 @@ class Company extends ApiBase
         $vip_type=Db::name('company')->where(['id'=>$company_id])->value('vip_type');
         $sysset = Db::table('sysset')->field('*')->find();
         $set =json_decode($sysset['vip'], true);
-        $re_num=Db::name('reserve')->where(['company_id'=>$company_id])->count();
+        $re_num=Db::name('person')->where(['reserve_c'=>$company_id])->count();
         switch ($vip_type){
             case 1:
                 $num=$set['month']-$re_num;

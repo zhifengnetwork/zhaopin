@@ -548,6 +548,7 @@ class User extends ApiBase
         $person = Db::name('person')
             ->alias('p')
             ->field('p.id,p.avatar,p.name,p.job_type,p.work_age,p.images')
+            ->where(['p.reserve_c' => 0,'status'=>1])
             ->limit(6)
             ->select();
         foreach ($person as &$v) {
@@ -584,12 +585,13 @@ class User extends ApiBase
                 ->join('member m', 'c.user_id=m.id', 'LEFT')
                 ->limit(6)
                 ->where(['r.is_hot' => 1, 'r.status' => 1,'m.regtype'=>$rt])->select();
+
+            $company_id = Db::name('company')->where(['user_id'=>$user_id])->value('id');
             $job_type=input('job_type');
-            $where=[];
+            $where=['p.status'=>1,'p.reserve_c' => [['=', 0], ['=', $company_id], 'or']];
             if($job_type){
                 $where['p.job_type']=$job_type;
             }
-            $where['p.status']=1;
             // 找活
             $person = Db::name('person')
                 ->alias('p')

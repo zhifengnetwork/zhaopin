@@ -653,14 +653,40 @@ class User extends ApiBase
             $data['avatar']=SITE_URL.$data['avatar'];
         } else {
             $data = Db::name('company')->alias('c')
-                ->field('c.id,c.contacts,c.logo,m.openid,c.vip_time,m.mobile,c.vip_type,c.company_name,c.status')
+                ->field('c.id,c.contacts,c.logo,m.openid,c.vip_time,m.mobile,c.vip_type,c.company_name,c.status,c.is_vip')
                 ->join('member m', 'm.id = c.user_id', 'LEFT')
                 ->where(['c.user_id' => $user_id])->find();
             $data['logo']=SITE_URL.$data['logo'];
+            $num=0;
+            if($data['is_vip']){
+                $num=look_num($data['id']);
+            }
+            $data['number']=$num;
         }
         $this->ajaxReturn(['status' => 1, 'msg' => '获取成功！', 'data' => $data]);
     }
-
+    //查询该公司还有多少可查看（预约）人数
+    public function look_num($company_id){
+        $vip_type=Db::name('company')->where(['id'=>$company_id])->value('vip_type');
+        $sysset = Db::table('sysset')->field('*')->find();
+        $set =json_decode($sysset['vip'], true);
+        $re_num=Db::name('reserve')->where(['company_id'=>$company_id])->count();
+        switch ($vip_type){
+            case 1:
+                $num=$set['month']-$re_num;
+                break;
+            case 2:
+                $num=$set['quarter']-$re_num;
+                break;
+            case 3:
+                $num=$set['year']-$re_num;
+                break;
+            default:
+                $num=0;
+                break;
+        }
+        return $num;
+    }
     /**
      * 上传头像
      */

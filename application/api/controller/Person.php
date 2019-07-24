@@ -392,7 +392,7 @@ class Person extends ApiBase
             $data['old_balance']=$member['balance'];
             $data['balance']=sprintf("%.2f",$member['balance']-$money);
             $data['balance_type']='VIP购买';
-            $data['source_type']=4;
+            $data['source_type']=3;
             $data['log_type']=0;
             $data['source_id']=$user_id;
             $data['create_time']=time();

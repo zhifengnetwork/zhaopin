@@ -216,17 +216,17 @@ class Company extends ApiBase
         $rows=input('rows',10);
         $province=input('province');
         if($province){
-            $where['r.province']=$province;
+            $where['co.province']=$province;
             $pageParam['query']['province']=$province;
         }
         $city=input('city');
         if($city){
-            $where['r.city']=$city;
+            $where['co.city']=$city;
             $pageParam['query']['city']=$city;
         }
         $district=input('district');
         if($district){
-            $where['r.district']=$district;
+            $where['co.district']=$district;
             $pageParam['query']['district']=$district;
         }
         $regtype=input('regtype',1);
@@ -251,17 +251,17 @@ class Company extends ApiBase
         $rows=input('rows',10);
         $province=input('province');
         if($province){
-            $where['r.province']=$province;
+            $where['co.province']=$province;
             $pageParam['query']['province']=$province;
         }
         $city=input('city');
         if($city){
-            $where['r.city']=$city;
+            $where['co.city']=$city;
             $pageParam['query']['city']=$city;
         }
         $district=input('district');
         if($district){
-            $where['r.district']=$district;
+            $where['co.district']=$district;
             $pageParam['query']['district']=$district;
         }
         $regtype=input('regtype',1);

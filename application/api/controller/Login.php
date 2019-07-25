@@ -24,13 +24,13 @@ class Login extends ApiBase
      * 微信登录
      */
     public function index () {
-        $code = I('code');
+        $code = input('code');
         if(!$code){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'code不能为空','data'=>'']);
         }
 
-        $appid = M('config')->where(['name'=>'appid'])->value('value');
-        $appsecret = M('config')->where(['name'=>'appsecret'])->value('value');
+        $appid = Db::name('config')->where(['name'=>'appid'])->value('value');
+        $appsecret = Db::name('config')->where(['name'=>'appsecret'])->value('value');
 
         $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$appid.'&secret='.$appsecret.'&js_code='.$code.'&grant_type=authorization_code' ;
         $result = httpRequest($url, 'GET');

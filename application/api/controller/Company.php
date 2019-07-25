@@ -353,12 +353,13 @@ class Company extends ApiBase
             $this->ajaxReturn(['status' => -2, 'msg' => '您已预约该应聘者']);
         if ($person['reserve_c'] != $this->_id && $person['reserve_c'] > 0)
             $this->ajaxReturn(['status' => -2, 'msg' => '已被预约']);
-
-        $num=$this->look_num($this->_id);//可预约人数
-        if($num>0){
+        $reserve_num=Db::name('company')->where(['id'=>$this->_id])->value('reserve_num');
+//        $num=$this->look_num($this->_id);//可预约人数
+        if($reserve_num>0){
             if (Db::name('person')->where(['id' => $id])->update(['reserve_c' =>$this->_id])) {
                 //删除收藏该应聘者的数据，除了预约的第三方或公司
                 Db::name('collection')->where(['type' => 2, 'to_id' => $id, 'user_id' => ['neq', $this->_id]])->delete();
+                Db::name('company')->where(['id'=>$this->_id])->setDec('reserve_num',1);
                 $this->ajaxReturn(['status' => 1, 'msg' => '预约成功']);
             }
         }else{

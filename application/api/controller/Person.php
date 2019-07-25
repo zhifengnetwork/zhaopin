@@ -350,17 +350,21 @@ class Person extends ApiBase
         if($vip_time<time()){
             $vip_time=time();
         }
+        $num=0;
         switch ($vip_type){
             case 1:
                 $money=$set['month_money'];
+                $num=$set['month'];
                 $vip_time=strtotime("+1 month",$vip_time);
                 break;
             case 2:
                 $money=$set['quarter_money'];
+                $num=$set['quarter'];
                 $vip_time=strtotime("+3 month",$vip_time);
                 break;
             case 3:
                 $money=$set['year_money'];
+                $num=$set['year'];
                 $vip_time=strtotime("+12 month",$vip_time);
                 break;
             default:
@@ -381,6 +385,8 @@ class Person extends ApiBase
             $data['is_vip']=1;
             $data['vip_type']=$vip_type;
             $data['vip_time']=$vip_time;
+            $data['reserve_num']=$company['reserve_num']+$num;
+            $data['reserve_num_all']=$company['reserve_num_all']+$num;
             $res=Db::name('company')->where(['user_id'=>$user_id])->update($data);
             if(!$res){
                 Db::rollback();

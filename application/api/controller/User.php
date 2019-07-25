@@ -661,7 +661,8 @@ class User extends ApiBase
             $data['logo']=SITE_URL.$data['logo'];
             $num=0;
             if($data['is_vip']){
-                $num=look_num($data['id']);
+                $num=Db::name('company')->where(['id'=>$data['id']])->value('reserve_num');
+//                $num=look_num($data['id']);
             }
             $data['number']=$num;
         }

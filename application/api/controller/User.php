@@ -755,10 +755,16 @@ class User extends ApiBase
             $company=Db::name('company')->where(['user_id'=>$data['id']])->find();
             if(!$company){
                 $this->ajaxReturn(['status' => 3, 'msg' => '继续填写！', 'data' => $data]);
+            }elseif($company['status']==-1){
+                Db::name('company')->where(['user_id'=>$data['id']])->delete();
+                $this->ajaxReturn(['status' => 3, 'msg' => '继续填写！', 'data' => $data]);
             }
         }elseif ($data['regtype']==3){
             $person=Db::name('person')->where(['user_id'=>$data['id']])->find();
             if(!$person){
+                $this->ajaxReturn(['status' => 3, 'msg' => '继续填写！', 'data' => $data]);
+            }elseif($person['status']==-1){
+                Db::name('person')->where(['user_id'=>$data['id']])->delete();
                 $this->ajaxReturn(['status' => 3, 'msg' => '继续填写！', 'data' => $data]);
             }
         }

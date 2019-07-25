@@ -610,15 +610,15 @@ class User extends ApiBase
             $where=[];
             $province=input('province');
             if($province){
-                $where['r.province']=$province;
+                $where['c.province']=$province;
             }
             $city=input('city');
             if($city){
-                $where['r.city']=$city;
+                $where['c.city']=$city;
             }
             $district=input('district');
             if($district){
-                $where['r.district']=$district;
+                $where['c.district']=$district;
             }
             $list = Db::name('recruit')
                 ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')

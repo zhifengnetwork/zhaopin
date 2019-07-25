@@ -150,6 +150,9 @@ class Person extends ApiBase
         $member['month_money']=$set['month_money'];
         $member['quarter_money']=$set['quarter_money'];
         $member['year_money']=$set['year_money'];
+        $member['month_num']=$set['month'];
+        $member['quarter_num']=$set['quarter'];
+        $member['year_num']=$set['year'];
         $this->ajaxReturn(['status' => 1, 'msg' => '获取成功','data'=>$member]);
     }
     // 个人信息:没被预约都隐藏，被预约其他人看不到，本公司看全部

@@ -89,17 +89,17 @@ class Login extends ApiBase
         if(!$data){
             $res=Db::name('member')->where(['id'=>$user_id])->update(['openid'=>$openid]);
             if($res){
-                $this->ajaxReturn(['status' => 1 , 'msg'=>'绑定成功','data'=>$data]);
+                $this->ajaxReturn(['status' => 1 , 'msg'=>'绑定成功','data'=>[]]);
             }else{
-                $this->ajaxReturn(['status' => 1 , 'msg'=>'绑定失败','data'=>$data]);
+                $this->ajaxReturn(['status' => 1 , 'msg'=>'绑定失败','data'=>[]]);
             }
         }else{
 
 //            $data['token'] = $this->create_token($data['id']);
             if($user_id==$data['id']){
-                $this->ajaxReturn( ['status'=>-2,'msg'=>'您已绑定该微信，请勿重新绑定','data'=>$data]);
+                $this->ajaxReturn( ['status'=>-2,'msg'=>'您已绑定该微信，请勿重新绑定','data'=>[]]);
             }else{
-                $this->ajaxReturn( ['status'=>-2,'msg'=>'该微信已绑定其他账户','data'=>$data]);
+                $this->ajaxReturn( ['status'=>-2,'msg'=>'该微信已绑定其他账户','data'=>[]]);
             }
 
 

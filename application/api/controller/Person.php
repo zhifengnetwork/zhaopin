@@ -278,6 +278,68 @@ class Person extends ApiBase
         }
         $member=Db::name('member')->where(['id'=>$user_id])->find();
         $poundage=sprintf("%.2f",$money*$percent/100);;//手续费
+        $order_money=$money-$poundage;
+        if($pay_tpye==2){//微信
+
+        }elseif($pay_tpye==4){//支付宝   后台审核
+            $alipay=input('alipay');
+            $alipay_name=input('alipay_name');
+            if(!$alipay||!$alipay_name){
+                $this->ajaxReturn(['status' => -2, 'msg' => '支付宝账户和名称不能为空','data'=>[]]);
+            }
+            $data['alipay']=$alipay;
+            $data['alipay_name']=$alipay_name;
+            Db::table('member')->where('id',$user_id)->update($data);
+            $data=[];
+            Db::startTrans();
+            $data['user_id']=$user_id;
+            $data['money']=$money;
+            $data['rate']=$percent;
+            $data['taxfee']=$poundage;
+            $data['account']=$order_money;
+            $data['type']=$pay_tpye;
+            $data['status']=0;
+            $data['createtime']=time();
+            $wi_id=Db::name('member_withdrawal')->insertGetId($data);
+            if($wi_id){
+                Db::table('member')->where('id',$user_id)->setDec('balance',$money);
+                $data=[];
+                $data['user_id']=$user_id;
+                $data['money']=$money;
+                $data['old_balance']=$member['balance'];
+                $data['balance']=sprintf("%.2f",$member['balance']-$money);
+                $data['balance_type']='支付宝提现';
+                $data['source_type']=4;
+                $data['log_type']=0;
+                $data['source_id']=$wi_id;
+                $data['create_time']=time();
+                Db::name('member_balance_log')->insertGetId($data);
+                Db::commit();
+                $this->ajaxReturn(['status' => 1, 'msg' => '已提交后台审核！','data'=>$wi_id]);
+            }else{
+                Db::rollback();
+                $this->ajaxReturn(['status' => -2, 'msg' => '提现失败','data'=>[]]);
+            }
+        }
+    }
+    //提现
+    public function withdrawal222(){
+        $user_id=$this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $pay_tpye=input('pay_tpye');
+        $money=input('money');
+        if(!$pay_tpye||!$money){
+            $this->ajaxReturn(['status' => -2, 'msg' => '参数错误','data'=>[]]);
+        }
+        $max_money=Sysset::getWDMax();
+        $percent=Sysset::getWDRate();
+        if($money>$max_money){
+            $this->ajaxReturn(['status' => -2, 'msg' => '提现金额不能大于最大金额'.$max_money,'data'=>[]]);
+        }
+        $member=Db::name('member')->where(['id'=>$user_id])->find();
+        $poundage=sprintf("%.2f",$money*$percent/100);;//手续费
         $order_money=$money+$poundage;
         if($order_money>$member['balance']){
             $this->ajaxReturn(['status' => -2, 'msg' => '提现失败，余额不足'.$order_money,'data'=>[]]);

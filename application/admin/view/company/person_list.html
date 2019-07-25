@@ -114,7 +114,7 @@
                                 </div>
                                 <div class="modal-body">
                                     <ul>
-                                        {if $row['person_data']['edit'] eq 0 }
+                                        {if $row['edit'] eq 0 }
                                         <li>姓名 : {$row['data_array']['name']}</li>
                                         <li>手机号 : {$row['member_data']['mobile']}</li>
                                         <li>性别 : {if $row['data_array']['gender'] ==1 }男{else/}女{/if}</li>

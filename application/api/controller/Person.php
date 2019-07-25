@@ -124,6 +124,7 @@ class Person extends ApiBase
             'type' => 3,
             'content_id' => $this->_person->user_id,
             'data' => json_encode($data,JSON_UNESCAPED_UNICODE),
+            'edit'=>1,
             'create_time'=>time()
         ]);
         if (!$res) {

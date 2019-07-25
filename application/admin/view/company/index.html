@@ -112,7 +112,7 @@
                             </div>
                             <div class="modal-body">
                                 <ul>
-                                    {if $row['company_data']['edit'] eq 0 }
+                                    {if $row['edit'] eq 0 }
                                     <li>联系人 : {$row['data_array']['contacts']}</li>
                                     <li>手机号 : {$row['data_array']['mobile']}</li>
                                     <li>固定电话 : {if $row['data_array']['telephone'] }{/if}</li>

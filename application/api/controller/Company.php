@@ -74,6 +74,7 @@ class Company extends ApiBase
             'type'=>Db::name('member')->where(['id'=>$this->_com->user_id])->value('regtype'),
             'content_id'=>$this->_com->user_id,
             'data'=>json_encode($data,JSON_UNESCAPED_UNICODE),
+            'edit'=>1,
             'create_time'=>time()
         ]);
         if (!$res) {

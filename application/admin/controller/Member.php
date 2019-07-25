@@ -69,12 +69,12 @@ class Member extends Common
         $begin_time = input('begin_time', '');
         $end_time = input('end_time', '');
         $id = input('mid', '');
-        $kw = input('realname', '');
+        $mobile = input('mobile', '');
         $type = input('type', '');
         $where = [];
         if (!empty($id)) $where['id'] = $id;
         if (!empty($type)) $where['regtype'] = $type;
-        if (!empty($kw)) is_numeric($kw) ? $where['mobile'] = $kw : $where['realname'] = $kw;
+        if (!empty($mobile)) $where['mobile'] = $mobile;
 
         if ($begin_time && $end_time) {
             $where['createtime'] = [['EGT', strtotime($begin_time)], ['LT', strtotime($end_time)]];
@@ -85,7 +85,7 @@ class Member extends Common
         }
         //携带参数
         $carryParameter = [
-            'kw' => $kw,
+            'mobile' => $mobile,
             'begin_time' => $begin_time,
             'end_time' => $end_time,
             'mid' => $id,
@@ -98,7 +98,7 @@ class Member extends Common
 
         return $this->fetch('', [
             'list' => $list,
-            'kw' => $kw,
+            'mobile' => $mobile,
             'id' => $id,
             'type' => $type,
             'begin_time' => empty($begin_time) ? '' : $begin_time,

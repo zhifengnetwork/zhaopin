@@ -107,4 +107,14 @@ class Member extends Model
         }
     }
 
+    public function getNameAttr($data,$value)
+    {
+       if($value['regtype']==1||$value['regtype']==2){
+           return Company::where(['user_id'=>$value['id']])->value('company_name')?:'';
+       }elseif($value['regtype']==3){
+           return Person::where(['user_id'=>$value['id']])->value('name')?:'';
+       }
+       return '';
+    }
+
 }

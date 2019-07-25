@@ -107,6 +107,10 @@ class Person extends ApiBase
     public function edit()
     {
         $this->getPerson();
+        if(Db::name('audit')->where(['type'=>3,'content_id'=>$this->get_user_id(),'status'=>0])->find()){
+            return $this->ajaxReturn(['status' => -2, 'msg' => '信息还在审核中，不可再次编辑']);
+        }
+
         $data = input();
         $validate = $this->validate($data, 'User.person_edit');
         if (true !== $validate) {

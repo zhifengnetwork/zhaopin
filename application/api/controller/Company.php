@@ -56,6 +56,11 @@ class Company extends ApiBase
     public function edit()
     {
         $this->getCompany();
+        $regtype = Db::name('member')->where(['id'=>$this->get_user_id()])->value('regtype');
+        if(Db::name('audit')->where(['type'=>$regtype,'content_id'=>$this->get_user_id(),'status'=>0])->find()){
+            return $this->ajaxReturn(['status' => -2, 'msg' => '信息还在审核中，不可再次编辑']);
+        }
+
         $data = input();
         $validate = $this->validate($data, 'User.company_edit');
         if (true !== $validate) {
@@ -71,7 +76,7 @@ class Company extends ApiBase
             $this->ajaxReturn(['status' => -2, 'msg' => '保存失败！']);
         }
         $res = Db::name('audit')->insert([
-            'type'=>Db::name('member')->where(['id'=>$this->_com->user_id])->value('regtype'),
+            'type'=>$regtype,
             'content_id'=>$this->_com->user_id,
             'data'=>json_encode($data,JSON_UNESCAPED_UNICODE),
             'edit'=>1,
@@ -108,7 +113,11 @@ class Company extends ApiBase
             if (!($recruit) || $recruit['status'] == 0) {
                 $this->ajaxReturn(['status' => -2, 'msg' => '信息不存在！']);
             }
+            if(Db::name('audit')->where(['type'=>4,'content_id'=>$id,'status'=>0])->find()){
+                return $this->ajaxReturn(['status' => -2, 'msg' => '信息还在审核中，不可再次编辑']);
+            }
         }
+
         $data = input();
         $validate = $this->validate($data, 'Recruit.edit');
         if (true !== $validate) {

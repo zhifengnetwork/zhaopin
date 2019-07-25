@@ -21,8 +21,8 @@
                 </div>
                 <div class="col-sm-2">
                     <div class="form-group">
-                        <label class="control-label" for="invoice_no">会员信息</label>
-                        <input type="text" placeholder="会员信息" name="realname" value="{$kw}" class="form-control">
+                        <label class="control-label" for="invoice_no">会员手机号</label>
+                        <input type="text" placeholder="会员手机号" name="mobile" value="{$mobile}" class="form-control">
                     </div>
                 </div>
 
@@ -69,7 +69,7 @@
                 <tr>
                     <th>会员ID</th>
                     <th>手机号码</th>
-                    <th>注册类型</th>
+                    <th>信息</th>
                     <th>余额</th>
                     <th>注册时间</th>
                     <th>操作</th>
@@ -81,7 +81,7 @@
                 <tr>
                     <td>{$vo.id}</td>
                     <td>{$vo['mobile']}</td>
-                    <td>{$register_type[$vo['regtype']]}</td>
+                    <td>{$register_type[$vo['regtype']]}<br>{$vo.name}</td>
                     <td>
                         {$vo['balance']}
                     </td>

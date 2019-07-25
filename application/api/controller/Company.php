@@ -314,16 +314,26 @@ class Company extends ApiBase
     // 职位详情
     public function recruit_detail()
     {
+        $user_id=$this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
         $id = input('id/d');
         if (!$id || !($recruit = Db::name('recruit')->where(['id' => $id])->find())) {
             $this->ajaxReturn(['status' => -2, 'msg' => '信息不存在！']);
         }
+
         $detail = Db::name('recruit')
             ->alias('r')
             ->field('r.id,r.title,r.salary,r.work_age,c.province,c.logo,c.company_name,c.city,c.district,r.detail')
             ->join('company c', 'c.id=r.company_id', 'LEFT')
             ->where(['r.id' => $id])
             ->find();
+        $detail['is_collection']=0;
+        $res=Db::name('collection')->where(['user_id'=>$user_id,'to_id'=>$id])->find();
+        if($res){
+            $detail['is_collection']=1;
+        }
         $detail['province'] = Region::getName($detail['province']);
         $detail['city'] = Region::getName($detail['city']);
         $detail['district'] = Region::getName($detail['district']);
@@ -368,7 +378,7 @@ class Company extends ApiBase
         if($reserve_num>0){
             if (Db::name('person')->where(['id' => $id])->update(['reserve_c' =>$this->_id])) {
                 //删除收藏该应聘者的数据，除了预约的第三方或公司
-                Db::name('collection')->where(['type' => 2, 'to_id' => $id, 'user_id' => ['neq', $this->_id]])->delete();
+                Db::name('collection')->where(['type' => 2, 'to_id' => $id, 'user_id' => ['neq', $this->get_user_id()]])->delete();
                 Db::name('company')->where(['id'=>$this->_id])->setDec('reserve_num',1);
                 $this->ajaxReturn(['status' => 1, 'msg' => '预约成功']);
             }

@@ -171,7 +171,15 @@ class Person extends ApiBase
             ->where(['id' => $id,'status'=>1])->find();
         if (!$detail) $this->ajaxReturn(['status' => -2, 'msg' => '信息不存在！']);
 
-        $this->get_user_id();
+        $user_id=$this->get_user_id();
+        $member=Db::name('member')->where(['id'=>$user_id])->find();
+        $detail['is_collection']=0;
+        if($member['regtype']==1||$member['regtype']==2){
+            $res=Db::name('collection')->where(['user_id'=>$user_id,'to_id'=>$id])->find();
+            if($res){
+                $detail['is_collection']=1;
+            }
+        }
         if (!$this->get_user_id() || !($company = CompanyModel::get(['user_id' => $this->get_user_id()]))) {
             $this->ajaxReturn(['status' => -1, 'msg' => '用户不存在']);
         }

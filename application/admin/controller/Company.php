@@ -60,14 +60,14 @@ class Company extends Common
         Db::startTrans();
         if ($status == 1){
             $data = json_decode($audit['data'],true);
+            isset($data['images']) && $data['images'] = json_encode($data['images']);
         }
         $data['status']=$status;
-        $data['id']=$audit['content_id'];
         $data['remark']=$content;
         $data['auditor']=UID;
         $data['examination']=time();
         // 更新数据
-        $res=Db::name('company')->update($data);
+        $res=Db::name('company')->where(['user_id'=>$audit['content_id']])->update($data);
         if(!$res){
             Db::rollback();
             $this->error('审核失败！');
@@ -85,7 +85,7 @@ class Company extends Common
     public function person_list(){
         $where=['type'=>3,'status'=>0];
         $pageParam = ['query' => ['type'=>3,'status'=>0]];
-        $list=Audit::where($where)
+        $list=Audit::where($where)->order('id desc')
 //            ->field('p.*,c.cat_name')
             ->paginate(10,false,$pageParam);
         return $this->fetch('company/person_list',[
@@ -94,7 +94,6 @@ class Company extends Common
         ]);
     }
     public function person_audit(){
-
         $status = input('status/d');
         if ($status != -1 && $status != 1) {
             $this->error('状态错误');
@@ -113,6 +112,7 @@ class Company extends Common
         Db::startTrans();
         if ($status == 1){
             $data = json_decode($audit['data'],true);
+            isset($data['images']) && $data['images'] = json_encode($data['images']);
         }
         $data['status']=$status;
         $data['remark']=$content;

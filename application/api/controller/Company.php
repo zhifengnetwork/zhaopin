@@ -379,6 +379,8 @@ class Company extends ApiBase
             $recharge['user_id'] = $this->get_user_id();
             $recharge['type'] = 3;//预约支付
             $recharge['c_time'] = time();
+            $recharge['for_id']=$this->_id;
+            $recharge['to_id']=$id;
             $recharge_id=Db::name('recharge')->insertGetId($recharge);
             if($recharge_id){
                 $this->ajaxReturn(['status' => 5, 'msg' => '请支付','data'=>$recharge_id]);

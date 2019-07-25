@@ -203,6 +203,7 @@ class Person extends ApiBase
             $this->ajaxReturn(['status' => -1, 'msg' => '用户不存在']);
         }
         $type=input('type');//工种
+        $rows=input('rows',10);
         $kw=input('kw');
         $where = ['p.status'=>1,'p.reserve_c' => [['=', 0], ['=', $this->_com->id], 'or']];
         $pageParam = ['query' => ['p.status'=>1,'p.reserve_c' => [['=', 0], ['=', $this->_com->id], 'or']]];
@@ -218,7 +219,7 @@ class Person extends ApiBase
             ->join('category ca','ca.cat_id=p.job_type','LEFT')
             ->where($where)
             ->field('p.id,p.work_age,p.name,p.avatar,p.gender,p.images,ca.cat_name,p.status,p.reserve_c')
-            ->paginate(10,false,$pageParam);
+            ->paginate($rows,false,$pageParam);
         if(!$list){
             $this->ajaxReturn(['status' => -2, 'msg' => '获取失败','data'=>$list]);
         }

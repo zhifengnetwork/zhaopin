@@ -118,7 +118,7 @@ class Finance extends Common
             }
 
             MemberModel::setBalance($uid, 0, $num, array(UID, '余额充值'));
-            $this->success('充值成功', url('finance/balance_recharge', ['id' => $profile['id']]));
+            $this->success('充值成功', url('member/index'));
         }
         $profile['balance'] = $balance_info['balance'];
         $this->assign('register_type', \app\common\model\Member::$_registerType);

@@ -123,10 +123,10 @@
                                         <li>学历 : {$row['data_array']['school_type']}</li>
                                         <li>毕业时间 : {$row['data_array']['graduate_time']}</li>
                                         <li>职业 : {$row['data_array']['job_type']|cate}</li>
-                                        <li>身份证正面：<img src="{$row['data_array']['idcard_front']}"></li>
-                                        <li>身份证反面：<img src="{$row['data_array']['idcard_back']}"></li>
+                                        <li>身份证正面：<img width="100px" height="100px" src="{$row['data_array']['idcard_front']}"></li>
+                                        <li>身份证反面：<img width="100px" height="100px" src="{$row['data_array']['idcard_back']}"></li>
                                         {volist name="row['data_array']['images']" id="row"  key="k"}
-                                        {if $k%2 neq 0}<li><img src="{$row}"></li>{/if}
+                                        {if $k%2 neq 0}<li><img width="100px" height="100px" src="{$row}"></li>{/if}
                                         {/volist}
                                         {else/}
                                         <li>姓名 : {$row['data_array']['name']}</li>

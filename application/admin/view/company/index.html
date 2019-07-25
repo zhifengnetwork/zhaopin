@@ -115,7 +115,7 @@
                                     {if $row['edit'] eq 0 }
                                     <li>联系人 : {$row['data_array']['contacts']}</li>
                                     <li>手机号 : {$row['data_array']['mobile']}</li>
-                                    <li>固定电话 : {if $row['data_array']['telephone'] }{/if}</li>
+                                    {if isset($row['data_array']['telephone']) }<li>固定电话 :{$row['data_array']['telephone']}</li> {/if}
                                     <li>地区 : {$row['data_array']['province']|region} {$row['data_array']['city']|region} {$row['data_array']['district']|region}</li>
                                     <li>公司名称 : {$row['data_array']['company_name']}</li>
                                     <li>公司类型 : {$row['data_array']['type']}</li>

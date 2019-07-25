@@ -44,35 +44,41 @@ class Company extends Common
     public function audit(){
 
         $status = input('status/d');
-        if ($status != -1 && $status != 1) {
-            $this->error('状态错误');
-        }
+        if ($status != -1 && $status != 1) $this->error('状态错误');
+
         $id = input('id/d');//audit表的id
 
         $audit=Db::name('audit')->where(['id'=>$id])->find();
-        if (!$audit || $audit['status'] != 0) {
-            $this->error('数据没有找到或不能操作');
-        }
+        if (!$audit || $audit['status'] != 0) $this->error('数据没有找到或不能操作');
+
         $content = input('content');
-        if ($status == -1 && !$content) {
-            $this->error('内容不能为空');
-        }
+        if ($status == -1 && !$content) $this->error('内容不能为空');
+
         Db::startTrans();
-        if ($status == 1){
-            $data = json_decode($audit['data'],true);
+        if ($audit['edit'] == 0) {
+            // 注册审核
+            $data['status'] = $status;
+            $data['remark'] = $content;
+            $data['auditor'] = UID;
+            $data['examination'] = time();
+            $data['edit'] = 1;
+            $res = Db::name('company')->where(['user_id' => $audit['content_id']])->update($data);
+            if (!$res) {
+                Db::rollback();
+                $this->error('审核失败!');
+            }
+        } elseif ($audit['edit'] != 0 && $status == 1) {
+            // 编辑信息审核成功，替换数据
+            $data = json_decode($audit['data'], true);
             isset($data['images']) && $data['images'] = json_encode($data['images']);
-        }
-        $data['status']=$status;
-        $data['remark']=$content;
-        $data['auditor']=UID;
-        $data['examination']=time();
-        // 更新数据
-        $res=Db::name('company')->where(['user_id'=>$audit['content_id']])->update($data);
-        if(!$res){
-            Db::rollback();
-            $this->error('审核失败！');
+            $res = Db::name('company')->where(['user_id' => $audit['content_id']])->update($data);
+            if (!$res) {
+                Db::rollback();
+                $this->error('审核失败!');
+            }
         }
         $res=Db::name('audit')->where(['id'=>$id])->update([
+            'remark' => $content,
             'status'=>$status
         ]);
         if(!$res){
@@ -95,67 +101,70 @@ class Company extends Common
     }
     public function person_audit(){
         $status = input('status/d');
-        if ($status != -1 && $status != 1) {
-            $this->error('状态错误');
-        }
-        $id = input('id/d');
+        if ($status != -1 && $status != 1) $this->error('状态错误');
 
-        $audit=Db::name('audit')->where(['id'=>$id])->find();
-        if (!$audit || $audit['status'] != 0) {
-            $this->error('数据没有找到或不能操作');
-        }
+        $id = input('id/d');
+        $audit = Db::name('audit')->where(['id' => $id])->find();
+        if (!$audit || $audit['status'] != 0) $this->error('数据没有找到或不能操作');
+
         $content = input('content');
-        if ($status == -1 && !$content) {
-            $this->error('内容不能为空');
-        }
+        if ($status == -1 && !$content) $this->error('内容不能为空');
 
         Db::startTrans();
-        if ($status == 1){
-            $data = json_decode($audit['data'],true);
-            isset($data['images']) && $data['images'] = json_encode($data['images']);
-        }
-        $data['status']=$status;
-        $data['remark']=$content;
-        $data['check_user']=UID;
-        $data['check_time']=time();
-        $person = Db::name('person')->where(['user_id'=>$audit['content_id']])->field('edit,user_id,job_type')->find();
-        if($person['edit']==0)$data['edit']=1;
-        $res=Db::name('person')->where(['user_id'=>$audit['content_id']])->update($data);
-
-        if(!$res){
-            Db::rollback();
-            $this->error('审核失败!');
-        }else{
-            if($status==1&&$person['edit']==0){
-                $balance=Db::name('member')->where(['id'=>$person['user_id']])->value('balance');
-                $money= Db::name('category')->where(['cat_id'=>$person['job_type']])->value('money');
-                $member_balance=bcadd($balance,$money);
-                $res = Db::name('member')->where(['id'=>$person['user_id']])->update(['balance'=>$member_balance]);
-                if($money > 0 && !$res){
-                    Db::rollback();
-                    $this->error('审核失败!');
-                }
-
-                // 余额记录
-                $res = Db::name('member_balance_log')->insert([
-                    'user_id'=>$person['user_id'],'money'=>$money,'old_balance'=>$balance,'balance'=>$member_balance,
-                    'source_type'=>8,'log_type'=>1,'source_id'=>$person['user_id'],'note'=>'注册成功','create_time'=>time()
-                ]);
-                if(!$res){
-                    Db::rollback();
-                    $this->error('审核失败3！');
-                }
-            }
-            $res=Db::name('audit')->where(['id'=>$id])->update([
-                'status'=>$status
-            ]);
-            if(!$res){
+        if ($audit['edit'] == 0) {
+            // 注册审核
+            $data['status'] = $status;
+            $data['remark'] = $content;
+            $data['check_user'] = UID;
+            $data['check_time'] = time();
+            $data['edit'] = 1;
+            $res = Db::name('person')->where(['user_id' => $audit['content_id']])->update($data);
+            if (!$res) {
                 Db::rollback();
-                $this->error('审核失败4！');
+                $this->error('审核失败!');
             }
-            Db::commit();
-            $this->success('操作成功', url('company/person_list'));
+        } elseif ($audit['edit'] != 0 && $status == 1) {
+            // 编辑信息审核成功，替换数据
+            $data = json_decode($audit['data'], true);
+            isset($data['images']) && $data['images'] = json_encode($data['images']);
+            $res = Db::name('person')->where(['user_id' => $audit['content_id']])->update($data);
+            if (!$res) {
+                Db::rollback();
+                $this->error('审核失败!');
+            }
         }
+        $person = Db::name('person')->where(['user_id' => $audit['content_id']])->field('user_id,job_type')->find();
+        if ($status == 1 && $audit['edit'] == 0) {
+            // 注册审核成功，根据求职类型返佣
+            $balance = Db::name('member')->where(['id' => $person['user_id']])->value('balance');
+            $money = Db::name('category')->where(['cat_id' => $person['job_type']])->value('money');
+            $member_balance = bcadd($balance, $money);
+            $res = Db::name('member')->where(['id' => $person['user_id']])->update(['balance' => $member_balance]);
+            if ($money > 0 && !$res) {
+                Db::rollback();
+                $this->error('审核失败!');
+            }
+
+            // 余额记录
+            $res = Db::name('member_balance_log')->insert([
+                'user_id' => $person['user_id'], 'money' => $money, 'old_balance' => $balance, 'balance' => $member_balance,
+                'source_type' => 8, 'log_type' => 1, 'source_id' => $person['user_id'], 'note' => '注册成功', 'create_time' => time()
+            ]);
+            if (!$res) {
+                Db::rollback();
+                $this->error('审核失败！');
+            }
+        }
+        $res = Db::name('audit')->where(['id' => $id])->update([
+            'remark' => $content,
+            'status' => $status
+        ]);
+        if (!$res) {
+            Db::rollback();
+            $this->error('审核失败！');
+        }
+        Db::commit();
+        $this->success('操作成功', url('company/person_list'));
 
     }
 

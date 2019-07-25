@@ -93,14 +93,33 @@ class Person extends ApiBase
     // 信息
     public function info()
     {
-        $data = Db::name('person')->where(['user_id' => $this->get_user_id()])
-            ->field('id,name,gender,avatar,age,nation,work_age,daogang_time,salary,job_type,desc,experience,education')->find();
-        if(!$data){
-            $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在或者用户类型不对，请重新操作']);
+        $user_id=$this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
-        $data['gender'] = $data['gender'] == 'male' ? 1 : 2;
-        $data['avatar'] = SITE_URL . $data['avatar'];
-        $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
+
+        $audit=Db::name('audit')->where(['content_id'=>$user_id])->order('id DESC')->find();
+        if($audit['status']==1){
+            $data = Db::name('person')->where(['user_id' => $this->get_user_id()])
+                ->field('id,name,gender,avatar,age,nation,work_age,daogang_time,salary,job_type,desc,experience,education')->find();
+            if(!$data){
+                $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在或者用户类型不对，请重新操作']);
+            }
+            $data['is_edit']=$audit['status'];
+            $data['gender'] = $data['gender'] == 'male' ? 1 : 2;
+            $data['avatar'] = SITE_URL . $data['avatar'];
+            $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
+        }else{
+            $data=json_decode($audit['data'],true);
+            $data['gender'] = $data['gender'] == 'male' ? 1 : 2;
+            if(empty($data['avatar'])&&$data['avatar']){
+                $data['avatar'] = SITE_URL . $data['avatar'];
+            }
+            $data['is_edit']=$audit['status'];//是否可编辑
+            $data['remark']=$audit['remark'];
+            $this->ajaxReturn(['status' => 1, 'msg' => '请1求成功', 'data' => $data]);
+        }
+
     }
 
     // 编辑信息
@@ -120,10 +139,10 @@ class Person extends ApiBase
         unset($data['token'], $data['person_desc']);
 
         Db::startTrans();
-        if (!$this->_person->daogang_time && !$this->_person->save($data)) {
-            Db::rollback();
-            $this->ajaxReturn(['status' => -2, 'msg' => '保存失败！']);
-        }
+//        if (!$this->_person->daogang_time && !$this->_person->save($data)) {
+//            Db::rollback();
+//            $this->ajaxReturn(['status' => -2, 'msg' => '保存失败！']);
+//        }
         $res = Db::name('audit')->insert([
             'type' => 3,
             'content_id' => $this->_person->user_id,

@@ -38,18 +38,45 @@ class Company extends ApiBase
     public function info()
     {
         $this->getCompany();
-        $data = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement')
-            ->where(['user_id' => $this->get_user_id()])->find();
-        if (!$data) {
-            return $this->ajaxReturn(['status' => -2, 'msg' => '不存在的信息']);
+        $user_id=$this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
-        $data['logo'] = SITE_URL . $data['logo'];
-        $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
-        $data['open_year'] = $open ? $open[0] : '';
-        $data['open_month'] = $open ? $open[1] : '';
-        $data['open_day'] = $open ? $open[2] : '';
 
-        $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
+        $audit=Db::name('audit')->where(['content_id'=>$user_id])->order('id DESC')->find();
+        $company = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement')
+            ->where(['user_id' => $this->get_user_id()])->find();
+        if($audit['status']==1){
+            $data = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement')
+                ->where(['user_id' => $this->get_user_id()])->find();
+            if (!$data) {
+                return $this->ajaxReturn(['status' => -2, 'msg' => '不存在的信息']);
+            }
+            if($data['logo']){
+                $data['logo'] = SITE_URL . $data['logo'];
+            }
+            $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
+            $data['open_year'] = $open ? $open[0] : '';
+            $data['open_month'] = $open ? $open[1] : '';
+            $data['open_day'] = $open ? $open[2] : '';
+            $data['is_edit']=$audit['status'];
+            $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
+        }else{
+            $data=json_decode($audit['data'],true);
+            if(empty($company['logo'])&&$company['logo']){
+                $data['logo'] = SITE_URL . $company['logo'];
+            }else{
+                $data['logo']='';
+            }
+            $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
+            $data['open_year'] = $open ? $open[0] : '';
+            $data['open_month'] = $open ? $open[1] : '';
+            $data['open_day'] = $open ? $open[2] : '';
+            $data['is_edit']=$audit['status'];//是否可编辑
+            $data['remark']=$audit['remark'];
+            $this->ajaxReturn(['status' => 1, 'msg' => '请1求成功', 'data' => $data]);
+        }
+
     }
 
     // 编辑信息

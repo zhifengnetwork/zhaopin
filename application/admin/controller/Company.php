@@ -26,7 +26,7 @@ class Company extends Common
 
     function company_list($regtype){
         $where =  ['type'=>$regtype,'status'=>0];
-        $pageParam['query']=['regtype'=>$regtype,'status'=>0];
+        $pageParam['query']=['type'=>$regtype,'status'=>0];
         return Audit::where($where)
             ->paginate(10,false,$pageParam);
     }

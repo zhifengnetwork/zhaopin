@@ -1,0 +1,78 @@
+{extend name="common:base" /}
+
+{block name="content"}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$meta_title}</h5>
+                    <div class="pull-right" style="margin-top:-8px;">
+                        <a class="btn btn-info" href="{:url('message/edit')}"><i class="fa fa-plus"></i> 新增</a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>标题</th>
+                                    <th>内容</th>
+                                    <th>显示</th>
+                                    <th>创建时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {notempty name="list"}
+                                {volist name="list" id="vo"}
+                                <tr>
+                                    <td>{$vo.id}</td>
+                                    <td title="{$vo.title}">{$vo.title|getSubstr=0,18}</td>
+                                    <td title="{$vo.content}">{$vo.content|getSubstr=0,25}</td>
+                                    <td align="left" axis="col0" data-show="{$vo.show}" data-id="{$vo.id}">
+                                        <div style="text-align: left; width: 50px;">
+                                            {if condition='$vo.show eq 1'}
+                                            <span onClick="change_show(this)">
+                                            <i class="fa fa-check-circle"></i>显示</span>
+                                            {else/}
+                                            <span onClick="change_show(this)">
+                                            <i class="fa fa-ban"></i>隐藏</span>
+                                            {/if}
+                                        </div>
+                                    </td>
+                                    <td>{$vo.create_time}</td>
+                                    <td>
+                                        <a class="btn btn-default" href="{:url('message/edit',array('id'=>$vo['id']))}"><i class="fa fa-edit"></i> 编辑</a>
+                                    </td>
+                                </tr>
+                                {/volist}
+                                {/notempty}
+                            </tbody>
+                        </table>
+                        {$list->render()}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+{block name='script'}
+<script>
+    function change_show(el) {
+        var td = $(el).closest('td'),
+            show = td.data('show'),
+            id = td.data('id'),
+            value = !show ? 1 : 0,
+            src = show == 1 ? '<i class="fa fa-ban"></i>隐藏' : '<i class="fa fa-check-circle"></i>显示</span>';
+        $.post("{:url('Message/show')}", {'id': id, 'value': value}, function (data) {
+            if (data.code == 1) {
+                updateAlert(data.msg, 'alert-success');
+                $(el).html(src);
+            } else {
+                updateAlert(data.msg, 'alert-danger');
+            }
+        }, 'json');
+    }
+</script>
+{/block}

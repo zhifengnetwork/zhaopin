@@ -56,6 +56,30 @@ return [
                     ],
                 ],
             ],
+            [
+                'id'    => 50500,
+                'title' => '系统消息',
+                'sort'  => 1,
+                'url'   => 'message/index',
+                'hide'  => 1,
+                'icon'  => 'fa-th-large',
+                'child' => [
+                    [
+                        'id'    => 50501,
+                        'title' => '系统消息列表',
+                        'sort'  => 1,
+                        'url'   => 'message/index',
+                        'hide'  => 1,
+                    ],
+                    [
+                        'id'    => 50502,
+                        'title' => '系统消息编辑',
+                        'sort'  => 1,
+                        'url'   => 'message/edit',
+                        'hide'  => 0,
+                    ],
+                ],
+            ],
         ],
     ],
 

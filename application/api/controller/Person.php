@@ -112,7 +112,7 @@ class Person extends ApiBase
         }else{
             $data=json_decode($audit['data'],true);
             $data['gender'] = $data['gender'] == 'male' ? 1 : 2;
-            if(empty($data['avatar'])&&$data['avatar']){
+            if(isset($data['avatar'])&&$data['avatar']){
                 $data['avatar'] = SITE_URL . $data['avatar'];
             }
             $data['is_edit']=$audit['status'];//是否可编辑
@@ -296,6 +296,9 @@ class Person extends ApiBase
             $this->ajaxReturn(['status' => -2, 'msg' => '提现金额不能大于最大金额'.$max_money,'data'=>[]]);
         }
         $member=Db::name('member')->where(['id'=>$user_id])->find();
+        if($money>$member['balance']){
+            $this->ajaxReturn(['status' => -2, 'msg' => '提现失败，余额不足'.$money,'data'=>[]]);
+        }
         $poundage=sprintf("%.2f",$money*$percent/100);;//手续费
         $order_money=$money-$poundage;
         if($pay_tpye==2){//微信

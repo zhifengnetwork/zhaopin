@@ -74,7 +74,7 @@ class Company extends ApiBase
             }else{
                 $data['logo']='';
             }
-            if(!empty($data['open_time'])&&$data['open_time']){
+            if(isset($data['open_time'])&&$data['open_time']){
                 $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
                 $data['open_year'] = $open ? $open[0] : '';
                 $data['open_month'] = $open ? $open[1] : '';

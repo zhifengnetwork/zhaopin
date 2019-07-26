@@ -45,14 +45,35 @@ class Company extends ApiBase
         $member=Db::name('member')->where(['id'=>$user_id])->find();
         $regtype=$member['regtype'];
         $audit=Db::name('audit')->where(['content_id'=>$user_id])->where(['type'=>$regtype,'edit'=>1])->order('id DESC')->find();
-        if(!$audit){
-            $this->ajaxReturn(['status' => -2, 'msg' => '审核未通过，暂不可编辑']);
-        }
-        $company = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement')
+        $company = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement,status')
             ->where(['user_id' => $this->get_user_id()])->find();
+        if($company['status']==0){
+            $this->ajaxReturn(['status' => -3, 'msg' => '审核未通过，暂不可编辑']);
+        }elseif (!$audit) {
+            $data = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement')
+                ->where(['user_id' => $user_id])->find();
+            if (!$data) {
+                return $this->ajaxReturn(['status' => -2, 'msg' => '不存在的信息']);
+            }
+            if($data['logo']){
+                $data['logo'] = SITE_URL . $data['logo'];
+            }
+            if($data['open_time']){
+                $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
+                $data['open_year'] = $open ? $open[0] : '';
+                $data['open_month'] = $open ? $open[1] : '';
+                $data['open_day'] = $open ? $open[2] : '';
+            }else{
+                $data['open_year'] =  '';
+                $data['open_month'] = '';
+                $data['open_day'] =  '';
+            }
+            $data['is_edit']=$audit['status'];
+            $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
+        }
         if($audit['status']==1){
             $data = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement')
-                ->where(['user_id' => $this->get_user_id()])->find();
+                ->where(['user_id' => $user_id])->find();
             if (!$data) {
                 return $this->ajaxReturn(['status' => -2, 'msg' => '不存在的信息']);
             }

@@ -570,6 +570,7 @@ class User extends ApiBase
         $adList = Advertisement::getList();
         $member=Db::name('member')->where(['id'=>$user_id])->find();
         $regtype=$member['regtype'];
+        $kw=input('kw');
         if($regtype==1||$regtype==2){
             // 热招
 
@@ -578,12 +579,17 @@ class User extends ApiBase
             }else{
                 $rt=1;
             }
+            $where=[];
+            if($kw){
+                $where['r.title'] = ['like', '%' . $kw . '%'];
+            }
             $list = Db::name('recruit')
                 ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
                 ->alias('r')
                 ->join('company c', 'c.id=r.company_id', 'LEFT')
                 ->join('member m', 'c.user_id=m.id', 'LEFT')
                 ->limit(6)
+                ->where($where)
                 ->where(['r.is_hot' => 1, 'r.status' => 1,'m.regtype'=>$rt])->select();
 
             $company_id = Db::name('company')->where(['user_id'=>$user_id])->value('id');
@@ -620,6 +626,9 @@ class User extends ApiBase
             if($district){
                 $where['c.district']=$district;
             }
+            if($kw){
+                $where['r.title'] = ['like', '%' . $kw . '%'];
+            }
             $list = Db::name('recruit')
                 ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
                 ->alias('r')
@@ -653,6 +662,7 @@ class User extends ApiBase
                 ->join('member m', 'm.id = p.user_id', 'LEFT')
                 ->where(['p.user_id' => $user_id])->find();
             $data['avatar']=SITE_URL.$data['avatar'];
+            $data['user_id']=$user_id;
         } else {
             $data = Db::name('company')->alias('c')
                 ->field('c.id,c.contacts,c.logo,m.openid,c.vip_time,m.mobile,c.vip_type,c.company_name,c.status,c.is_vip')
@@ -665,6 +675,7 @@ class User extends ApiBase
 //                $num=look_num($data['id']);
             }
             $data['number']=$num;
+            $data['user_id']=$user_id;
         }
         $this->ajaxReturn(['status' => 1, 'msg' => '获取成功！', 'data' => $data]);
     }

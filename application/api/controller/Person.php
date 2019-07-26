@@ -299,7 +299,7 @@ class Person extends ApiBase
         $poundage=sprintf("%.2f",$money*$percent/100);;//手续费
         $order_money=$money-$poundage;
         if($pay_tpye==2){//微信
-
+            $this->ajaxReturn(['status' => -2, 'msg' => '微信支付暂时未开通，请等待','data'=>[]]);
         }elseif($pay_tpye==4){//支付宝   后台审核
             $alipay=input('alipay');
             $alipay_name=input('alipay_name');

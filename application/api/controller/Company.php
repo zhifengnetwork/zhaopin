@@ -55,10 +55,16 @@ class Company extends ApiBase
             if($data['logo']){
                 $data['logo'] = SITE_URL . $data['logo'];
             }
-            $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
-            $data['open_year'] = $open ? $open[0] : '';
-            $data['open_month'] = $open ? $open[1] : '';
-            $data['open_day'] = $open ? $open[2] : '';
+            if($data['open_time']){
+                $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
+                $data['open_year'] = $open ? $open[0] : '';
+                $data['open_month'] = $open ? $open[1] : '';
+                $data['open_day'] = $open ? $open[2] : '';
+            }else{
+                $data['open_year'] =  '';
+                $data['open_month'] = '';
+                $data['open_day'] =  '';
+            }
             $data['is_edit']=$audit['status'];
             $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
         }else{
@@ -68,10 +74,16 @@ class Company extends ApiBase
             }else{
                 $data['logo']='';
             }
-            $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
-            $data['open_year'] = $open ? $open[0] : '';
-            $data['open_month'] = $open ? $open[1] : '';
-            $data['open_day'] = $open ? $open[2] : '';
+            if($data['open_time']){
+                $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
+                $data['open_year'] = $open ? $open[0] : '';
+                $data['open_month'] = $open ? $open[1] : '';
+                $data['open_day'] = $open ? $open[2] : '';
+            }else{
+                $data['open_year'] = '';
+                $data['open_month'] =  '';
+                $data['open_day'] = '';
+            }
             $data['is_edit']=$audit['status'];//是否可编辑
             $data['remark']=$audit['remark'];
             $this->ajaxReturn(['status' => 1, 'msg' => '请1求成功', 'data' => $data]);

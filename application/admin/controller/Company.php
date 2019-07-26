@@ -239,11 +239,12 @@ class Company extends Common
      */
     public function audit_list()
     {
-        $where =  ['type'=>4,'status'=>0];
-        $pageParam['query']=['type'=>4,'status'=>0];
-        $list=Audit::where($where)->order('id desc')
+        $where =  ['a.type'=>4,'a.status'=>0];
+        $pageParam['query']=['a.type'=>4,'a.status'=>0];
+        $list=Audit::where($where)->field('a.*')->order('a.id desc')->alias('a')
+            ->join('recruit r','a.content_id=r.id')
             ->paginate(10,false,$pageParam);
-
+        
         return $this->fetch('',[
             'list'         =>$list,
             'meta_title'   => '职位审核列表',

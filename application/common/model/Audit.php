@@ -24,7 +24,7 @@ class Audit extends Model
             ->field('c.id as c_id,c.company_name,r.id as r_id')
             ->join('recruit r','r.id = a.content_id','LEFT')
             ->join('company c','r.company_id = c.id','LEFT')
-            ->where(['a.id'=>$data['content_id']])->find();
+            ->where(['a.id'=>$data['id']])->find();
     }
 
     public function getMemberDataAttr($value, $data){

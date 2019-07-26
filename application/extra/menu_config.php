@@ -475,6 +475,13 @@ return [
                         'url'   => 'company/person_details',
                         'hide'  => 0,
                     ],
+                    [
+                        'id'    => 91006,
+                        'title' => '个人证书审核',
+                        'sort'  => 4,
+                        'url'   => 'company/person_pic',
+                        'hide'  => 1,
+                    ],
                 ],
             ],
         ],

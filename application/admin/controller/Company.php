@@ -104,7 +104,7 @@ class Company extends Common
         if ($status != -1 && $status != 1) $this->error('状态错误');
 
         $id = input('id/d');
-        $audit = Db::name('audit')->where(['id' => $id])->find();
+        $audit = Db::name('audit')->where(['id' => $id,'type'=>3])->find();
         if (!$audit || $audit['status'] != 0) $this->error('数据没有找到或不能操作');
 
         $content = input('content');
@@ -240,7 +240,7 @@ class Company extends Common
     public function audit_list()
     {
         $where =  ['type'=>4,'status'=>0];
-        $pageParam['query']=['regtype'=>4,'status'=>0];
+        $pageParam['query']=['type'=>4,'status'=>0];
         $list=Audit::where($where)->order('id desc')
             ->paginate(10,false,$pageParam);
 
@@ -258,7 +258,7 @@ class Company extends Common
         }
         $id = input('id/d');
 
-        $audit=Db::name('audit')->where(['id'=>$id])->find();
+        $audit=Db::name('audit')->where(['id'=>$id,'type'=>4])->find();
         if (!$audit || $audit['status'] != 0) {
             $this->error('数据没有找到或不能操作');
         }
@@ -302,5 +302,51 @@ class Company extends Common
             return json(['code'=>0, 'msg'=>'修改失败！','data'=>[]]);
         }
 
+    }
+
+    public function person_pic(){
+        $where =  ['type'=>6,'status'=>0];
+        $pageParam['query']=['regtype'=>6,'status'=>0];
+        $list=Audit::where($where)->order('id desc')
+            ->paginate(10,false,$pageParam);
+
+        return $this->fetch('',[
+            'list'         =>$list,
+            'meta_title'   => '个人证书审核',
+        ]);
+    }
+
+    public function pic_audit(){
+        $status = input('status/d');
+        if ($status != -1 && $status != 1) $this->error('状态错误');
+
+        $id = input('id/d');
+        $audit = Db::name('audit')->where(['id' => $id,'type'=>6])->find();
+        if (!$audit || $audit['status'] != 0) $this->error('数据没有找到或不能操作');
+
+        $content = input('content');
+        if ($status == -1 && !$content) $this->error('内容不能为空');
+
+        Db::startTrans();
+        if ($status == 1) {
+            // 编辑信息审核成功，替换数据
+            $res = Db::name('person')->where(['user_id' => $audit['content_id']])->update([
+                'images' => $audit['data']
+            ]);
+            if (!$res) {
+                Db::rollback();
+                $this->error('审核失败!');
+            }
+        }
+        $res = Db::name('audit')->where(['id' => $id])->update([
+            'remark' => $content,
+            'status' => $status
+        ]);
+        if (!$res) {
+            Db::rollback();
+            $this->error('审核失败！');
+        }
+        Db::commit();
+        $this->success('操作成功', url('company/person_pic'));
     }
 }

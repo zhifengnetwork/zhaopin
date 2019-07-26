@@ -1121,21 +1121,29 @@ class User extends ApiBase
         $type = Db::name('member')->where(['id' => $user_id])->value('regtype');
         if (!$type) $this->ajaxReturn(['status' => -2, 'msg' => '请求失败']);
         if ($type == 3) {
-            $images = Db::name('person')->where(['id' => $user_id])->value('images');
+            $images = Db::name('person')->where(['user_id' => $user_id])->value('images');
         } else {
-            $images= Db::name('company')->where(['id' => $user_id])->value('images');
+            $images= Db::name('company')->where(['user_id' => $user_id])->value('images');
         }
         if (!$images) $this->ajaxReturn(['status' => -2, 'msg' => '请求失败']);
-        $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => ['image' => json_decode($images)]]);
+        $images=json_decode($images,true);
+        foreach ($images as $key=>$value){
+            $images[$key]['path']=SITE_URL.$images[$key]['path'];
+        }
+        $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => ['image' =>$images ]]);
     }
 
     // 资料管理
     public function edit_images()
     {
         $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
         $type = Db::name('member')->where(['id' => $user_id])->value('regtype');
         if (!$type) $this->ajaxReturn(['status' => -2, 'msg' => '请求失败']);
         $table = $type == 3 ? 'person' : 'company';
+        $a_type=$type == 3 ? 6 : 5;
         if (!Db::name($table)->where(['user_id' => $user_id])->find()) {
             $this->ajaxReturn(['status' => -2, 'msg' => '保存失败']);
         }
@@ -1148,7 +1156,13 @@ class User extends ApiBase
                 'title' => isset($title[$k]) ? $title[$k] : ''
             ];
         }
-        if (Db::name($table)->where(['user_id' => $user_id])->update(['images' => json_encode($images,JSON_UNESCAPED_UNICODE)])) {
+        $res = Db::name('audit')->insert([
+            'type'=>$a_type,
+            'content_id'=>$user_id,
+            'data'=>json_encode($images,JSON_UNESCAPED_UNICODE),
+            'create_time'=>time()
+        ]);
+        if ($res) {
             $this->ajaxReturn(['status' => 1, 'msg' => '保存成功']);
         }
         $this->ajaxReturn(['status' => -2, 'msg' => '保存失败']);

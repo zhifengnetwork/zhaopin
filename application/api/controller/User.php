@@ -651,7 +651,80 @@ class User extends ApiBase
         }
 
     }
+    public function search(){
+        $user_id = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $member=Db::name('member')->where(['id'=>$user_id])->find();
+        $regtype=$member['regtype'];
+        $kw=input('kw');
+        $page=input('page',1);
+        $rows=input('rows',10);
+        $start=($page-1)*$rows;
+        if($regtype==1||$regtype==2){
+            // 热招
+            if($regtype==1){
+                $rt=2;
+            }else{
+                $rt=1;
+            }
+            $where=[];
+            if($kw){
+                $where['r.title'] = ['like', '%' . $kw . '%'];
+            }
+            $list = Db::name('recruit')
+                ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
+                ->alias('r')
+                ->join('company c', 'c.id=r.company_id', 'LEFT')
+                ->join('member m', 'c.user_id=m.id', 'LEFT')
+                ->limit($start,$rows)
+                ->where($where)
+                ->where(['r.is_hot' => 1, 'r.status' => 1,'m.regtype'=>$rt])->select();
 
+            $company_id = Db::name('company')->where(['user_id'=>$user_id])->value('id');
+            $where=['p.status'=>1,'p.reserve_c' => [['=', 0], ['=', $company_id], 'or']];
+            $where['p.name']=['like', '%' . $kw . '%'];
+            // 找活
+            $person = Db::name('person')
+                ->alias('p')
+                ->field('p.id,p.avatar,p.name,p.job_type,p.work_age,p.images')
+                ->where($where)
+                ->limit($start,$rows)
+                ->select();
+            foreach ($person as &$v) {
+                $v['job_type'] = Category::getNameById($v['job_type']) ?: '';
+                $v['images'] = $v['images']!='[]' ? 1 : 0;
+            }
+            $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
+                'data' => ['recruit' => $list, 'person' => $person]
+            ]);
+        }elseif ($regtype==3){
+            $where=[];
+            if($kw){
+                $where['r.title'] = ['like', '%' . $kw . '%'];
+            }
+            $list = Db::name('recruit')
+                ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
+                ->alias('r')
+                ->join('company c', 'c.id=r.company_id', 'LEFT')
+                ->join('member m', 'c.user_id=m.id', 'LEFT')
+                ->where($where)
+                ->limit($start,$rows)
+                ->where([ 'r.status' => 1,'m.regtype'=>1])->select();
+            $person = Db::name('recruit')
+                ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
+                ->alias('r')
+                ->join('company c', 'c.id=r.company_id', 'LEFT')
+                ->join('member m', 'c.user_id=m.id', 'LEFT')
+                ->where($where)
+                ->limit($start,$rows)
+                ->where([ 'r.status' => 1,'m.regtype'=>2])->select();
+            $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
+                'data' => [ 'recruit' => $list, 'person' => $person]
+            ]);
+        }
+    }
     public function index()
     {
         $user_id = $this->get_user_id();

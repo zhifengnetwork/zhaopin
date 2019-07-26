@@ -42,8 +42,12 @@ class Company extends ApiBase
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
-
-        $audit=Db::name('audit')->where(['content_id'=>$user_id])->order('id DESC')->find();
+        $member=Db::name('member')->where(['id'=>$user_id])->find();
+        $regtype=$member['regtype'];
+        $audit=Db::name('audit')->where(['content_id'=>$user_id])->where(['type'=>$regtype,'edit'=>1])->order('id DESC')->find();
+        if(!$audit){
+            $this->ajaxReturn(['status' => -2, 'msg' => '审核未通过，暂不可编辑']);
+        }
         $company = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement')
             ->where(['user_id' => $this->get_user_id()])->find();
         if($audit['status']==1){

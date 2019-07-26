@@ -98,7 +98,10 @@ class Person extends ApiBase
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
 
-        $audit=Db::name('audit')->where(['content_id'=>$user_id])->order('id DESC')->find();
+        $audit=Db::name('audit')->where(['content_id'=>$user_id])->where(['type'=>3])->where(['edit'=>1])->order('id DESC')->find();
+        if(!$audit){
+            $this->ajaxReturn(['status' => -2, 'msg' => '审核未通过，暂不可编辑']);
+        }
         if($audit['status']==1){
             $data = Db::name('person')->where(['user_id' => $this->get_user_id()])
                 ->field('id,name,gender,avatar,age,nation,work_age,daogang_time,salary,job_type,desc,experience,education')->find();
@@ -114,10 +117,12 @@ class Person extends ApiBase
             $data['gender'] = $data['gender'] == 'male' ? 1 : 2;
             if(isset($data['avatar'])&&$data['avatar']){
                 $data['avatar'] = SITE_URL . $data['avatar'];
+            }else{
+                $data['avatar']='';
             }
             $data['is_edit']=$audit['status'];//是否可编辑
             $data['remark']=$audit['remark'];
-            $this->ajaxReturn(['status' => 1, 'msg' => '请1求成功', 'data' => $data]);
+            $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
         }
 
     }

@@ -101,19 +101,9 @@ class Person extends ApiBase
         $audit=Db::name('audit')->where(['content_id'=>$user_id])->where(['type'=>3])->where(['edit'=>1])->order('id DESC')->find();
         $status = Db::name('person')->where(['user_id' => $this->get_user_id()])->value('status');
         if($status==0){
-            $this->ajaxReturn(['status' => -3, 'msg' => '审核未通过，暂不可编辑']);
-        }elseif (!$audit){
-            $data = Db::name('person')->where(['user_id' => $this->get_user_id()])
-                ->field('id,name,gender,avatar,age,nation,work_age,daogang_time,salary,job_type,desc,experience,education')->find();
-            if(!$data){
-                $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在或者用户类型不对，请重新操作']);
-            }
-            $data['is_edit']=$audit['status'];
-            $data['gender'] = $data['gender'] == 'male' ? 1 : 2;
-            $data['avatar'] = SITE_URL . $data['avatar'];
-            $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
+            $this->ajaxReturn(['status' => -3, 'msg' => '审核中，暂不可编辑']);
         }
-        if($audit['status']==1){
+        if (!$audit){
             $data = Db::name('person')->where(['user_id' => $this->get_user_id()])
                 ->field('id,name,gender,avatar,age,nation,work_age,daogang_time,salary,job_type,desc,experience,education')->find();
             if(!$data){
@@ -124,17 +114,43 @@ class Person extends ApiBase
             $data['avatar'] = SITE_URL . $data['avatar'];
             $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
         }else{
-            $data=json_decode($audit['data'],true);
-            $data['gender'] = $data['gender'] == 'male' ? 1 : 2;
-            if(isset($data['avatar'])&&$data['avatar']){
+            if($audit['status']==1){
+                $data = Db::name('person')->where(['user_id' => $this->get_user_id()])
+                    ->field('id,name,gender,avatar,age,nation,work_age,daogang_time,salary,job_type,desc,experience,education')->find();
+                if(!$data){
+                    $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在或者用户类型不对，请重新操作']);
+                }
+                $data['is_edit']=$audit['status'];
+                $data['gender'] = $data['gender'] == 'male' ? 1 : 2;
                 $data['avatar'] = SITE_URL . $data['avatar'];
+                $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
+            }elseif($audit['status']==0){
+                $data=json_decode($audit['data'],true);
+                $data['gender'] = $data['gender'] == 'male' ? 1 : 2;
+                if(isset($data['avatar'])&&$data['avatar']){
+                    $data['avatar'] = SITE_URL . $data['avatar'];
+                }else{
+                    $data['avatar']='';
+                }
+                $data['is_edit']=$audit['status'];//是否可编辑
+                $data['remark']=$audit['remark'];
+                $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
+            }elseif($audit['status']==-1){
+                $data=json_decode($audit['data'],true);
+                $data['gender'] = $data['gender'] == 'male' ? 1 : 2;
+                if(isset($data['avatar'])&&$data['avatar']){
+                    $data['avatar'] = SITE_URL . $data['avatar'];
+                }else{
+                    $data['avatar']='';
+                }
+                $data['is_edit']=1;//是否可编辑
+                $data['remark']=$audit['remark'];
+                $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
             }else{
-                $data['avatar']='';
+                $this->ajaxReturn(['status' => -2, 'msg' => '用户编辑信息状态异常！']);
             }
-            $data['is_edit']=$audit['status'];//是否可编辑
-            $data['remark']=$audit['remark'];
-            $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
         }
+
 
     }
 

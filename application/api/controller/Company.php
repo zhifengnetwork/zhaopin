@@ -48,30 +48,9 @@ class Company extends ApiBase
         $company = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement,status')
             ->where(['user_id' => $this->get_user_id()])->find();
         if($company['status']==0){
-            $this->ajaxReturn(['status' => -3, 'msg' => '审核未通过，暂不可编辑']);
-        }elseif (!$audit) {
-            $data = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement')
-                ->where(['user_id' => $user_id])->find();
-            if (!$data) {
-                return $this->ajaxReturn(['status' => -2, 'msg' => '不存在的信息']);
-            }
-            if($data['logo']){
-                $data['logo'] = SITE_URL . $data['logo'];
-            }
-            if($data['open_time']){
-                $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
-                $data['open_year'] = $open ? $open[0] : '';
-                $data['open_month'] = $open ? $open[1] : '';
-                $data['open_day'] = $open ? $open[2] : '';
-            }else{
-                $data['open_year'] =  '';
-                $data['open_month'] = '';
-                $data['open_day'] =  '';
-            }
-            $data['is_edit']=$audit['status'];
-            $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
+            $this->ajaxReturn(['status' => -3, 'msg' => '审核中，暂不可编辑']);
         }
-        if($audit['status']==1){
+        if (!$audit) {
             $data = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement')
                 ->where(['user_id' => $user_id])->find();
             if (!$data) {
@@ -90,30 +69,74 @@ class Company extends ApiBase
                 $data['open_month'] = '';
                 $data['open_day'] =  '';
             }
-            $data['is_edit']=$audit['status'];
+            $data['is_edit']=1;
             $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
         }else{
-            $data=json_decode($audit['data'],true);
-            if(empty($company['logo'])&&$company['logo']){
-                $data['logo'] = SITE_URL . $company['logo'];
+            if($audit['status']==1){
+                $data = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement')
+                    ->where(['user_id' => $user_id])->find();
+                if (!$data) {
+                    return $this->ajaxReturn(['status' => -2, 'msg' => '不存在的信息']);
+                }
+                if($data['logo']){
+                    $data['logo'] = SITE_URL . $data['logo'];
+                }
+                if($data['open_time']){
+                    $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
+                    $data['open_year'] = $open ? $open[0] : '';
+                    $data['open_month'] = $open ? $open[1] : '';
+                    $data['open_day'] = $open ? $open[2] : '';
+                }else{
+                    $data['open_year'] =  '';
+                    $data['open_month'] = '';
+                    $data['open_day'] =  '';
+                }
+                $data['is_edit']=$audit['status'];
+                $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
+            }elseif($audit['status']==0){
+                $data=json_decode($audit['data'],true);
+                if(empty($company['logo'])&&$company['logo']){
+                    $data['logo'] = SITE_URL . $company['logo'];
+                }else{
+                    $data['logo']='';
+                }
+                if(isset($data['open_time'])&&$data['open_time']){
+                    $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
+                    $data['open_year'] = $open ? $open[0] : '';
+                    $data['open_month'] = $open ? $open[1] : '';
+                    $data['open_day'] = $open ? $open[2] : '';
+                }else{
+                    $data['open_year'] = '';
+                    $data['open_month'] =  '';
+                    $data['open_day'] = '';
+                }
+                $data['is_edit']=$audit['status'];//是否可编辑
+                $data['remark']=$audit['remark'];
+                $this->ajaxReturn(['status' => 1, 'msg' => '请1求成功', 'data' => $data]);
+            }elseif ($audit['status']==-1){
+                $data=json_decode($audit['data'],true);
+                if(empty($company['logo'])&&$company['logo']){
+                    $data['logo'] = SITE_URL . $company['logo'];
+                }else{
+                    $data['logo']='';
+                }
+                if(isset($data['open_time'])&&$data['open_time']){
+                    $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
+                    $data['open_year'] = $open ? $open[0] : '';
+                    $data['open_month'] = $open ? $open[1] : '';
+                    $data['open_day'] = $open ? $open[2] : '';
+                }else{
+                    $data['open_year'] = '';
+                    $data['open_month'] =  '';
+                    $data['open_day'] = '';
+                }
+                $data['is_edit']=1;//是否可编辑
+                $data['remark']=$audit['remark'];
+                $this->ajaxReturn(['status' => 1, 'msg' => '请1求成功', 'data' => $data]);
             }else{
-                $data['logo']='';
+                $this->ajaxReturn(['status' => -2, 'msg' => '编辑信息状态异常！']);
             }
-            if(isset($data['open_time'])&&$data['open_time']){
-                $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
-                $data['open_year'] = $open ? $open[0] : '';
-                $data['open_month'] = $open ? $open[1] : '';
-                $data['open_day'] = $open ? $open[2] : '';
-            }else{
-                $data['open_year'] = '';
-                $data['open_month'] =  '';
-                $data['open_day'] = '';
-            }
-            $data['is_edit']=$audit['status'];//是否可编辑
-            $data['remark']=$audit['remark'];
-            $this->ajaxReturn(['status' => 1, 'msg' => '请1求成功', 'data' => $data]);
         }
-
     }
 
     // 编辑信息

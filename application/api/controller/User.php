@@ -1296,13 +1296,14 @@ class User extends ApiBase
         if (!Db::name($table)->where(['user_id' => $user_id])->find()) {
             $this->ajaxReturn(['status' => -2, 'msg' => '保存失败']);
         }
-        $data = input('image');
-        $title = input('title');
+
+
+        $data = input();
         $images = [];
-        foreach ($data as $k => $image) {
+        foreach ($data['image'] as $k => $image) {
             $images[] = [
                 'path' => str_replace(SITE_URL, '', $image),
-                'title' => isset($title[$k]) ? $title[$k] : ''
+                'title' => isset($data['title'][$k]) ? $data['title'][$k] : ''
             ];
         }
         $res = Db::name('audit')->insert([

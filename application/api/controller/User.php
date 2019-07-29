@@ -368,10 +368,8 @@ class User extends ApiBase
      */
     public function register()
     {
-//        $user_id = $this->get_user_id();
-//        if (!$user_id || !($member = Member::get($user_id))) {
-//            $this->ajaxReturn(['status' => -2, 'msg' => '用户错误']);
-//        }
+        $register=input('register',0);
+
         $type = input('type');
         if (!key_exists($type, Member::$_registerType)) {// 1公司，2第三方,3个人
             $this->ajaxReturn(['status' => -2, 'msg' => '类型选择错误']);
@@ -399,19 +397,40 @@ class User extends ApiBase
         } else if (!$res) {
             $this->ajaxReturn(['status' => -2, 'msg' => '验证码错误！', 'data' => '']);
         }
-        $data['salt'] = create_salt();
-        $data['password'] = md5($data['salt'] . $pwd);
-        $data['regtype'] = $type;
-        $data['mobile'] = $mobile;
-        $data['createtime'] = time();
-        $id = Db::name('member')->insertGetId($data);
-        if (!$id) {
-            $this->ajaxReturn(['status' => -2, 'msg' => '注册失败，请重试！', 'data' => '']);
+        if($register){//微信登陆绑定手机
+            $user_id = $this->get_user_id();
+            if (!$user_id || !($member = Member::get($user_id))) {
+                $this->ajaxReturn(['status' => -2, 'msg' => '用户错误']);
+            }
+            $data['salt'] = create_salt();
+            $data['password'] = md5($data['salt'] . $pwd);
+            $data['regtype'] = $type;
+            $data['mobile'] = $mobile;
+            $data['createtime'] = time();
+            $res=Db::name('member')->where(['id'=>$user_id])->update($data);
+            if(!$res){
+                $this->ajaxReturn(['status' => -2, 'msg' => '注册失败，请重试！', 'data' => '']);
+            }
+            $data_user['token'] = $this->create_token($user_id);
+            $data_user['mobile'] = $mobile;
+            $data_user['id'] = $user_id;
+            $this->ajaxReturn(['status' => 1, 'msg' => '注册成功！', 'data' => $data_user]);
+        }else{
+            $data['salt'] = create_salt();
+            $data['password'] = md5($data['salt'] . $pwd);
+            $data['regtype'] = $type;
+            $data['mobile'] = $mobile;
+            $data['createtime'] = time();
+            $id = Db::name('member')->insertGetId($data);
+            if (!$id) {
+                $this->ajaxReturn(['status' => -2, 'msg' => '注册失败，请重试！', 'data' => '']);
+            }
+            $data_user['token'] = $this->create_token($id);
+            $data_user['mobile'] = $mobile;
+            $data_user['id'] = $id;
+            $this->ajaxReturn(['status' => 1, 'msg' => '注册成功！', 'data' => $data_user]);
         }
-        $data_user['token'] = $this->create_token($id);
-        $data_user['mobile'] = $mobile;
-        $data_user['id'] = $id;
-        $this->ajaxReturn(['status' => 1, 'msg' => '注册成功！', 'data' => $data_user]);
+
     }
     /*
      *  微信注册开始

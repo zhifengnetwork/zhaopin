@@ -44,18 +44,34 @@ class Login extends ApiBase
         // 查询数据库，判断是否有此openid
         $data = Db::table('member')->where('openid',$openid)->find();
         if(!$data){
-            Db::table('member')->insert(['openid'=>$openid]);
+            Db::table('member')->insert(['openid'=>$openid,'regtype'=>0]);
             $data = Db::table('member')->where('openid',$openid)->find();
-
             $data['token'] = $this->create_token($data['id']);
-
-            $this->ajaxReturn(['status' => 4 , 'msg'=>'获取成功','data'=>$data]);
+            $this->ajaxReturn(['status' => 4 , 'msg'=>'获取成功','data'=>$data]);//微信第一次登陆跳转绑定手机号
         }else{
-
             $data['token'] = $this->create_token($data['id']);
-
-            $this->ajaxReturn( ['status'=>1,'msg'=>'获取用户信息成功','data'=>$data]);
-
+            if($data['regtype']!=0){
+                if($data['regtype']==1||$data['regtype']==2){
+                    $company=Db::name('company')->where(['user_id'=>$data['id']])->find();
+                    if(!$company){
+                        $this->ajaxReturn(['status' => 3, 'msg' => '继续填写！', 'data' => $data]);
+                    }elseif($company['status']==-1){
+                        Db::name('company')->where(['user_id'=>$data['id']])->delete();
+                        $this->ajaxReturn(['status' => 3, 'msg' => '继续填写！', 'data' => $data]);
+                    }
+                }elseif ($data['regtype']==3){
+                    $person=Db::name('person')->where(['user_id'=>$data['id']])->find();
+                    if(!$person){
+                        $this->ajaxReturn(['status' => 3, 'msg' => '继续填写！', 'data' => $data]);
+                    }elseif($person['status']==-1){
+                        Db::name('person')->where(['user_id'=>$data['id']])->delete();
+                        $this->ajaxReturn(['status' => 3, 'msg' => '继续填写！', 'data' => $data]);
+                    }
+                }
+                $this->ajaxReturn( ['status'=>1,'msg'=>'获取用户信息成功','data'=>$data]);
+            }else{
+                $this->ajaxReturn(['status' => 4 , 'msg'=>'获取成功','data'=>$data]);
+            }
         }
 
     }

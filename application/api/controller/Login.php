@@ -49,7 +49,7 @@ class Login extends ApiBase
 
             $data['token'] = $this->create_token($data['id']);
 
-            $this->ajaxReturn(['status' => 1 , 'msg'=>'获取成功','data'=>$data]);
+            $this->ajaxReturn(['status' => 4 , 'msg'=>'获取成功','data'=>$data]);
         }else{
 
             $data['token'] = $this->create_token($data['id']);
@@ -95,7 +95,6 @@ class Login extends ApiBase
             }
         }else{
 
-//            $data['token'] = $this->create_token($data['id']);
             if($user_id==$data['id']){
                 $this->ajaxReturn( ['status'=>-2,'msg'=>'您已绑定该微信，请勿重新绑定','data'=>[]]);
             }else{

@@ -413,7 +413,53 @@ class User extends ApiBase
         $data_user['id'] = $id;
         $this->ajaxReturn(['status' => 1, 'msg' => '注册成功！', 'data' => $data_user]);
     }
+    /*
+     *  微信注册开始
+     */
+    public function weixin_register()
+    {
+        $user_id = $this->get_user_id();
+        if (!$user_id || !($member = Member::get($user_id))) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '用户错误']);
+        }
+        $type = input('type');
+        if (!key_exists($type, Member::$_registerType)) {// 1公司，2第三方,3个人
+            $this->ajaxReturn(['status' => -2, 'msg' => '类型选择错误']);
+        }
+        $mobile = input('mobile');
+        $pwd = input('pwd');
+        $pwd2 = input('pwd2');
+        $code = input('code');
+        if ($pwd != $pwd2) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '两次密码输入不一样！请重新输入！']);
+        }
+        if (!checkMobile($mobile)) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '手机格式错误！']);
+        }
+        if (Member::get(['mobile' => $mobile])) {
+            $this->ajaxReturn(['status' => -1, 'msg' => '此手机号已注册，请直接登录！']);
+        }
 
+        $res = action('PhoneAuth/phoneAuth', [$mobile, $code]);
+        if ($res === '-1') {
+            $this->ajaxReturn(['status' => -2, 'msg' => '验证码已过期！', 'data' => '']);
+        } else if (!$res) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '验证码错误！', 'data' => '']);
+        }
+        $data['salt'] = create_salt();
+        $data['password'] = md5($data['salt'] . $pwd);
+        $data['regtype'] = $type;
+        $data['mobile'] = $mobile;
+        $data['createtime'] = time();
+        $res=Db::name('member')->where(['id'=>$user_id])->update($data);
+        if(!$res){
+            $this->ajaxReturn(['status' => -2, 'msg' => '注册失败，请重试！', 'data' => '']);
+        }
+        $data_user['token'] = $this->create_token($user_id);
+        $data_user['mobile'] = $mobile;
+        $data_user['id'] = $user_id;
+        $this->ajaxReturn(['status' => 1, 'msg' => '注册成功！', 'data' => $data_user]);
+    }
     // 下一步
     public function next()
     {

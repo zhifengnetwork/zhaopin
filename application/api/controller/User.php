@@ -823,14 +823,23 @@ class User extends ApiBase
                 ->field('p.id,p.name,p.avatar,m.mobile,m.openid,p.status,p.reserve,p.shelf,p.pull')
                 ->join('member m', 'm.id = p.user_id', 'LEFT')
                 ->where(['p.user_id' => $user_id])->find();
-            $data['avatar']=SITE_URL.$data['avatar'];
+            if($data['avatar']){
+                $data['avatar']=SITE_URL.$data['avatar'];
+            }else{
+                $data['avatar']=SITE_URL.'/public/images/default.jpg';
+            }
+
             $data['user_id']=$user_id;
         } else {
             $data = Db::name('company')->alias('c')
                 ->field('c.id,c.contacts,c.logo,m.openid,c.vip_time,m.mobile,c.vip_type,c.company_name,c.status,c.is_vip')
                 ->join('member m', 'm.id = c.user_id', 'LEFT')
                 ->where(['c.user_id' => $user_id])->find();
-            $data['logo']=SITE_URL.$data['logo'];
+            if($data['logo']){
+                $data['logo']=SITE_URL.$data['logo'];
+            }else{
+                $data['logo']=SITE_URL.'/public/images/default.jpg';
+            }
             $num=0;
             if($data['is_vip']){
                 $num=Db::name('company')->where(['id'=>$data['id']])->value('reserve_num');

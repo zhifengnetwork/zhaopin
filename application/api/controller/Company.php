@@ -266,6 +266,9 @@ class Company extends ApiBase
             ->field('co.logo,r.id,r.title,r.require_cert,r.salary,r.work_age')
             ->paginate(3,false,$pageParam);
         $recruit_hot=$recruit_hot->toArray();
+        foreach ($recruit_hot['data'] as $key=>&$value){
+            $value['logo']=SITE_URL.$value['logo'];
+        }
         $data['recruit_hot']=$recruit_hot['data'];
         unset($where['r.is_rcmd']);
 
@@ -277,6 +280,9 @@ class Company extends ApiBase
             ->field('co.logo,r.id,r.title,r.require_cert,r.salary,r.work_age')
             ->paginate(3,false,$pageParam);
         $recruit_better=$recruit_better->toArray();
+        foreach ($recruit_better['data'] as $k=>&$v){
+            $v['logo']=SITE_URL.$v['logo'];
+        }
         $data['recruit_better']=$recruit_better['data'];
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
 
@@ -314,6 +320,9 @@ class Company extends ApiBase
             ->field('co.logo,r.id,r.title,r.require_cert,r.salary,r.work_age')
             ->paginate($rows,false,$pageParam);
         $recruit_better=$recruit_better->toArray();
+        foreach ($recruit_better['data'] as $k=>&$v){
+            $v['logo']=SITE_URL.$v['logo'];
+        }
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $recruit_better['data']]);
     }
     public function recruit_hot(){
@@ -349,6 +358,9 @@ class Company extends ApiBase
             ->field('co.logo,r.id,r.title,r.require_cert,r.salary,r.work_age')
             ->paginate($rows,false,$pageParam);
         $recruit_hot=$recruit_hot->toArray();
+        foreach ($recruit_hot['data'] as $key=>&$value){
+            $value['logo']=SITE_URL.$value['logo'];
+        }
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $recruit_hot['data']]);
     }
     // 资料显示

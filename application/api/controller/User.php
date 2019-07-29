@@ -608,7 +608,11 @@ class User extends ApiBase
             ->join('member m', 'c.user_id=m.id', 'LEFT')
             ->limit(6)
             ->where(['r.is_hot' => 1, 'r.status' => 1])->select();
-
+        foreach ($list as $key=>$value){
+            if($list[$key]['logo']){
+                $list[$key]['logo']=SITE_URL.$list[$key]['logo'];
+            }
+        }
         // 找活
         $person = Db::name('person')
             ->alias('p')
@@ -619,6 +623,9 @@ class User extends ApiBase
         foreach ($person as &$v) {
             $v['job_type'] = Category::getNameById($v['job_type']) ?: '';
             $v['images'] = $v['images']!='[]' ? 1 : 0;
+            if($v['avatar']){
+                $v['avatar']=SITE_URL.$v['avatar'];
+            }
         }
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
             'data' => ['ad' => $adList, 'recruit' => $list, 'person' => $person]
@@ -656,7 +663,11 @@ class User extends ApiBase
                 ->limit(6)
                 ->where($where)
                 ->where(['r.is_hot' => 1, 'r.status' => 1,'m.regtype'=>$rt])->select();
-
+            foreach ($list as $key=>$value){
+                if($list[$key]['logo']){
+                    $list[$key]['logo']=SITE_URL.$list[$key]['logo'];
+                }
+            }
             $company_id = Db::name('company')->where(['user_id'=>$user_id])->value('id');
             $job_type=input('job_type');
             $where=['p.status'=>1,'p.reserve_c' => [['=', 0], ['=', $company_id], 'or']];
@@ -673,6 +684,9 @@ class User extends ApiBase
             foreach ($person as &$v) {
                 $v['job_type'] = Category::getNameById($v['job_type']) ?: '';
                 $v['images'] = $v['images']!='[]' ? 1 : 0;
+                if($v['avatar']){
+                    $v['avatar']=SITE_URL.$v['avatar'];
+                }
             }
             $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
                 'data' => ['ad' => $adList, 'recruit' => $list, 'person' => $person]
@@ -702,6 +716,11 @@ class User extends ApiBase
                 ->where($where)
                 ->limit(6)
                 ->where(['r.is_hot' => 1, 'r.status' => 1,'m.regtype'=>1])->select();
+            foreach ($list as $key=>$value){
+                if($list[$key]['logo']){
+                    $list[$key]['logo']=SITE_URL.$list[$key]['logo'];
+                }
+            }
             $person = Db::name('recruit')
                 ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
                 ->alias('r')
@@ -710,6 +729,11 @@ class User extends ApiBase
                 ->where($where)
                 ->limit(6)
                 ->where(['r.is_hot' => 1, 'r.status' => 1,'m.regtype'=>2])->select();
+            foreach ($person as $k=>$v){
+                if($person[$k]['logo']){
+                    $person[$k]['logo']=SITE_URL.$person[$k]['logo'];
+                }
+            }
             $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
                 'data' => ['ad' => $adList, 'recruit' => $list, 'person' => $person]
             ]);

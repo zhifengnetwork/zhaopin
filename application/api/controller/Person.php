@@ -263,6 +263,7 @@ class Person extends ApiBase
             $value['images'] = $value['images']!='[]'?1:0;
             $na = $value['gender']=='female'?'女士':'先生';
             $value['name']=mb_substr($value['name'], 0, 1, 'utf-8').$na;
+            $value['avatar']=SITE_URL.$value['avatar'];
             unset($value['gender']);
         }
         $this->ajaxReturn(['status' => 1, 'msg' => '获取成功','data'=>$list['data']]);

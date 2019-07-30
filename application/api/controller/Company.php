@@ -216,7 +216,9 @@ class Company extends ApiBase
         $pageParam['query']['company_id'] = $this->_id;
         $list = Db::name('recruit')
             ->field('id,title,salary,work_age,type,require_cert,detail,status,remark')
-            ->where($where)->order('id desc')->paginate(3, false, $pageParam);
+            ->where($where)->order('id desc')
+            ->select();
+//            ->paginate(3, false, $pageParam);
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $list]);
     }
 

@@ -138,7 +138,37 @@ class Company extends ApiBase
             }
         }
     }
-
+// 信息
+    public function look_company()
+    {
+        $user_id=$this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $company_id=input('company_id');
+        $data = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement,status')
+            ->where(['id' => $company_id])->find();
+        if (!$data) {
+            return $this->ajaxReturn(['status' => -2, 'msg' => '不存在的信息']);
+        }
+        if($data['status']==0){
+            $this->ajaxReturn(['status' => -3, 'msg' => '该公司信息审核中，暂不可查看']);
+        }
+        if($data['logo']){
+            $data['logo'] = SITE_URL . $data['logo'];
+        }
+        if($data['open_time']){
+            $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
+            $data['open_year'] = $open ? $open[0] : '';
+            $data['open_month'] = $open ? $open[1] : '';
+            $data['open_day'] = $open ? $open[2] : '';
+        }else{
+            $data['open_year'] =  '';
+            $data['open_month'] = '';
+            $data['open_day'] =  '';
+        }
+        $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
+    }
     // 编辑信息
     public function edit()
     {
@@ -432,7 +462,7 @@ class Company extends ApiBase
 
         $detail = Db::name('recruit')
             ->alias('r')
-            ->field('r.id,r.title,r.salary,r.work_age,c.province,c.logo,c.company_name,c.city,c.district,r.detail')
+            ->field('r.id,r.title,r.salary,r.work_age,c.province,c.logo,c.id company_id,c.company_name,c.city,c.district,r.detail')
             ->join('company c', 'c.id=r.company_id', 'LEFT')
             ->where(['r.id' => $id])
             ->find();

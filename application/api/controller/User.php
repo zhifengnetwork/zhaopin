@@ -1059,12 +1059,12 @@ class User extends ApiBase
         $type = input('type',1);//1登录密码 2支付密码
         $code = input('code');
         $mobile = $member['mobile'];
-//        $res = action('PhoneAuth/phoneAuth', [$mobile, $code]);
-//        if ($res === '-1') {
-//            $this->ajaxReturn(['status' => -2, 'msg' => '验证码已过期！', 'data' => '']);
-//        } else if (!$res) {
-//            $this->ajaxReturn(['status' => -2, 'msg' => '验证码错误！', 'data' => '']);
-//        }
+        $res = action('PhoneAuth/phoneAuth', [$mobile, $code]);
+        if ($res === '-1') {
+            $this->ajaxReturn(['status' => -2, 'msg' => '验证码已过期！', 'data' => '']);
+        } else if (!$res) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '验证码错误！', 'data' => '']);
+        }
         if ($type == 1) {
             $stri = 'password';
         } else {

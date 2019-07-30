@@ -62,7 +62,7 @@ class Finance extends Common
 
         $list = Db::name('member_balance_log')->alias('log')
             ->field('m.id as mid,log.id,m.regtype,log.source_type,log.balance,log.create_time,log.money,log.log_type')
-            ->join('member m','log.user_id = m.id','LEFT')
+            ->join('member m','log.user_id = m.id')
             ->where($where)
             ->where(['log.balance_type' => 0])
             ->order('log.create_time DESC')

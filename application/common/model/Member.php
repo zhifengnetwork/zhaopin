@@ -14,7 +14,8 @@ class Member extends Model
     static $_registerType = [
         1=>'公司',
         2=>'第三方',
-        3=>'个人'
+        3=>'个人',
+        4=>'微信注册'
     ];
     /***
      * 充值余额

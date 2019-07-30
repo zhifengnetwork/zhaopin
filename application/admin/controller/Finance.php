@@ -222,7 +222,7 @@ class Finance extends Common
 
         $list = MemberWithdrawal::alias('w')
             ->field('w.*, m.id as mid,m.mobile,m.regtype')
-            ->join("member m", 'm.id = w.user_id', 'LEFT')
+            ->join("member m", 'm.id = w.user_id')
             ->where($where)
             ->order('w.id DESC')
             ->paginate(10, false, ['query' => $where]);

@@ -241,6 +241,11 @@ class Person extends ApiBase
         } elseif ($detail['reserve_c'] == 0) {// 不是当前公司第三方的预约，隐藏信息
             $detail['name'] = shadow($detail['name']);
             $detail['mobile'] = shadow($detail['mobile']);
+            $detail['school_type'] = '***';
+            $detail['work_age'] = '***';
+            $detail['job_type'] = '***';
+            $detail['desc'] = '***';
+            $detail['experience'] = '***';
         }
         $detail['gender'] = $detail['gender'] == 'female' ? '女' : '男';
         $detail['images'] = $detail['images']!='[]' ? 1 : 0;
@@ -266,6 +271,8 @@ class Person extends ApiBase
             $where['p.name|ca.cat_name'] = ['like', '%' . $kw . '%'];
             $pageParam['query']['kw'] = $kw;
         }
+        $where['p.reserve_c']=0;
+        $where['p.status']=1;
         $list=Db::name('person')->alias('p')
             ->join('category ca','ca.cat_id=p.job_type','LEFT')
             ->where($where)

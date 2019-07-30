@@ -674,6 +674,8 @@ class User extends ApiBase
             if($job_type){
                 $where['p.job_type']=$job_type;
             }
+            $where['p.reserve_c']=0;
+            $where['p.status']=1;
             // 找活
             $person = Db::name('person')
                 ->alias('p')
@@ -775,6 +777,8 @@ class User extends ApiBase
             $where=['p.status'=>1,'p.reserve_c' => [['=', 0], ['=', $company_id], 'or']];
             $where['p.name']=['like', '%' . $kw . '%'];
             // 找活
+            $where['p.reserve_c']=0;
+            $where['p.status']=1;
             $person = Db::name('person')
                 ->alias('p')
                 ->field('p.id,p.avatar,p.name,p.job_type,p.work_age,p.images')

@@ -523,7 +523,7 @@ class Person extends ApiBase
         $member=Db::name('member')->where(['id'=>$user_id])->find();
 
         if($pay_type==1){//余额支付
-            if($money>$member){
+            if($money>$member['balance']){
                 $this->ajaxReturn(['status' => -2, 'msg' => '余额不足，开通失败','data'=>[]]);
             }
             Db::startTrans();

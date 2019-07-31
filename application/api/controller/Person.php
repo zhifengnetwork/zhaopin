@@ -246,6 +246,9 @@ class Person extends ApiBase
             $detail['job_type'] = '***';
             $detail['desc'] = '***';
             $detail['experience'] = '***';
+            if($detail['avatar']){
+                $detail['avatar']=SITE_URL.$detail['avatar'];
+            }
         }
         $detail['gender'] = $detail['gender'] == 'female' ? '女' : '男';
         $detail['images'] = $detail['images']!='[]' ? 1 : 0;

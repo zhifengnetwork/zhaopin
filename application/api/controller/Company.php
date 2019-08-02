@@ -56,6 +56,7 @@ class Company extends ApiBase
             if (!$data) {
                 return $this->ajaxReturn(['status' => -2, 'msg' => '不存在的信息']);
             }
+            $audit=Db::name('audit')->where(['content_id'=>$user_id])->where(['type'=>$regtype])->order('id DESC')->find();
             if($data['logo']){
                 $data['logo'] = SITE_URL . $data['logo'];
             }
@@ -69,7 +70,7 @@ class Company extends ApiBase
                 $data['open_month'] = '';
                 $data['open_day'] =  '';
             }
-            $data['is_edit']=1;
+            $data['is_edit']=$audit['status'];
             $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
         }else{
             if($audit['status']==1){

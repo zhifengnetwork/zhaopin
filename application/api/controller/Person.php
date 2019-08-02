@@ -109,7 +109,8 @@ class Person extends ApiBase
             if(!$data){
                 $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在或者用户类型不对，请重新操作']);
             }
-            $data['is_edit']=$audit['status'];
+            $audit_person=Db::name('audit')->where(['content_id'=>$user_id])->where(['type'=>3])->order('id DESC')->find();
+            $data['is_edit']=$audit_person['status'];
             $data['gender'] = $data['gender'] == 'male' ? 1 : 2;
             $data['avatar'] = SITE_URL . $data['avatar'];
             $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);

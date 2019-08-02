@@ -762,7 +762,7 @@ class User extends ApiBase
             }
             $where=[];
             if($kw){
-                $where['r.title'] = ['like', '%' . $kw . '%'];
+                $where['r.title|c.company_name'] = ['like', '%' . $kw . '%'];
             }
             $list = Db::name('recruit')
                 ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
@@ -779,7 +779,9 @@ class User extends ApiBase
             }
             $company_id = Db::name('company')->where(['user_id'=>$user_id])->value('id');
             $where=['p.status'=>1,'p.reserve_c' => [['=', 0], ['=', $company_id], 'or']];
-            $where['p.name']=['like', '%' . $kw . '%'];
+            if($kw){
+                $where['p.name']=['like', '%' . $kw . '%'];
+            }
             // 找活
             $where['p.reserve_c']=0;
             $where['p.status']=1;
@@ -802,7 +804,7 @@ class User extends ApiBase
         }elseif ($regtype==3){
             $where=[];
             if($kw){
-                $where['r.title'] = ['like', '%' . $kw . '%'];
+                $where['r.title|c.company_name'] = ['like', '%' . $kw . '%'];
             }
             $list = Db::name('recruit')
                 ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')

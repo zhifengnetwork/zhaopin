@@ -33,10 +33,11 @@ class Collection extends ApiBase
                 ->where('c.user_id',$user_id)
                 ->where('m.regtype',$regtype)
                 ->select();
-//            foreach ($list as $key=>$value){
+            foreach ($list as $key=>$value){
 //                $list[$key]['city']=Region::getName($list[$key]['city']);
 //                $list[$key]['district']=Region::getName($list[$key]['district']);
-//            }
+                $list[$key]['logo']=SITE_URL.$list[$key]['logo'];
+            }
             $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$list]);
         }elseif ($regtype==2){
             $list = Db::table('collection')->alias('c')
@@ -49,10 +50,11 @@ class Collection extends ApiBase
                 ->where('c.user_id',$user_id)
                 ->where('m.regtype',$regtype)
                 ->select();
-//            foreach ($list as $key=>$value){
+            foreach ($list as $key=>$value){
 //                $list[$key]['city']=Region::getName($list[$key]['city']);
 //                $list[$key]['district']=Region::getName($list[$key]['district']);
-//            }
+                $list[$key]['logo']=SITE_URL.$list[$key]['logo'];
+            }
             $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$list]);
         }elseif ($regtype==3){
             $list = Db::table('collection')->alias('c')
@@ -66,6 +68,7 @@ class Collection extends ApiBase
                 ->select();
             foreach ($list as $key=>$value){
                 $list[$key]['images']=$list[$key]['images']!='[]'?1:0;
+                $list[$key]['avatar']=SITE_URL.$list[$key]['avatar'];
             }
             $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$list]);
         }

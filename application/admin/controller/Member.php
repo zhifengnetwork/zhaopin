@@ -71,7 +71,7 @@ class Member extends Common
         $id = input('mid', '');
         $mobile = input('mobile', '');
         $type = input('type', '');
-        $where = [];
+        $where = ['regtype'=>['lt',4]];
         if (!empty($id)) $where['id'] = $id;
         if (!empty($type)) $where['regtype'] = $type;
         if (!empty($mobile)) $where['mobile'] = $mobile;

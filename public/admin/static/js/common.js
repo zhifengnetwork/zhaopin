@@ -254,3 +254,15 @@ function highlight_subnav(url){
 	$subnav.find("a[href='" + url + "']").parent().parents('li').addClass("active");
 	$subnav.find("a[href='" + url + "']").parent().parents('li').addClass("open");
 }
+
+    $('.enlarge_img').click(function () {
+        layer.open({
+            type: 1,
+            title: '查看图片',
+            shade: 0.3,
+            area: ['70%', '80%'],
+            content: "<img id='bgImg' src='" + $(this).attr('src')+ "'/>"
+        });
+
+    });
+

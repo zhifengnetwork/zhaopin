@@ -120,9 +120,9 @@
                                     <li>公司名称 : {$row['data_array']['company_name']}</li>
                                     <li>公司类型 : {$row['data_array']['type']}</li>
                                     <li>公司介绍 : {$row['data_array']['desc']}</li>
-                                    <li>营业执照：<img width="100px" height="100px" src="{$row['data_array']['c_img']}"></li>
+                                    <li>营业执照：<img class="enlarge_img" src="{$row['data_array']['c_img']}"></li>
                                     {volist name="row['data_array']['images']" id="row"  key="k"}
-                                    {if $k%2 neq 0}<li><img width="100px" height="100px" src="{$row}"></li>{/if}
+                                    {if $k%2 neq 0}<li><img class="enlarge_img" src="{$row}"></li>{/if}
                                     {/volist}
 
                                     {else/}

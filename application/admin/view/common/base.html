@@ -30,6 +30,20 @@
 		{block name="style"}{/block}
 	</head>
 	<style>
+		#bgImg {
+			animation-name: zoom;
+			animation-duration: 0.6s;
+			display: block;
+			padding: 10px;
+			margin: auto;
+			max-width: 100%;
+			max-height: 100%;
+		}
+		.enlarge_img{
+			width: 100px;
+			height: 100px;
+		}
+
 		#tit {
 			margin-left: -15px;
 			font-size: 15px;
@@ -159,7 +173,10 @@
 				</div>
 				{/block}
 			</div>
+
 		</div>
+
+
 
 		<div style="position:fixed; left:220px; right:0; margin:0 15px; top: 10px; z-index: 99999; display: none;" id="top-alert" class="alert alert-dismissable">
 			<button class="close" type="button"> </button>

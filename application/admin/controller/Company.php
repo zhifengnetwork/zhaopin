@@ -63,7 +63,7 @@ class Company extends Common
             $data['examination'] = time();
             $data['edit'] = 1;
             $res = Db::name('company')->where(['user_id' => $audit['content_id']])->update($data);
-            if (!$res) {
+            if ($res===false) {
                 Db::rollback();
                 $this->error('审核失败!');
             }
@@ -72,7 +72,7 @@ class Company extends Common
             $data = json_decode($audit['data'], true);
             isset($data['images']) && $data['images'] = json_encode($data['images']);
             $res = Db::name('company')->where(['user_id' => $audit['content_id']])->update($data);
-            if (!$res) {
+            if ($res===false) {
                 Db::rollback();
                 $this->error('审核失败!');
             }
@@ -81,7 +81,7 @@ class Company extends Common
             'remark' => $content,
             'status'=>$status
         ]);
-        if(!$res){
+        if($res===false){
             Db::rollback();
             $this->error('审核失败！');
         }
@@ -119,7 +119,7 @@ class Company extends Common
             $data['check_time'] = time();
             $data['edit'] = 1;
             $res = Db::name('person')->where(['user_id' => $audit['content_id']])->update($data);
-            if (!$res) {
+            if ($res===false) {
                 Db::rollback();
                 $this->error('审核失败!');
             }
@@ -128,7 +128,7 @@ class Company extends Common
             $data = json_decode($audit['data'], true);
             isset($data['images']) && $data['images'] = json_encode($data['images']);
             $res = Db::name('person')->where(['user_id' => $audit['content_id']])->update($data);
-            if (!$res) {
+            if ($res===false) {
                 Db::rollback();
                 $this->error('审核失败!');
             }
@@ -140,7 +140,7 @@ class Company extends Common
             $money = Db::name('category')->where(['cat_id' => $person['job_type']])->value('money');
             $member_balance = bcadd($balance, $money);
             $res = Db::name('member')->where(['id' => $person['user_id']])->update(['balance' => $member_balance]);
-            if ($money > 0 && !$res) {
+            if ($money > 0 && $res===false) {
                 Db::rollback();
                 $this->error('审核失败!');
             }
@@ -159,7 +159,7 @@ class Company extends Common
             'remark' => $content,
             'status' => $status
         ]);
-        if (!$res) {
+        if ($res===false) {
             Db::rollback();
             $this->error('审核失败！');
         }
@@ -280,12 +280,12 @@ class Company extends Common
         $data['remark']=$content;
         $data['check_time']=time();
         $res=Db::name('recruit')->update($data);
-        if(!$res){
+        if($res===false){
             Db::rollback();
             $this->error('审核失败！');
         }
         $res=Db::name('audit')->where(['id'=>$id])->update(['status'=>$status]);
-        if(!$res){
+        if($res===false){
             Db::rollback();
             $this->error('审核失败！');
         }
@@ -297,7 +297,7 @@ class Company extends Common
         $key=input('key');
         $value=input('value');
         $res=Db::name('recruit')->where(['id'=>$id])->update(array($key=>$value));
-        if($res){
+        if($res!==false){
             return json(['code'=>1, 'msg'=>'修改成功！','data'=>[]]);
         }else{
             return json(['code'=>0, 'msg'=>'修改失败！','data'=>[]]);
@@ -334,7 +334,7 @@ class Company extends Common
             $res = Db::name('person')->where(['user_id' => $audit['content_id']])->update([
                 'images' => $audit['data']
             ]);
-            if (!$res) {
+            if ($res===false) {
                 Db::rollback();
                 $this->error('审核失败!');
             }
@@ -343,7 +343,7 @@ class Company extends Common
             'remark' => $content,
             'status' => $status
         ]);
-        if (!$res) {
+        if ($res===false) {
             Db::rollback();
             $this->error('审核失败！');
         }

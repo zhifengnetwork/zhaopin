@@ -113,7 +113,7 @@
                                 <div class="modal-body">
                                     <ul>
                                         {volist name="$row.data|json_decode=true" id="vo"}
-                                        <img width="100px" height="100px" src="{$vo.path}">
+                                        <img class="enlarge_img" src="{$vo.path}">
                                         {$vo.title}
                                         {/volist}
                                     </ul>

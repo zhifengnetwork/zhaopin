@@ -99,13 +99,13 @@
                 </div>
                 <div>
                     {if $company.logo}
-                    <img width="100px" height="100px" src="{$company.logo}">
+                    <img class="enlarge_img" src="{$company.logo}">
                     LOGO
                     {/if}
-                    <img width="100px" height="100px" src="{$company.c_img}">
+                    <img class="enlarge_img" src="{$company.c_img}">
                     营业执照
                     {volist name="$company.images|json_decode=true" id="vo"}
-                    <img width="100px" height="100px" src="{$vo.path}">
+                    <img class="enlarge_img" src="{$vo.path}">
                     {$vo.title}
                     {/volist}
                 </div>

@@ -103,15 +103,15 @@
                 </div>
                 <div>
                     {if $person.avatar}
-                    <img width="100px" height="100px" src="{$person.avatar}">
+                    <img class="enlarge_img" src="{$person.avatar}">
                     头像
                     {/if}
-                    <img width="100px" height="100px" src="{$person.idcard_front}">
+                    <img class="enlarge_img" src="{$person.idcard_front}">
                     正面照
-                    <img width="100px" height="100px"  src="{$person.idcard_back}">
+                    <img class="enlarge_img" src="{$person.idcard_back}">
                     反面照
                     {volist name="$person.images|json_decode=true" id="vo"}
-                    <img width="100px" height="100px" src="{$vo.path}">
+                    <img class="enlarge_img" src="{$vo.path}">
                     {$vo.title}
                     {/volist}
                 </div>

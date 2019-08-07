@@ -62,7 +62,7 @@ class Collection extends ApiBase
                 ->join('member m','m.id=p.user_id','LEFT')
                 ->join('category ca','ca.cat_id=p.job_type','LEFT')
                 ->field('p.id,p.name,p.desc,ca.cat_name,p.work_age,p.images,p.avatar,m.regtype')
-                ->where('c.type',1)
+                ->where('c.type',2)
                 ->where('c.user_id',$user_id)
                 ->where('m.regtype',$regtype)
                 ->select();

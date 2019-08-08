@@ -105,7 +105,7 @@ class Person extends ApiBase
         }
         if (!$audit){
             $data = Db::name('person')->where(['user_id' => $this->get_user_id()])
-                ->field('id,name,gender,avatar,age,nation,work_age,daogang_time,salary,job_type,desc,experience,education')->find();
+                ->field('id,name,gender,avatar,age,nation,work_age,daogang_time,salary,job_type,desc,experience,education,province,city,district,school_type')->find();
             if(!$data){
                 $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在或者用户类型不对，请重新操作']);
             }
@@ -117,7 +117,7 @@ class Person extends ApiBase
         }else{
             if($audit['status']==1){
                 $data = Db::name('person')->where(['user_id' => $this->get_user_id()])
-                    ->field('id,name,gender,avatar,age,nation,work_age,daogang_time,salary,job_type,desc,experience,education')->find();
+                    ->field('id,name,gender,avatar,age,nation,work_age,daogang_time,salary,job_type,desc,experience,education,province,city,district,school_type')->find();
                 if(!$data){
                     $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在或者用户类型不对，请重新操作']);
                 }
@@ -219,7 +219,7 @@ class Person extends ApiBase
         if (!$id) $this->ajaxReturn(['status' => -2, 'msg' => '信息不存在！']);
 
         $detail = Db::name('person')
-            ->field('id,user_id,name,gender,avatar,school_type,age,work_age,images,job_type,desc,experience,reserve_c')
+            ->field('id,user_id,name,gender,avatar,school_type,age,work_age,images,job_type,desc,experience,reserve_c,province,city,district,degree')
             ->where(['id' => $id,'status'=>1])->find();
         if (!$detail) $this->ajaxReturn(['status' => -2, 'msg' => '信息不存在！']);
 
@@ -240,22 +240,34 @@ class Person extends ApiBase
             $this->ajaxReturn(['status' => -2, 'msg' => '该用户已被预约，无法显示']);
 
         } elseif ($detail['reserve_c'] == 0) {// 不是当前公司第三方的预约，隐藏信息
-            $detail['name'] = shadow($detail['name']);
+//            $detail['name'] = shadow($detail['name']);
             $detail['mobile'] = shadow($detail['mobile']);
-            $detail['school_type'] = '***';
-            $detail['work_age'] = '***';
-            $detail['job_type'] = '***';
-            $detail['desc'] = '***';
+//            $detail['school_type'] = '***';
+//            $detail['work_age'] = '***';
+//            $detail['job_type'] = '***';
+//            $detail['desc'] = '***';
+            $detail['address']=$this->detail($detail['province']).$this->detail($detail['city']).$this->detail($detail['district']);
+            $detail['education'] = '***';
             $detail['experience'] = '***';
             if($detail['avatar']){
                 $detail['avatar']=SITE_URL.$detail['avatar'];
             }
+            unset($detail['province']);
+            unset($detail['city']);
+            unset($detail['district']);
         }
         $detail['gender'] = $detail['gender'] == 'female' ? '女' : '男';
         $detail['images'] = $detail['images']!='[]' ? 1 : 0;
         $detail['job_type'] = Category::getNameById($detail['job_type']) ?: '';
 
         $this->ajaxReturn(['status' => 1, 'msg' => '获取成功', 'data' => $detail]);
+    }
+    public function address($code){
+        if($code){
+            return Db::name('region')->where(['code'=>$code])->value('area_name');
+        }else{
+            return '';
+        }
     }
     // 个人列表
     public function person_list(){

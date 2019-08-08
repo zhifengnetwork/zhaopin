@@ -222,7 +222,22 @@ class Company extends ApiBase
 //            ->paginate(3, false, $pageParam);
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $list]);
     }
-
+    // 查看公司招聘
+    public function get_recruit_list()
+    {
+        $user_id = $this->get_user_id();
+        $company_id = input('company_id',0);
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $where = ['company_id' => $company_id,'status' => 1];
+        $pageParam['query']['company_id'] = $this->_id;
+        $list = Db::name('recruit')
+            ->field('id,title,salary,work_age,type,require_cert,detail,status,remark')
+            ->where($where)->order('id desc')
+            ->select();
+        $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $list]);
+    }
     // 编辑招聘 审核失败可编辑
     public function edit_recruit()
     {

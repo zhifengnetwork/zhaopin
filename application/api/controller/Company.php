@@ -238,6 +238,42 @@ class Company extends ApiBase
             ->select();
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $list]);
     }
+    //公司、第三方列表
+    public function company_list(){
+        $user_id = $this->get_user_id();
+        $this->getCompany();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $regtype = Db::name('member')->where(['id'=>$this->get_user_id()])->value('regtype');
+        if($regtype==1){
+            $list=Db::name('company')->alias('c')
+                ->join('member m','m.id=c.user_id','left')
+                ->field('c.id,c.logo,c.open_time,c.type,c.company_name,c.contacts_scale,c.desc,c.introduction,c.achievement,c.status')
+                ->where(['c.status'=>1,'m.regtype'=>2])->limit(3)->select();
+        }else{
+            $list=Db::name('company')->alias('c')
+                ->join('member m','m.id=c.user_id','left')
+                ->field('c.id,c.logo,c.open_time,c.type,c.company_name,c.contacts_scale,c.desc,c.introduction,c.achievement,c.status')
+                ->where(['c.status'=>1,'m.regtype'=>1])->limit(3)->select();
+        }
+        foreach ($list as $key=>$value){
+            if($list[$key]['logo']){
+                $list[$key]['logo'] = SITE_URL . $list[$key]['logo'];
+            }
+            if($list[$key]['open_time']){
+                $open = $list[$key]['open_time'] ? explode('-', $list[$key]['open_time']) : [];
+                $list[$key]['open_year'] = $open ? $open[0] : '';
+                $list[$key]['open_month'] = $open ? $open[1] : '';
+                $list[$key]['open_day'] = $open ? $open[2] : '';
+            }else{
+                $list[$key]['open_year'] =  '';
+                $list[$key]['open_month'] = '';
+                $list[$key]['open_day'] =  '';
+            }
+        }
+        $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $list]);
+    }
     // 编辑招聘 审核失败可编辑
     public function edit_recruit()
     {

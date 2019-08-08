@@ -245,6 +245,22 @@ class Company extends ApiBase
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
+        $where=[];
+        $province=input('province');
+        if($province){
+            $where['c.province']=$province;
+            $pageParam['query']['province']=$province;
+        }
+        $city=input('city');
+        if($city){
+            $where['c.city']=$city;
+            $pageParam['query']['city']=$city;
+        }
+        $district=input('district');
+        if($district){
+            $where['c.district']=$district;
+            $pageParam['query']['district']=$district;
+        }
         $pageParam=[];
         $rows=input('rows',10);
         $regtype = Db::name('member')->where(['id'=>$this->get_user_id()])->value('regtype');
@@ -253,6 +269,7 @@ class Company extends ApiBase
                 ->join('member m','m.id=c.user_id','left')
                 ->field('c.id,c.logo,c.open_time,c.type,c.company_name,c.contacts_scale,c.desc,c.introduction,c.achievement,c.status')
                 ->where(['c.status'=>1,'m.regtype'=>2])
+                ->where($where)
                 ->paginate($rows, false, $pageParam);
 //                ->limit(3)->select();
         }else{
@@ -260,6 +277,7 @@ class Company extends ApiBase
                 ->join('member m','m.id=c.user_id','left')
                 ->field('c.id,c.logo,c.open_time,c.type,c.company_name,c.contacts_scale,c.desc,c.introduction,c.achievement,c.status')
                 ->where(['c.status'=>1,'m.regtype'=>1])
+                ->where($where)
                 ->paginate($rows, false, $pageParam);
 //                ->limit(3)->select();
         }

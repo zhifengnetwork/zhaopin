@@ -652,6 +652,18 @@ class User extends ApiBase
                 $rt=1;
             }
             $where=[];
+            $province=input('province');
+            if($province){
+                $where['c.province']=$province;
+            }
+            $city=input('city');
+            if($city){
+                $where['c.city']=$city;
+            }
+            $district=input('district');
+            if($district){
+                $where['c.district']=$district;
+            }
             if($kw){
                 $where['r.title'] = ['like', '%' . $kw . '%'];
             }
@@ -670,17 +682,26 @@ class User extends ApiBase
             }
             $company_id = Db::name('company')->where(['user_id'=>$user_id])->value('id');
             $job_type=input('job_type');
-            $where=['p.status'=>1,'p.reserve_c' => [['=', 0], ['=', $company_id], 'or']];
+            $where_person=['p.status'=>1,'p.reserve_c' => [['=', 0], ['=', $company_id], 'or']];
             if($job_type){
-                $where['p.job_type']=$job_type;
+                $where_person['p.job_type']=$job_type;
             }
-            $where['p.reserve_c']=0;
-            $where['p.status']=1;
+            if($province){
+                $where_person['p.province']=$province;
+            }
+            if($city){
+                $where_person['p.city']=$city;
+            }
+            if($district){
+                $where_person['p.district']=$district;
+            }
+            $where_person['p.reserve_c']=0;
+            $where_person['p.status']=1;
             // 找活
             $person = Db::name('person')
                 ->alias('p')
                 ->field('p.id,p.avatar,p.name,p.job_type,p.work_age,p.images')
-                ->where($where)
+                ->where($where_person)
                 ->limit(6)
                 ->select();
             foreach ($person as &$v) {

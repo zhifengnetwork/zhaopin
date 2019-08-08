@@ -287,6 +287,21 @@ class Person extends ApiBase
             $where['p.name|ca.cat_name'] = ['like', '%' . $kw . '%'];
             $pageParam['query']['kw'] = $kw;
         }
+        $province=input('province');
+        if($province){
+            $where['p.province']=$province;
+            $pageParam['query']['province']=$province;
+        }
+        $city=input('city');
+        if($city){
+            $where['p.city']=$city;
+            $pageParam['query']['city']=$city;
+        }
+        $district=input('district');
+        if($district){
+            $where['p.district']=$district;
+            $pageParam['query']['district']=$district;
+        }
         $where['p.reserve_c']=0;
         $where['p.status']=1;
         $list=Db::name('person')->alias('p')

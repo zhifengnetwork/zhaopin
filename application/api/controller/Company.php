@@ -247,7 +247,6 @@ class Company extends ApiBase
         }
         $pageParam=[];
         $rows=input('rows',10);
-        $page=input('page',10);
         $regtype = Db::name('member')->where(['id'=>$this->get_user_id()])->value('regtype');
         if($regtype==1){
             $list=Db::name('company')->alias('c')

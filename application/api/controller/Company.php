@@ -245,18 +245,27 @@ class Company extends ApiBase
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
+        $pageParam=[];
+        $rows=input('rows',10);
+        $page=input('page',10);
         $regtype = Db::name('member')->where(['id'=>$this->get_user_id()])->value('regtype');
         if($regtype==1){
             $list=Db::name('company')->alias('c')
                 ->join('member m','m.id=c.user_id','left')
                 ->field('c.id,c.logo,c.open_time,c.type,c.company_name,c.contacts_scale,c.desc,c.introduction,c.achievement,c.status')
-                ->where(['c.status'=>1,'m.regtype'=>2])->limit(3)->select();
+                ->where(['c.status'=>1,'m.regtype'=>2])
+                ->paginate($rows, false, $pageParam);
+//                ->limit(3)->select();
         }else{
             $list=Db::name('company')->alias('c')
                 ->join('member m','m.id=c.user_id','left')
                 ->field('c.id,c.logo,c.open_time,c.type,c.company_name,c.contacts_scale,c.desc,c.introduction,c.achievement,c.status')
-                ->where(['c.status'=>1,'m.regtype'=>1])->limit(3)->select();
+                ->where(['c.status'=>1,'m.regtype'=>1])
+                ->paginate($rows, false, $pageParam);
+//                ->limit(3)->select();
         }
+        $list=$list->toArray();
+        $list=$list['data'];
         foreach ($list as $key=>$value){
             if($list[$key]['logo']){
                 $list[$key]['logo'] = SITE_URL . $list[$key]['logo'];

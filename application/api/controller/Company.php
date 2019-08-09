@@ -139,6 +139,7 @@ class Company extends ApiBase
             }
         }
     }
+
 // 信息
     public function look_company()
     {
@@ -299,6 +300,33 @@ class Company extends ApiBase
             }
         }
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $list]);
+    }
+    // 进入职位编辑
+    public function go_edit_recruit()
+    {
+        $user_id=$this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $id = input('id/d');
+        if (!$id || !($recruit = Db::name('recruit')->where(['id' => $id])->find())) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '信息不存在！']);
+        }
+        $recruit_edit=Db::name('audit')->where(['type'=>4,'content_id'=>$id])->find();
+        if($recruit_edit['status']==0){
+            $list=json_decode($recruit_edit['data'],true);
+            $this->ajaxReturn(['status' => 1, 'msg' => '保存成功', 'data' => $list]);
+        }else{
+            $detail = Db::name('recruit')
+                ->alias('r')
+                ->field('r.id,r.title,r.salary,r.work_age,c.province,c.logo,c.id company_id,c.company_name,c.city,c.district,r.detail,r.type')
+                ->join('company c', 'c.id=r.company_id', 'LEFT')
+                ->where(['r.id' => $id])
+                ->find();
+            $this->ajaxReturn(['status' => 1, 'msg' => '保存成功', 'data' => $detail]);
+        }
+
+
     }
     // 编辑招聘 审核失败可编辑
     public function edit_recruit()

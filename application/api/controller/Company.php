@@ -77,7 +77,7 @@ class Company extends ApiBase
             $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
         }else{
             if($audit['status']==1){
-                $data = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement')
+                $data = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement,province,city,district')
                     ->where(['user_id' => $user_id])->find();
                 if (!$data) {
                     return $this->ajaxReturn(['status' => -2, 'msg' => '不存在的信息']);

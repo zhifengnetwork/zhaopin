@@ -217,13 +217,15 @@ class Person extends ApiBase
     {
         $id = input('id/d');
         if (!$id) $this->ajaxReturn(['status' => -2, 'msg' => '信息不存在！']);
-
         $detail = Db::name('person')
             ->field('id,user_id,name,gender,avatar,school_type,age,work_age,images,job_type,desc,experience,reserve_c,province,city,district,degree')
             ->where(['id' => $id,'status'=>1])->find();
+
+
         if (!$detail) $this->ajaxReturn(['status' => -2, 'msg' => '信息不存在！']);
 
         $user_id=$this->get_user_id();
+
         $member=Db::name('member')->where(['id'=>$user_id])->find();
         $detail['is_collection']=0;
         if($member['regtype']==1||$member['regtype']==2){
@@ -232,6 +234,7 @@ class Person extends ApiBase
                 $detail['is_collection']=1;
             }
         }
+
         if (!$this->get_user_id() || !($company = CompanyModel::get(['user_id' => $this->get_user_id()]))) {
             $this->ajaxReturn(['status' => -1, 'msg' => '用户不存在']);
         }
@@ -246,7 +249,7 @@ class Person extends ApiBase
 //            $detail['work_age'] = '***';
 //            $detail['job_type'] = '***';
 //            $detail['desc'] = '***';
-            $detail['address']=$this->detail($detail['province']).$this->detail($detail['city']).$this->detail($detail['district']);
+            $detail['address']=$this->address($detail['province']).$this->address($detail['city']).$this->address($detail['district']);
             $detail['education'] = '***';
             $detail['experience'] = '***';
             if($detail['avatar']){
@@ -256,6 +259,7 @@ class Person extends ApiBase
             unset($detail['city']);
             unset($detail['district']);
         }
+
         $detail['gender'] = $detail['gender'] == 'female' ? '女' : '男';
         $detail['images'] = $detail['images']!='[]' ? 1 : 0;
         $detail['job_type'] = Category::getNameById($detail['job_type']) ?: '';

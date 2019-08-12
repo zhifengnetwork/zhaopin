@@ -51,7 +51,7 @@ class Company extends ApiBase
             $this->ajaxReturn(['status' => -3, 'msg' => '审核中，暂不可编辑']);
         }
         if (!$audit) {
-            $data = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement')
+            $data = Db::name('company')->field('id,logo,open_time,type,company_name,contacts_scale,desc,introduction,achievement,province,city,district')
                 ->where(['user_id' => $user_id])->find();
             if (!$data) {
                 return $this->ajaxReturn(['status' => -2, 'msg' => '不存在的信息']);
@@ -60,6 +60,9 @@ class Company extends ApiBase
             if($data['logo']){
                 $data['logo'] = SITE_URL . $data['logo'];
             }
+            $data['province_str']=$this->address($data['province']);
+            $data['city_str']=$this->address($data['city']);
+            $data['district_str']=$this->address($data['district']);
             if($data['open_time']){
                 $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
                 $data['open_year'] = $open ? $open[0] : '';
@@ -82,6 +85,9 @@ class Company extends ApiBase
                 if($data['logo']){
                     $data['logo'] = SITE_URL . $data['logo'];
                 }
+                $data['province_str']=$this->address($data['province']);
+                $data['city_str']=$this->address($data['city']);
+                $data['district_str']=$this->address($data['district']);
                 if($data['open_time']){
                     $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
                     $data['open_year'] = $open ? $open[0] : '';
@@ -101,6 +107,9 @@ class Company extends ApiBase
                 }else{
                     $data['logo']='';
                 }
+                $data['province_str']=$this->address($data['province']);
+                $data['city_str']=$this->address($data['city']);
+                $data['district_str']=$this->address($data['district']);
                 if(isset($data['open_time'])&&$data['open_time']){
                     $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
                     $data['open_year'] = $open ? $open[0] : '';
@@ -121,6 +130,9 @@ class Company extends ApiBase
                 }else{
                     $data['logo']='';
                 }
+                $data['province_str']=$this->address($data['province']);
+                $data['city_str']=$this->address($data['city']);
+                $data['district_str']=$this->address($data['district']);
                 if(isset($data['open_time'])&&$data['open_time']){
                     $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
                     $data['open_year'] = $open ? $open[0] : '';
@@ -139,7 +151,13 @@ class Company extends ApiBase
             }
         }
     }
-
+    public function address($code){
+        if($code){
+            return Db::name('region')->where(['code'=>$code])->value('area_name');
+        }else{
+            return '';
+        }
+    }
 // 信息
     public function look_company()
     {

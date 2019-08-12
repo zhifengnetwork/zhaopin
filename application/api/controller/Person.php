@@ -112,6 +112,9 @@ class Person extends ApiBase
             $audit_person=Db::name('audit')->where(['content_id'=>$user_id])->where(['type'=>3])->order('id DESC')->find();
             $data['is_edit']=$audit_person['status'];
             $data['gender'] = $data['gender'] == 'male' ? 1 : 2;
+            $data['province_str']=$this->address($data['province']);
+            $data['city_str']=$this->address($data['city']);
+            $data['district_str']=$this->address($data['district']);
             $data['avatar'] = SITE_URL . $data['avatar'];
             $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
         }else{
@@ -123,6 +126,9 @@ class Person extends ApiBase
                 }
                 $data['is_edit']=$audit['status'];
                 $data['gender'] = $data['gender'] == 'male' ? 1 : 2;
+                $data['province_str']=$this->address($data['province']);
+                $data['city_str']=$this->address($data['city']);
+                $data['district_str']=$this->address($data['district']);
                 $data['avatar'] = SITE_URL . $data['avatar'];
                 $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
             }elseif($audit['status']==0){
@@ -133,6 +139,9 @@ class Person extends ApiBase
                 }else{
                     $data['avatar']='';
                 }
+                $data['province_str']=$this->address($data['province']);
+                $data['city_str']=$this->address($data['city']);
+                $data['district_str']=$this->address($data['district']);
                 $data['is_edit']=$audit['status'];//是否可编辑
                 $data['remark']=$audit['remark'];
                 $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
@@ -144,6 +153,9 @@ class Person extends ApiBase
                 }else{
                     $data['avatar']='';
                 }
+                $data['province_str']=$this->address($data['province']);
+                $data['city_str']=$this->address($data['city']);
+                $data['district_str']=$this->address($data['district']);
                 $data['is_edit']=1;//是否可编辑
                 $data['remark']=$audit['remark'];
                 $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);

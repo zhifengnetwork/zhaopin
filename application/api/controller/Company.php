@@ -319,7 +319,7 @@ class Company extends ApiBase
         }else{
             $detail = Db::name('recruit')
                 ->alias('r')
-                ->field('r.id,r.title,r.salary,r.work_age,c.province,c.logo,c.id company_id,c.company_name,c.city,c.district,r.detail,r.type')
+                ->field('r.id,r.title,r.salary,r.work_age,c.province,c.logo,c.id company_id,c.company_name,c.city,c.district,r.detail,r.type,r.require_cert')
                 ->join('company c', 'c.id=r.company_id', 'LEFT')
                 ->where(['r.id' => $id])
                 ->find();

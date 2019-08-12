@@ -309,8 +309,12 @@ class Company extends ApiBase
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
         $id = input('id/d');
-        if (!$id || !($recruit = Db::name('recruit')->where(['id' => $id])->find())) {
+        $recruit = Db::name('recruit')->where(['id' => $id])->find();
+        if (!$id || !$recruit) {
             $this->ajaxReturn(['status' => -2, 'msg' => '信息不存在！']);
+        }
+        if($recruit['status']==0){
+            $this->ajaxReturn(['status' => -2, 'msg' => '职位信息未审核，不可编辑！']);
         }
         $recruit_edit=Db::name('audit')->where(['type'=>4,'content_id'=>$id])->find();
         if($recruit_edit['status']==0){

@@ -786,7 +786,7 @@ class User extends ApiBase
                 $where['r.title|c.company_name'] = ['like', '%' . $kw . '%'];
             }
             $list = Db::name('recruit')
-                ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
+                ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype,c.company_name,c.city,c.district')
                 ->alias('r')
                 ->join('company c', 'c.id=r.company_id', 'LEFT')
                 ->join('member m', 'c.user_id=m.id', 'LEFT')
@@ -797,6 +797,8 @@ class User extends ApiBase
                 if($list[$key]['logo']){
                     $list[$key]['logo']=SITE_URL.$list[$key]['logo'];
                 }
+                $list[$key]['city_str']=$this->address($value['city']);
+                $list[$key]['district_str']=$this->address($value['district']);
             }
             $company_id = Db::name('company')->where(['user_id'=>$user_id])->value('id');
             $where=['p.status'=>1,'p.reserve_c' => [['=', 0], ['=', $company_id], 'or']];
@@ -808,7 +810,7 @@ class User extends ApiBase
             $where['p.status']=1;
             $person = Db::name('person')
                 ->alias('p')
-                ->field('p.id,p.avatar,p.name,p.job_type,p.work_age,p.images')
+                ->field('p.id,p.avatar,p.name,p.job_type,p.work_age,p.images,p.school_type,p.salary')
                 ->where($where)
                 ->limit($start,$rows)
                 ->select();
@@ -828,7 +830,7 @@ class User extends ApiBase
                 $where['r.title|c.company_name'] = ['like', '%' . $kw . '%'];
             }
             $list = Db::name('recruit')
-                ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
+                ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype,c.company_name,c.city,c.district')
                 ->alias('r')
                 ->join('company c', 'c.id=r.company_id', 'LEFT')
                 ->join('member m', 'c.user_id=m.id', 'LEFT')
@@ -839,9 +841,11 @@ class User extends ApiBase
                 if($list[$key]['logo']){
                     $list[$key]['logo']=SITE_URL.$list[$key]['logo'];
                 }
+                $list[$key]['city_str']=$this->address($value['city']);
+                $list[$key]['district_str']=$this->address($value['district']);
             }
             $person = Db::name('recruit')
-                ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
+                ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype,c.company_name,c.city,c.district')
                 ->alias('r')
                 ->join('company c', 'c.id=r.company_id', 'LEFT')
                 ->join('member m', 'c.user_id=m.id', 'LEFT')
@@ -852,10 +856,19 @@ class User extends ApiBase
                 if($person[$k]['logo']){
                     $person[$k]['logo']=SITE_URL.$person[$k]['logo'];
                 }
+                $list[$key]['city_str']=$this->address($value['city']);
+                $list[$key]['district_str']=$this->address($value['district']);
             }
             $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
                 'data' => [ 'recruit' => $list, 'person' => $person]
             ]);
+        }
+    }
+    public function address($code){
+        if($code){
+            return Db::name('region')->where(['code'=>$code])->value('area_name');
+        }else{
+            return '';
         }
     }
     public function index()

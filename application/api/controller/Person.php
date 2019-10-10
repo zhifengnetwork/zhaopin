@@ -323,7 +323,7 @@ class Person extends ApiBase
         $list=Db::name('person')->alias('p')
             ->join('category ca','ca.cat_id=p.job_type','LEFT')
             ->where($where)
-            ->field('p.id,p.work_age,p.name,p.avatar,p.gender,p.images,ca.cat_name,p.status,p.reserve_c')
+            ->field('p.id,p.work_age,p.name,p.avatar,p.gender,p.images,ca.cat_name,p.status,p.reserve_c,p.school_type,p.salary')
             ->paginate($rows,false,$pageParam);
         if(!$list){
             $this->ajaxReturn(['status' => -2, 'msg' => '获取失败','data'=>$list]);
@@ -335,6 +335,8 @@ class Person extends ApiBase
             $value['name']=mb_substr($value['name'], 0, 1, 'utf-8').$na;
             if($value['avatar']){
                 $value['avatar']=SITE_URL.$value['avatar'];
+            }else{
+                $value['avatar']=SITE_URL.'/public/images/default.jpg';
             }
             unset($value['gender']);
         }

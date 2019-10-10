@@ -856,8 +856,8 @@ class User extends ApiBase
                 if($person[$k]['logo']){
                     $person[$k]['logo']=SITE_URL.$person[$k]['logo'];
                 }
-                $list[$key]['city_str']=$this->address($value['city']);
-                $list[$key]['district_str']=$this->address($value['district']);
+                $person[$k]['city_str']=$this->address($v['city']);
+                $person[$k]['district_str']=$this->address($v['district']);
             }
             $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
                 'data' => [ 'recruit' => $list, 'person' => $person]

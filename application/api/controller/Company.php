@@ -260,9 +260,9 @@ class Company extends ApiBase
     //公司、第三方列表
     public function company_list(){
         $user_id = $this->get_user_id();
-        $this->getCompany();
+//        $this->getCompany();
         if(!$user_id){
-            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不11存在','data'=>'']);
         }
         $where=[];
         $province=input('province');
@@ -286,7 +286,7 @@ class Company extends ApiBase
         if($regtype==1){
             $list=Db::name('company')->alias('c')
                 ->join('member m','m.id=c.user_id','left')
-                ->field('c.id,c.logo,c.open_time,c.type,c.company_name,c.contacts_scale,c.desc,c.introduction,c.achievement,c.status')
+                ->field('c.id,c.logo,c.open_time,c.type,c.company_name,c.contacts_scale,c.desc,c.introduction,c.achievement,c.status,c.city,c.district')
                 ->where(['c.status'=>1,'m.regtype'=>2])
                 ->where($where)
                 ->paginate($rows, false, $pageParam);
@@ -294,7 +294,7 @@ class Company extends ApiBase
         }else{
             $list=Db::name('company')->alias('c')
                 ->join('member m','m.id=c.user_id','left')
-                ->field('c.id,c.logo,c.open_time,c.type,c.company_name,c.contacts_scale,c.desc,c.introduction,c.achievement,c.status')
+                ->field('c.id,c.logo,c.open_time,c.type,c.company_name,c.contacts_scale,c.desc,c.introduction,c.achievement,c.status,c.city,c.district')
                 ->where(['c.status'=>1,'m.regtype'=>1])
                 ->where($where)
                 ->paginate($rows, false, $pageParam);
@@ -305,7 +305,11 @@ class Company extends ApiBase
         foreach ($list as $key=>$value){
             if($list[$key]['logo']){
                 $list[$key]['logo'] = SITE_URL . $list[$key]['logo'];
+            }else{
+                $value['avatar']=SITE_URL.'/public/images/default.jpg';
             }
+            $list[$key]['city_str']=$this->address($value['city']);
+            $list[$key]['district_str']=$this->address($value['district']);
             if($list[$key]['open_time']){
                 $open = $list[$key]['open_time'] ? explode('-', $list[$key]['open_time']) : [];
                 $list[$key]['open_year'] = $open ? $open[0] : '';

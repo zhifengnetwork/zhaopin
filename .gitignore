@@ -10,6 +10,8 @@ upload
 .project1
 .user.ini
 .well-known
-
-
+public/images/
+public/uploads/
+vendor/phpqrcode/cache
+vendor/phpqrcode/cache/*
 

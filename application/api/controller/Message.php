@@ -17,8 +17,8 @@ class Message extends ApiBase
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
-        $page=I('page',1);
-        $limit=I('limit',10);
+        $page=input('page',1);
+        $limit=input('limit',10);
         $start=($page-1)*$limit;
         $message=Db::name('message')->where(['show'=>1])->limit($start,$limit)->select();
         if (!empty($message)){

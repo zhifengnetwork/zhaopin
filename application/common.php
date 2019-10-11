@@ -83,7 +83,7 @@ function getTree1($items,$pid ="pid") {
 
 function checkMobile($mobilePhone)
 {
-    if (preg_match("/^1[345678]\d{9}$/", $mobilePhone)) {
+    if (preg_match("/^1[3456789]\d{9}$/", $mobilePhone)) {
         return $mobilePhone;
     } else {
         return false;

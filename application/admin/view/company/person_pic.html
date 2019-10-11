@@ -29,6 +29,7 @@
                     <th>学校名称</th>
                     <th>求职类型</th>
                     <th>申请时间</th>
+                    <th>状态</th>
                     <th>操作</th>
                 </tr>
                 </thead>
@@ -50,6 +51,7 @@
 
                     <td>{$row['person_data']['job_type']|cate}</td>
                     <td>{$row['create_time']}</td>
+                    <th>{if $row['status'] eq 0}申请中{elseif $row['status'] eq 1/}申请成功{else/}申请失败{/if}</th>
                     <td>
 
                         <a class='btn btn-default' data-toggle="modal" data-target="#dataModal{$row['id']}"  style=" margin-top: 6px;">

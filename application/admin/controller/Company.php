@@ -25,8 +25,8 @@ class Company extends Common
     }
 
     function company_list($regtype){
-        $where =  ['type'=>$regtype,'status'=>0];
-        $pageParam['query']=['type'=>$regtype,'status'=>0];
+        $where =  ['type'=>$regtype];
+        $pageParam['query']=['type'=>$regtype];
         return Audit::where($where)
             ->paginate(10,false,$pageParam);
     }
@@ -89,8 +89,8 @@ class Company extends Common
         $this->success('操作成功', url('company/index'));
     }
     public function person_list(){
-        $where=['type'=>3,'status'=>0];
-        $pageParam = ['query' => ['type'=>3,'status'=>0]];
+        $where=['type'=>3];
+        $pageParam = ['query' => ['type'=>3]];
         $list=Audit::where($where)->order('id desc')
 //            ->field('p.*,c.cat_name')
             ->paginate(10,false,$pageParam);
@@ -306,8 +306,8 @@ class Company extends Common
     }
 
     public function person_pic(){
-        $where =  ['type'=>6,'status'=>0];
-        $pageParam['query']=['regtype'=>6,'status'=>0];
+        $where =  ['type'=>6];
+        $pageParam['query']=['regtype'=>6];
         $list=Audit::where($where)->order('id desc')
             ->paginate(10,false,$pageParam);
 

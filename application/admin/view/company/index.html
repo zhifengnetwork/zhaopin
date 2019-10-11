@@ -30,6 +30,7 @@
                     <th>公司类型</th>
                     <th>审核类型</th>
                     <th>申请时间</th>
+                    <th>状态</th>
                     <th>操作</th>
                 </tr>
                 </thead>
@@ -53,11 +54,13 @@
                     <td>{$row['company_data']['type']}</td>
                     <td>{if $row['edit'] eq 0}注册用户审核{else/}编辑信息审核{/if}</td>
                     <th>{$row['create_time']}</th>
+                    <th>{if $row['status'] eq 0}申请中{elseif $row['status'] eq 1/}申请成功{else/}申请失败{/if}</th>
                     <td>
 
                         <a class='btn btn-default' data-toggle="modal" data-target="#dataModal{$row['content_id']}"  style=" margin-top: 6px;">
                             查看详情
                         </a>
+                        {if $row['status'] eq 0}
                         <a class='btn btn-default' onclick="return confirm('通过审批')" href="{:url('company/audit',array('status'=>'1','id' => $row['id']));}" style="background-color: #ffb034; color:#fff;">
                                 通过审批
                             </a>
@@ -67,6 +70,7 @@
                                 不通过审批
                             </a>
                             <br />
+                        {/if}
 
 
                             <div class="modal fade" id="myModal{$row['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

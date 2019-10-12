@@ -28,6 +28,7 @@
                     <th>标题</th>
                     <th>工种</th>
                     <th>时间</th>
+                    <th>状态</th>
                     <th>操作</th>
                 </tr>
                 </thead>
@@ -53,8 +54,13 @@
                         {$row['create_time']}
                     </td>
                     <td>
+                        {if $row['status'] eq 0}申请中{elseif $row['status'] eq 1/}申请成功{else/}申请失败{/if}
+                    </td>
+                    <td>
+
                         <a class='btn btn-default' data-toggle="modal" data-target="#dataModal{$row['id']}">
                             <i class='fa fa-edit'></i> 查看详情</a>
+                        {if $row['status'] eq 0 }
                         <a class='btn btn-default' onclick="return confirm('通过审批')" href="{:url('company/recruit_audit',array('status'=>'1','id' => $row['id']));}" style="background-color: #ffb034; color:#fff;">
                             通过审批
                         </a>
@@ -64,7 +70,7 @@
                             不通过审批
                         </a>
                         <br />
-
+                        {/if}
                         <div class="modal fade" id="myModal{$row['id']}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                             <form action="{:url('company/recruit_audit',array('status'=>'-1','id' => $row['id']));}" method="post">
                                 <div class="modal-dialog">

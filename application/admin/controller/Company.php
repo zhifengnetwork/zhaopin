@@ -239,8 +239,8 @@ class Company extends Common
      */
     public function audit_list()
     {
-        $where =  ['a.type'=>4,'a.status'=>0];
-        $pageParam['query']=['a.type'=>4,'a.status'=>0];
+        $where =  ['a.type'=>4];
+        $pageParam['query']=['a.type'=>4];
         $list=Audit::where($where)->field('a.*')->order('a.id desc')->alias('a')
             ->join('recruit r','a.content_id=r.id')
             ->paginate(10,false,$pageParam);
@@ -272,7 +272,7 @@ class Company extends Common
             $this->error('内容不能为空');
         }
         Db::startTrans();
-        if ($recruit['edit'] == 1 && $status == 1){
+        if ($recruit['edit'] == 1){
             $data = json_decode($audit['data'],true);
         }
         $data['status']=$status;

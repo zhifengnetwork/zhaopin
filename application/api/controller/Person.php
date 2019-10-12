@@ -264,9 +264,7 @@ class Person extends ApiBase
             $detail['address']=$this->address($detail['province']).$this->address($detail['city']).$this->address($detail['district']);
             $detail['education'] = '***';
             $detail['experience'] = '***';
-            if($detail['avatar']){
-                $detail['avatar']=SITE_URL.$detail['avatar'];
-            }
+            $detail['avatar']=SITE_URL.($detail['avatar']?:'/public/images/default.jpg');
             unset($detail['province']);
             unset($detail['city']);
             unset($detail['district']);

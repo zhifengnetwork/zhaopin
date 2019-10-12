@@ -379,10 +379,13 @@ class Company extends ApiBase
 
         Db::startTrans();
         if ($id > 0) {
-            if ($recruit['edit'] == 0 && !Db::name('recruit')->where(['company_id' => $this->_id, 'id' => $id])->update(['edit' => 1,'status'=>0])) {
+            $d =['status'=>0];
+            $recruit['edit'] == 0&& $d['edit'] = 1;
+            if (!Db::name('recruit')->where(['company_id' => $this->_id, 'id' => $id])->update($d)) {
                 Db::rollback();
                 $this->ajaxReturn(['status' => -2, 'msg' => '保存失败']);
             }
+
         } else {
             $data['company_id'] = $this->_id;
             $data['create_time'] = time();

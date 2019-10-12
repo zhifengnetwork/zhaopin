@@ -338,7 +338,7 @@ class Company extends ApiBase
         if($recruit['status']==0){
             $this->ajaxReturn(['status' => -2, 'msg' => '职位信息未审核，不可编辑！']);
         }
-        $recruit_edit=Db::name('audit')->where(['type'=>4,'content_id'=>$id])->find();
+        $recruit_edit=Db::name('audit')->where(['type'=>4,'content_id'=>$id])->order('id desc')->find();
         if($recruit_edit['status']==0){
             $list=json_decode($recruit_edit['data'],true);
             $this->ajaxReturn(['status' => 1, 'msg' => '保存成功', 'data' => $list]);
@@ -379,7 +379,7 @@ class Company extends ApiBase
 
         Db::startTrans();
         if ($id > 0) {
-            if ($recruit['edit'] == 0 && !Db::name('recruit')->where(['company_id' => $this->_id, 'id' => $id])->update(['edit' => 1])) {
+            if ($recruit['edit'] == 0 && !Db::name('recruit')->where(['company_id' => $this->_id, 'id' => $id])->update(['edit' => 1,'status'=>0])) {
                 Db::rollback();
                 $this->ajaxReturn(['status' => -2, 'msg' => '保存失败']);
             }

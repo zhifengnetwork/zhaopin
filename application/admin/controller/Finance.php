@@ -41,7 +41,7 @@ class Finance extends Common
         }
 
         if (!empty($kw)) {
-            is_numeric($kw) ? $where['m.mobile'] = ['like', "%{$kw}%"] : $where['m.realname'] = ['like', "%{$kw}%"];
+            $where['m.mobile'] = ['like', "%{$kw}%"];
         }
         if ($begin_time && $end_time) {
             $where['log.create_time'] = [['EGT', strtotime($begin_time)], ['LT', strtotime($end_time)]];

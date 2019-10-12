@@ -280,6 +280,10 @@ class Company extends ApiBase
             $where['c.district']=$district;
             $pageParam['query']['district']=$district;
         }
+        if($kw=input('kw')){
+            $where['c.company_name']=['like', '%' . $kw . '%'];
+            $pageParam['query']['company_name']=['like', '%' . $kw . '%'];
+        }
         $pageParam=[];
         $rows=input('rows',10);
         $regtype = Db::name('member')->where(['id'=>$this->get_user_id()])->value('regtype');

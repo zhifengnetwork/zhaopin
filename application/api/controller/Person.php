@@ -115,7 +115,7 @@ class Person extends ApiBase
             $data['province_str']=$this->address($data['province']);
             $data['city_str']=$this->address($data['city']);
             $data['district_str']=$this->address($data['district']);
-            $data['avatar'] = SITE_URL . $data['avatar'];
+            $data['avatar'] = SITE_URL . ($data['avatar']?:'/public/images/default.jpg');
             $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
         }else{
             if($audit['status']==1){
@@ -129,7 +129,7 @@ class Person extends ApiBase
                 $data['province_str']=$this->address($data['province']);
                 $data['city_str']=$this->address($data['city']);
                 $data['district_str']=$this->address($data['district']);
-                $data['avatar'] = SITE_URL . $data['avatar'];
+                $data['avatar'] = SITE_URL . ($data['avatar']?:'/public/images/default.jpg');
                 $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
             }elseif($audit['status']==0){
                 $data=json_decode($audit['data'],true);
@@ -137,7 +137,7 @@ class Person extends ApiBase
                 if(isset($data['avatar'])&&$data['avatar']){
                     $data['avatar'] = SITE_URL . $data['avatar'];
                 }else{
-                    $data['avatar']='';
+                    $data['avatar']= SITE_URL . '/public/images/default.jpg';
                 }
                 $data['province_str']=$this->address($data['province']);
                 $data['city_str']=$this->address($data['city']);
@@ -151,7 +151,7 @@ class Person extends ApiBase
                 if(isset($data['avatar'])&&$data['avatar']){
                     $data['avatar'] = SITE_URL . $data['avatar'];
                 }else{
-                    $data['avatar']='';
+                    $data['avatar']= SITE_URL . '/public/images/default.jpg';
                 }
                 $data['province_str']=$this->address($data['province']);
                 $data['city_str']=$this->address($data['city']);

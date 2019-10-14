@@ -36,7 +36,7 @@ class Collection extends ApiBase
             foreach ($list as $key=>$value){
 //                $list[$key]['city']=Region::getName($list[$key]['city']);
 //                $list[$key]['district']=Region::getName($list[$key]['district']);
-                $list[$key]['logo']=SITE_URL.$list[$key]['logo'];
+                $list[$key]['logo']=SITE_URL.($list[$key]['logo']?:'/public/images/default.jpg');
             }
             $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$list]);
         }elseif ($regtype==2){
@@ -53,7 +53,7 @@ class Collection extends ApiBase
             foreach ($list as $key=>$value){
 //                $list[$key]['city']=Region::getName($list[$key]['city']);
 //                $list[$key]['district']=Region::getName($list[$key]['district']);
-                $list[$key]['logo']=SITE_URL.$list[$key]['logo'];
+                $list[$key]['logo']=SITE_URL.($list[$key]['logo']?:'/public/images/default.jpg');
             }
             $this->ajaxReturn(['status' => 1 , 'msg'=>'成功！','data'=>$list]);
         }elseif ($regtype==3){

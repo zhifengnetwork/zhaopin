@@ -609,9 +609,7 @@ class User extends ApiBase
             ->limit(6)
             ->where(['r.is_hot' => 1, 'r.status' => 1])->select();
         foreach ($list as $key=>$value){
-            if($list[$key]['logo']){
-                $list[$key]['logo']=SITE_URL.($list[$key]['logo']?:'/public/images/default.jpg');
-            }
+            $list[$key]['logo']=SITE_URL.($list[$key]['logo']?:'/public/images/default.jpg');
         }
         // 找活
         $person = Db::name('person')
@@ -623,9 +621,7 @@ class User extends ApiBase
         foreach ($person as &$v) {
             $v['job_type'] = Category::getNameById($v['job_type']) ?: '';
             $v['images'] = $v['images']!='[]' ? 1 : 0;
-            if($v['avatar']){
-                $v['avatar']=SITE_URL.($v['avatar']?:'/public/images/default.jpg');
-            }
+            $v['avatar']=SITE_URL.($v['avatar']?:'/public/images/default.jpg');
         }
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
             'data' => ['ad' => $adList, 'recruit' => $list, 'person' => $person]
@@ -676,9 +672,7 @@ class User extends ApiBase
                 ->where($where)
                 ->where(['r.is_hot' => 1, 'r.status' => 1,'m.regtype'=>$rt])->select();
             foreach ($list as $key=>$value){
-                if($list[$key]['logo']){
-                    $list[$key]['logo']=SITE_URL.($list[$key]['logo']?:'/public/images/default.jpg');
-                }
+                $list[$key]['logo']=SITE_URL.($list[$key]['logo']?:'/public/images/default.jpg');
             }
             $company_id = Db::name('company')->where(['user_id'=>$user_id])->value('id');
             $job_type=input('job_type');
@@ -707,9 +701,7 @@ class User extends ApiBase
             foreach ($person as &$v) {
                 $v['job_type'] = Category::getNameById($v['job_type']) ?: '';
                 $v['images'] = $v['images']!='[]' ? 1 : 0;
-                if($v['avatar']){
-                    $v['avatar']=SITE_URL.($v['avatar']?:'/public/images/default.jpg');
-                }
+                $v['avatar']=SITE_URL.($v['avatar']?:'/public/images/default.jpg');
             }
             $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
                 'data' => ['ad' => $adList, 'recruit' => $list, 'person' => $person]
@@ -740,9 +732,7 @@ class User extends ApiBase
                 ->limit(6)
                 ->where(['r.is_hot' => 1, 'r.status' => 1,'m.regtype'=>1])->select();
             foreach ($list as $key=>$value){
-                if($list[$key]['logo']){
-                    $list[$key]['logo']=SITE_URL.($list[$key]['logo']?:'/public/images/default.jpg');
-                }
+                $list[$key]['logo']=SITE_URL.($list[$key]['logo']?:'/public/images/default.jpg');
             }
             $person = Db::name('recruit')
                 ->field('r.id,c.logo,r.title,r.salary,r.work_age,r.require_cert,m.regtype')
@@ -753,9 +743,7 @@ class User extends ApiBase
                 ->limit(6)
                 ->where(['r.is_hot' => 1, 'r.status' => 1,'m.regtype'=>2])->select();
             foreach ($person as $k=>$v){
-                if($person[$k]['logo']){
-                    $person[$k]['logo']=SITE_URL.($person[$k]['logo']?:'/public/images/default.jpg');
-                }
+                $person[$k]['logo']=SITE_URL.($person[$k]['logo']?:'/public/images/default.jpg');
             }
             $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
                 'data' => ['ad' => $adList, 'recruit' => $list, 'person' => $person]
@@ -794,9 +782,7 @@ class User extends ApiBase
                 ->where($where)
                 ->where(['r.is_hot' => 1, 'r.status' => 1,'m.regtype'=>$rt])->select();
             foreach ($list as $key=>$value){
-                if($list[$key]['logo']){
-                    $list[$key]['logo']=SITE_URL.($list[$key]['logo']?:'/public/images/default.jpg');
-                }
+                $list[$key]['logo']=SITE_URL.($list[$key]['logo']?:'/public/images/default.jpg');
                 $list[$key]['city_str']=$this->address($value['city']);
                 $list[$key]['district_str']=$this->address($value['district']);
             }
@@ -817,9 +803,7 @@ class User extends ApiBase
             foreach ($person as &$v) {
                 $v['job_type'] = Category::getNameById($v['job_type']) ?: '';
                 $v['images'] = $v['images']!='[]' ? 1 : 0;
-                if($v['avatar']){
-                    $v['avatar']=SITE_URL.($v['avatar']?:'/public/images/default.jpg');
-                }
+                $v['avatar']=SITE_URL.($v['avatar']?:'/public/images/default.jpg');
             }
             $this->ajaxReturn(['status' => 1, 'msg' => '请求成功！',
                 'data' => ['recruit' => $list, 'person' => $person]
@@ -838,9 +822,7 @@ class User extends ApiBase
                 ->limit($start,$rows)
                 ->where([ 'r.status' => 1,'m.regtype'=>1])->select();
             foreach ($list as $key=>$value){
-                if($list[$key]['logo']){
-                    $list[$key]['logo']=SITE_URL.($list[$key]['logo']?:'/public/images/default.jpg');
-                }
+                $list[$key]['logo']=SITE_URL.($list[$key]['logo']?:'/public/images/default.jpg');
                 $list[$key]['city_str']=$this->address($value['city']);
                 $list[$key]['district_str']=$this->address($value['district']);
             }
@@ -853,9 +835,7 @@ class User extends ApiBase
                 ->limit($start,$rows)
                 ->where([ 'r.status' => 1,'m.regtype'=>2])->select();
             foreach ($person as $k=>$v){
-                if($person[$k]['logo']){
-                    $person[$k]['logo']=SITE_URL.($person[$k]['logo']?:'/public/images/default.jpg');
-                }
+                $person[$k]['logo']=SITE_URL.($person[$k]['logo']?:'/public/images/default.jpg');
                 $person[$k]['city_str']=$this->address($v['city']);
                 $person[$k]['district_str']=$this->address($v['district']);
             }

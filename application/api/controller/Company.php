@@ -57,9 +57,7 @@ class Company extends ApiBase
                 return $this->ajaxReturn(['status' => -2, 'msg' => '不存在的信息']);
             }
             $audit=Db::name('audit')->where(['content_id'=>$user_id])->where(['type'=>$regtype])->order('id DESC')->find();
-            if($data['logo']){
-                $data['logo'] = SITE_URL . $data['logo'];
-            }
+            $data['logo'] = SITE_URL.($data['logo']?:'/public/images/default.jpg');
             $data['province_str']=$this->address($data['province']);
             $data['city_str']=$this->address($data['city']);
             $data['district_str']=$this->address($data['district']);
@@ -82,9 +80,7 @@ class Company extends ApiBase
                 if (!$data) {
                     return $this->ajaxReturn(['status' => -2, 'msg' => '不存在的信息']);
                 }
-                if($data['logo']){
-                    $data['logo'] = SITE_URL . $data['logo'];
-                }
+                $data['logo'] = SITE_URL.($data['logo']?:'/public/images/default.jpg');
                 $data['province_str']=$this->address($data['province']);
                 $data['city_str']=$this->address($data['city']);
                 $data['district_str']=$this->address($data['district']);
@@ -102,11 +98,7 @@ class Company extends ApiBase
                 $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
             }elseif($audit['status']==0){
                 $data=json_decode($audit['data'],true);
-                if(empty($company['logo'])&&$company['logo']){
-                    $data['logo'] = SITE_URL . $company['logo'];
-                }else{
-                    $data['logo']='';
-                }
+                $data['logo'] = SITE_URL . ($company['logo']?:'/public/images/default.jpg');
                 $data['province_str']=$this->address($data['province']);
                 $data['city_str']=$this->address($data['city']);
                 $data['district_str']=$this->address($data['district']);
@@ -125,11 +117,7 @@ class Company extends ApiBase
                 $this->ajaxReturn(['status' => 1, 'msg' => '请1求成功', 'data' => $data]);
             }elseif ($audit['status']==-1){
                 $data=json_decode($audit['data'],true);
-                if(empty($company['logo'])&&$company['logo']){
-                    $data['logo'] = SITE_URL . $company['logo'];
-                }else{
-                    $data['logo']='';
-                }
+                $data['logo'] = SITE_URL . ($company['logo']?:'/public/images/default.jpg');
                 $data['province_str']=$this->address($data['province']);
                 $data['city_str']=$this->address($data['city']);
                 $data['district_str']=$this->address($data['district']);
@@ -174,9 +162,8 @@ class Company extends ApiBase
         if($data['status']==0){
             $this->ajaxReturn(['status' => -3, 'msg' => '该公司信息审核中，暂不可查看']);
         }
-        if($data['logo']){
-            $data['logo'] = SITE_URL . $data['logo'];
-        }
+        $data['logo'] = SITE_URL . ($data['logo']?:'/public/images/default.jpg');
+
         if($data['open_time']){
             $open = $data['open_time'] ? explode('-', $data['open_time']) : [];
             $data['open_year'] = $open ? $open[0] : '';
@@ -307,11 +294,7 @@ class Company extends ApiBase
         $list=$list->toArray();
         $list=$list['data'];
         foreach ($list as $key=>$value){
-            if($list[$key]['logo']){
-                $list[$key]['logo'] = SITE_URL . $list[$key]['logo'];
-            }else{
-                $value['avatar']=SITE_URL.'/public/images/default.jpg';
-            }
+            $list[$key]['logo'] = SITE_URL . ($list[$key]['logo']?:'/public/images/default.jpg');
             $list[$key]['city_str']=$this->address($value['city']);
             $list[$key]['district_str']=$this->address($value['district']);
             if($list[$key]['open_time']){
@@ -461,9 +444,7 @@ class Company extends ApiBase
             ->paginate(3,false,$pageParam);
         $recruit_hot=$recruit_hot->toArray();
         foreach ($recruit_hot['data'] as $key=>&$value){
-            if($value['logo']){
-                $value['logo']=SITE_URL.$value['logo'];
-            }
+            $value['logo']=SITE_URL.($value['logo']?:'/public/images/default.jpg');
         }
         $data['recruit_hot']=$recruit_hot['data'];
         unset($where['r.is_rcmd']);
@@ -477,9 +458,7 @@ class Company extends ApiBase
             ->paginate(3,false,$pageParam);
         $recruit_better=$recruit_better->toArray();
         foreach ($recruit_better['data'] as $k=>&$v){
-            if($v['logo']){
-                $v['logo']=SITE_URL.$v['logo'];
-            }
+            $v['logo']=SITE_URL.($v['logo']?:'/public/images/default.jpg');
         }
         $data['recruit_better']=$recruit_better['data'];
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $data]);
@@ -519,9 +498,7 @@ class Company extends ApiBase
             ->paginate($rows,false,$pageParam);
         $recruit_better=$recruit_better->toArray();
         foreach ($recruit_better['data'] as $k=>&$v){
-            if($v['logo']){
-                $v['logo']=SITE_URL.$v['logo'];
-            }
+            $v['logo']=SITE_URL.($v['logo']?:'/public/images/default.jpg');
         }
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $recruit_better['data']]);
     }
@@ -559,9 +536,7 @@ class Company extends ApiBase
             ->paginate($rows,false,$pageParam);
         $recruit_hot=$recruit_hot->toArray();
         foreach ($recruit_hot['data'] as $key=>&$value){
-            if($value['logo']){
-                $value['logo']=SITE_URL.$value['logo'];
-            }
+            $value['logo']=SITE_URL.($value['logo']?:'/public/images/default.jpg');
         }
         $this->ajaxReturn(['status' => 1, 'msg' => '请求成功', 'data' => $recruit_hot['data']]);
     }

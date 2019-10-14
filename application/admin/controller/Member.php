@@ -184,11 +184,6 @@ class Member extends Common
         if (empty($member)) {
             $this->error('会员不存在，无法删除!');
         }
-        $agentcount = MemberModel::where(['agentid' => $uid])->count();
-
-        if ($agentcount > 0) {
-            $this->error('此会员有下线存在，无法删除!');
-        }
 
         $res = MemberModel::where(['id' => $uid])->delete();
 

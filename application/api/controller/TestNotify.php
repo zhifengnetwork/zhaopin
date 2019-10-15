@@ -126,6 +126,137 @@ class TestNotify implements PayNotifyInterface
 
             
         } elseif ($channel === Config::WX_CHARGE) {// 微信支付
+            $amount=$data['amount'];
+            $order_sn=$data['order_no'];
+            $is_who=substr($order_sn,0,1);
+            $recharge=Db::name('recharge')->where(['recharge_sn'=>$order_sn])->find();
+            if(!$recharge||$recharge['status']==1){
+                return false;
+            }
+            $user_id=$recharge['user_id'];
+            $member=Db::name('member')->where(['user_id'=>$user_id])->find();
+            if($is_who=='R'){//充值
+                Db::startTrans();
+                $update = [
+//                    'seller_id'      => $data['seller_id'],
+//                    'transaction_id' => $data['transaction_id'],
+                    'status'     => 1,
+                    'pay_time'       => strtotime($data['pay_time']),
+                ];
+                Db::name('recharge')->where(['recharge_sn'=>$order_sn])->update($update);
+                $res=Db::table('member')->where('id',$user_id)->setInc('balance',$amount);
+                if(!$res){
+                    Db::rollback();
+                    return false;
+                }
+                $data=[];
+                $data['user_id']=$user_id;
+                $data['money']=$amount;
+                $data['old_balance']=$member['balance'];
+                $data['balance']=sprintf("%.2f",$member['balance']+$amount);
+                $data['balance_type']='充值';
+                $data['source_type']=2;
+                $data['log_type']=0;
+                $data['source_id']=$user_id;
+                $data['create_time']=time();
+                Db::name('member_balance_log')->insertGetId($data);
+                Db::commit();
+                return true;
+            }elseif ($is_who=='V'){//VIP充值
+                $vip_type=$recharge['for_id'];
+                $sysset = Db::table('sysset')->field('*')->find();
+                $set =json_decode($sysset['vip'], true);
+                $member['month_money']=$set['month_money'];
+                $member['quarter_money']=$set['quarter_money'];
+                $member['year_money']=$set['year_money'];
+                $company=Db::name('company')->where(['user_id'=>$user_id])->find();
+                if(!$company){
+                    return false;
+                }
+                $vip_time=$company['vip_time'];
+                $money=0;
+                if($vip_time<time()){
+                    $vip_time=time();
+                }
+                $num=0;
+                switch ($vip_type){
+                    case 1:
+                        $money=$set['month_money'];
+                        $num=$set['month'];
+                        $vip_time=strtotime("+1 month",$vip_time);
+                        break;
+                    case 2:
+                        $money=$set['quarter_money'];
+                        $num=$set['quarter'];
+                        $vip_time=strtotime("+3 month",$vip_time);
+                        break;
+                    case 3:
+                        $money=$set['year_money'];
+                        $num=$set['year'];
+                        $vip_time=strtotime("+12 month",$vip_time);
+                        break;
+                    default:
+                        $this->ajaxReturn(['status' => -2, 'msg' => '会员类型不存在','data'=>[]]);
+                        break;
+                }
+                Db::startTrans();
+                Db::table('member')->where('id',$user_id)->setDec('balance',$money);
+                $data['is_vip']=1;
+                $data['vip_type']=$vip_type;
+                $data['vip_time']=$vip_time;
+                $data['reserve_num']=$company['reserve_num']+$num;
+                $data['reserve_num_all']=$company['reserve_num_all']+$num;
+                $res=Db::name('company')->where(['user_id'=>$user_id])->update($data);
+                if(!$res){
+                    Db::rollback();
+                    return false;
+                }
+                $update = [
+//                    'seller_id'      => $data['seller_id'],
+//                    'transaction_id' => $data['transaction_id'],
+                    'status'     => 1,
+                    'pay_time'       => strtotime($data['pay_time']),
+                ];
+                Db::name('recharge')->where(['recharge_sn'=>$order_sn])->update($update);
+                $data=[];
+                $data['user_id']=$user_id;
+                $data['money']=$money;
+                $data['old_balance']=$member['balance'];
+                $data['balance']=sprintf("%.2f",$member['balance']-$money);
+                $data['balance_type']='VIP购买';
+                $data['source_type']=4;
+                $data['log_type']=0;
+                $data['source_id']=$user_id;
+                $data['create_time']=time();
+                $m_id=Db::name('member_balance_log')->insertGetId($data);
+                if(!$m_id){
+                    Db::rollback();
+                    return false;
+                }
+                Db::commit();
+                return true;
+            }elseif ($is_who=='Y'){//预约
+//                $reserve_money = Db::name('config')->where(['name'=>'reserve_money'])->value('value');
+                Db::startTrans();
+                $update = [
+//                    'seller_id'      => $data['seller_id'],
+//                    'transaction_id' => $data['transaction_id'],
+                    'status'     => 1,
+                    'pay_time'       => strtotime($data['pay_time']),
+                ];
+                Db::name('recharge')->where(['recharge_sn'=>$order_sn])->update($update);
+                if (Db::name('person')->where(['id' => $recharge['to_id']])->update(['reserve_c' =>$recharge['for_id']])) {
+                    //删除收藏该应聘者的数据，除了预约的第三方或公司
+                    Db::name('collection')->where(['type' => 2, 'to_id' => $recharge['to_id'], 'user_id' => ['neq', $recharge['user_id']]])->delete();
+                    Db::commit();
+                    return true;
+                }else{
+                    Db::rollback();
+                    return false;
+                }
+            }else{
+                return false;
+            }
         } elseif ($channel === Config::CMB_CHARGE) {// 招商支付
         } elseif ($channel === Config::CMB_BIND) {// 招商签约
         } else {

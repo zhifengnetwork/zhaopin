@@ -196,6 +196,52 @@ class Pay extends ApiBase
             exit;
         }
     }
+    //微信支付
+    public function recharge_pay(){
+
+        $recharge_id     = input('recharge_id');
+//        $type     = input('type');//支付类型
+        $user_id      = $this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $where['id']=$recharge_id;
+        $where['user_id']=$user_id;
+        $member       = MemberModel::get($user_id);
+        $recharge=Db::name('recharge')->where($where)->find();
+        if(!$recharge){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'支付订单不存在','data'=>'']);
+        }
+        if($recharge['status']==1){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'该订单已支付','data'=>'']);
+        }
+        switch ($recharge['type']){
+            case 1:
+                $pay_name='充值商品';
+                break;
+            case 2:
+                $pay_name='vip商品';
+                break;
+            case 3:
+                $pay_name='预约商品';
+                break;
+            default:
+                $pay_name='其他商品';
+                break;
+        }
+        $rechData['order_no']        = $recharge['recharge_sn'];
+        $rechData['subject']        = $pay_name;
+        $rechData['body']            = '购买商品';
+        $rechData['timeout_express'] = time() + 600;
+        $rechData['amount']          = $recharge['money'];
+        $rechData['product_id']          = '';
+        $rechData['return_param']          = '';
+        $rechData['client_ip']          = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1';
+        $rechData['openid']       = $member['openid'];
+        $wxConfig = Config::get('pay_weixin');
+        $url      = Charge::run(PayConfig::WX_CHANNEL_LITE, $wxConfig, $rechData);
+        $this->ajaxReturn(['status' => 1 , 'msg'=>'正确','data'=>$url]);
+    }
     /**
      * 打卡微信支付接口
      */

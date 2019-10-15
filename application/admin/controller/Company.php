@@ -62,6 +62,12 @@ class Company extends Common
             $data['auditor'] = UID;
             $data['examination'] = time();
             $data['edit'] = 1;
+            if ($status == 1) {
+                // 普通会员可免费预约查看人数设置
+                $sysset = Db::table('sysset')->field('*')->find();
+                $set = json_decode($sysset['vip'], true);
+                isset($set['members']) && $set['members'] > 0 && ($data['reserve_num_all'] = $set['members']);
+            }
             $res = Db::name('company')->where(['user_id' => $audit['content_id']])->update($data);
             if ($res===false) {
                 Db::rollback();

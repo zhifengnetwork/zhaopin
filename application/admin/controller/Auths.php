@@ -159,4 +159,23 @@ class Auths extends Common
         return $this->fetch();
     }
 
+    public function del(){
+        $id = input('id/d',0);
+        if(!$id||$id<1){
+            jason([],'参数错误',0);
+        }
+        $info = Db::table('auth_group')->find($id);
+        if(!$info){
+            jason([],'参数错误',0);
+        }
+
+        if( Db::table('auth_group')->where('id',$id)->delete() ){
+            //添加操作日志
+            jason([],'删除成功！');
+        }else{
+            jason([],'删除失败！',0);
+        }
+
+    }
+
 }

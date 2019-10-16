@@ -789,19 +789,19 @@ class User extends ApiBase
             $company_id = Db::name('company')->where(['user_id'=>$user_id])->value('id');
             $where=['p.status'=>1,'p.reserve_c' => [['=', 0], ['=', $company_id], 'or']];
             if($kw){
-                $where['p.name']=['like', '%' . $kw . '%'];
+                $where['p.name|c.cat_name']=['like', '%' . $kw . '%'];
             }
             // 找活
             $where['p.reserve_c']=0;
             $where['p.status']=1;
             $person = Db::name('person')
                 ->alias('p')
-                ->field('p.id,p.avatar,p.name,p.job_type,p.work_age,p.images,p.school_type,p.salary')
+                ->field('p.id,p.avatar,p.name,c.cat_name as job_type,p.work_age,p.images,p.school_type,p.salary')
+                ->join('category c', 'c.cat_id=p.job_type', 'LEFT')
                 ->where($where)
                 ->limit($start,$rows)
                 ->select();
             foreach ($person as &$v) {
-                $v['job_type'] = Category::getNameById($v['job_type']) ?: '';
                 $v['images'] = $v['images']!='[]' ? 1 : 0;
                 $v['avatar']=SITE_URL.($v['avatar']?:'/public/images/default.jpg');
             }
@@ -1273,6 +1273,23 @@ class User extends ApiBase
         if (!$user_id) {
             $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在', 'data' => '']);
         }
+        $member = Db::table('member')->where(['id' => $user_id])->find();
+        $mobile = input('userName');
+        if (!$mobile||!checkMobile($mobile)) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '手机号格式错误！']);
+        }
+        if ($mobile!==$member['mobile']) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '手机号错误！']);
+        }
+        $password = input('password/d');
+        if (!$password) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '密码格式错误！']);
+        }
+        $password = md5($member['salt'] . $password);
+        if ($member['password'] !== $password) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '密码错误！']);
+        }
+
         $new_mobile = input('mobile');
         if (!checkMobile($new_mobile)) {
             $this->ajaxReturn(['status' => -2, 'msg' => '手机号格式错误！']);
@@ -1282,7 +1299,6 @@ class User extends ApiBase
         if($user){
             $this->ajaxReturn(['status' => -2, 'msg' => '该手机号已有用户！', 'data' => '']);
         }
-        $member = Db::table('member')->where(['id' => $user_id])->find();
         if ($member['mobile'] == $new_mobile) {
             $this->ajaxReturn(['status' => -2, 'msg' => '手机号不能相同！', 'data' => '']);
         }

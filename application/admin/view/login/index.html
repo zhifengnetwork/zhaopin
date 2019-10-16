@@ -29,7 +29,7 @@
                     <input type="text" name="captcha" class="form-control" placeholder="验证码" required="">
                 </div>
                 <div class="form-group">
-                    <img src="{:captcha_src()}" alt="captcha" onclick="this.src=this.src"/>
+                    <img src="{:captcha_src()}" id="captcha" alt="captcha" onclick="this.src=this.src"/>
                 </div>
                     <button type="button" class="btn btn-primary block full-width m-b" id="submit_btn">登录</button>
             </form>
@@ -51,6 +51,7 @@
                     location.href = res.url;
                 } else {
                     layer.msg(res.msg, { icon: 5 });
+                    $('#captcha').click();
                 }
             });
         };

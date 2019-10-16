@@ -28,12 +28,13 @@
                                 <tr>
                                     <td>{$vo.title}</td>
                                     <td>{$vo.desc}</td>
-                                    <td>{eq name="vo['status']" value="1"}正常{else /}删除{/eq}</td>
+                                    <td>{eq name="vo['status']" value="1"}启用{else /}禁用{/eq}</td>
                                     <td>{$vo.create_time|time_format}</td>
                                     <td>
                                         <a class="btn btn-default" href="{:url('auths/edit',array('id'=>$vo['id']))}"><i class="fa fa-edit"></i> 编辑</a>
                                         <a class="btn btn-default" href="{:url('auths/manage_auths',array('id'=>$vo['id']))}"><i class="fa fa-edit"></i> 访问授权</a>
                                         <a class="btn btn-default" href="{:url('auths/auth_user',array('group_id'=>$vo['id']))}"><i class="fa fa-edit"></i> 授权用户</a>
+                                        <a class="btn btn-default delete" onclick="del(this)" id="{$vo.id}" ><i class="fa fa-edit"></i> 删除</a>
                                     </td>
                                 </tr>
                                 {/volist}
@@ -45,4 +46,20 @@
             </div>
         </div>
     </div>
+{/block}
+{block name="script"}
+<script>
+    function del(obj){
+        if(window.confirm('确认删除吗？')){
+            var id = $(obj).attr('id');
+            $.post("{:url('auths/del')}",{'id':id},function(data){
+                alert(data.msg);
+                if(data.code){
+                    $(obj).parents('tr').remove();
+                }
+            },'json');
+        }
+    }
+</script>
+
 {/block}

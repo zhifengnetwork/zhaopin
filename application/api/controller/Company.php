@@ -273,7 +273,7 @@ class Company extends ApiBase
         }
         $pageParam=[];
         $rows=input('rows',10);
-        $regtype = Db::name('member')->where(['id'=>$this->get_user_id()])->value('regtype');
+        $regtype = input('regtype/d',1);
         if($regtype==1){
             $list=Db::name('company')->alias('c')
                 ->join('member m','m.id=c.user_id','left')
@@ -582,6 +582,7 @@ class Company extends ApiBase
             ->join('company c', 'c.id=r.company_id', 'LEFT')
             ->where(['r.id' => $id])
             ->find();
+        $detail['logo'] = $detail['logo'] ? SITE_URL . $detail['logo'] : '';
         $detail['is_collection']=0;
         $res=Db::name('collection')->where(['user_id'=>$user_id,'to_id'=>$id])->find();
         if($res){

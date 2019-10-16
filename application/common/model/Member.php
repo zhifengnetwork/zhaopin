@@ -118,4 +118,13 @@ class Member extends Model
        return '';
     }
 
+    public function getVipAttr($data,$value)
+    {
+        if($value['regtype']==1||$value['regtype']==2){
+            return Company::where(['user_id'=>$value['id']])->value('is_vip')?:0;
+        }elseif($value['regtype']==3){
+            return 0;
+        }
+        return 0;
+    }
 }

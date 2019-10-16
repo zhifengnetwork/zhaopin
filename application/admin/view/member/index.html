@@ -67,10 +67,11 @@
             <table class="table  table-bordered table-hover text-center">
                 <thead>
                 <tr>
-                    <th>会员ID</th>
+                    <th>用户ID</th>
                     <th>手机号码</th>
                     <th>信息</th>
                     <th>余额</th>
+                    <th>类型</th>
                     <th>注册时间</th>
                     <th>操作</th>
                 </tr>
@@ -84,6 +85,9 @@
                     <td>{$register_type[$vo['regtype']]}<br>{$vo.name}</td>
                     <td>
                         {$vo['balance']}
+                    </td>
+                    <td>
+                        {if $vo['vip'] eq 1}会员用户{else/}普通用户{/if}
                     </td>
                     <td>{$vo['createtime']|date="Y-m-d H:i:s",###}</td>
                     <td  style="overflow:visible;">

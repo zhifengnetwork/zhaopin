@@ -131,6 +131,13 @@ return [
                         'url'   => 'mguser/index',
                         'hide'  => 1,
                     ],
+                    [
+                        'id'    => 210105,
+                        'title' => '用户授权',
+                        'sort'  => 3,
+                        'url'   => 'mguser/set_authgroup',
+                        'hide'  => 0,
+                    ],
                 ],
             ],
             [

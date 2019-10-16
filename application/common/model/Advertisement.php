@@ -41,6 +41,12 @@ class Advertisement extends Model
     public static function getList()
     {
         $page = input('page', 1);
+        $page = intval($page);
+        $ad = Db::table('page_advertisement')->where(['id' => $page])->field('status')->find();
+        if (!$ad || $ad['status'] != 1) {
+            return [];
+        }
+
         $list = Db::table('advertisement')->field('picture,url')->where(['state' => 1, 'page_id' => $page])->limit(5)->order('type asc sort asc')->select();
         for ($i = 0; $i < count($list); $i++) {
             $list[$i]['picture'] = SITE_URL . '/public' . $list[$i]['picture'];

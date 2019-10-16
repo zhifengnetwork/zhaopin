@@ -780,7 +780,7 @@ class User extends ApiBase
                 ->join('member m', 'c.user_id=m.id', 'LEFT')
                 ->limit($start,$rows)
                 ->where($where)
-                ->where(['r.is_hot' => 1, 'r.status' => 1,'m.regtype'=>$rt])->select();
+                ->where(['r.status' => 1,'m.regtype'=>$rt])->select();
             foreach ($list as $key=>$value){
                 $list[$key]['logo']=SITE_URL.($list[$key]['logo']?:'/public/images/default.jpg');
                 $list[$key]['city_str']=$this->address($value['city']);

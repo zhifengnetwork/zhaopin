@@ -364,10 +364,10 @@ return [
 
     'pay_weixin' => [
         'use_sandbox'       => true,// 是否使用 微信支付仿真测试系统
-        'app_secret'        => 'aeb753813c5e6d538905daeda4bc4932',
-        'app_id'            => 'wxbfd97e7c3331e60b',  // 公众账号ID
-        'mch_id'            => 'xxxxx',// 商户id
-        'md5_key'           => 'xxxxxxx',// md5 秘钥
+        'app_secret'        => '1123362706e37fc9d0f5302e6270d2b8',
+        'app_id'            => 'wxb2321247535b62b6',  // 公众账号ID
+        'mch_id'            => '1558990781',// 商户id
+        'md5_key'           => '271F92B32B98414A2A3E1EA12568B4C3',// md5 秘钥
         'app_cert_pem'      => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'wx' . DIRECTORY_SEPARATOR .  'pem' . DIRECTORY_SEPARATOR . 'weixin_app_cert.pem',
         'app_key_pem'       => dirname(__FILE__) . DIRECTORY_SEPARATOR . 'wx' . DIRECTORY_SEPARATOR .  'pem' . DIRECTORY_SEPARATOR . 'weixin_app_key.pem',
         'sign_type'         => 'MD5',// MD5  HMAC-SHA256

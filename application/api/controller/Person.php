@@ -503,11 +503,15 @@ class Person extends ApiBase
         if(!$user_id){
             $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
         }
-        $money=input('moeny');
+        $money = input('money');
+        $money = bcadd($money,0,2);
+        if($money<0.01||$money>100000){
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'金额不能小于0.01,大于100000','data'=>'']);
+        }
         $recharge['recharge_sn'] = 'R'.date('YmdHis',time()) . mt_rand(1000,9999);
         $recharge['money'] = $money;
         $recharge['user_id'] = $user_id;
-        $recharge['type'] = 2;//预约支付
+        $recharge['type'] = 1;//充值
         $recharge['c_time'] = time();
         $recharge_id=Db::name('recharge')->insertGetId($recharge);
         if($recharge_id){
@@ -599,13 +603,13 @@ class Person extends ApiBase
             $recharge['money'] = $money;
             $recharge['user_id'] = $user_id;
             $recharge['for_id'] = $vip_type;//vip类型
-            $recharge['type'] = 2;//预约支付
+            $recharge['type'] = 2;//VIP
             $recharge['c_time'] = time();
             $recharge_id=Db::name('recharge')->insertGetId($recharge);
             if($recharge_id){
                 $this->ajaxReturn(['status' => 5, 'msg' => '请支付','data'=>$recharge_id]);
             }else{
-                $this->ajaxReturn(['status' => -2, 'msg' => '充值失败!','data'=>[]]);
+                $this->ajaxReturn(['status' => -2, 'msg' => '开通失败!','data'=>[]]);
             }
         }
         $this->ajaxReturn(['status' => 1, 'msg' => '开通VIP成功','data'=>[]]);

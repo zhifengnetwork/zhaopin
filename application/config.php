@@ -363,7 +363,7 @@ return [
     ],
 
     'pay_weixin' => [
-        'use_sandbox'       => true,// 是否使用 微信支付仿真测试系统
+        'use_sandbox'       => false,// 是否使用 微信支付仿真测试系统
         'app_secret'        => '1123362706e37fc9d0f5302e6270d2b8',
         'app_id'            => 'wxb2321247535b62b6',  // 公众账号ID
         'mch_id'            => '1558990781',// 商户id

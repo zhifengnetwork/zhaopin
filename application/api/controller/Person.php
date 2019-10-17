@@ -506,7 +506,7 @@ class Person extends ApiBase
         $money = input('money');
         $money = bcadd($money,0,2);
         if($money<0.01||$money>100000){
-            $this->ajaxReturn(['status' => -2 , 'msg'=>'金额不能小于0.01,大于100000','data'=>'']);
+            $this->ajaxReturn(['status' => -2 , 'msg'=>'金额不能小于0.01,大于100000','data'=>$money]);
         }
         $recharge['recharge_sn'] = 'R'.date('YmdHis',time()) . mt_rand(1000,9999);
         $recharge['money'] = $money;

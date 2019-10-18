@@ -230,7 +230,7 @@ class Person extends ApiBase
         $id = input('id/d');
         if (!$id) $this->ajaxReturn(['status' => -2, 'msg' => '信息不存在！']);
         $detail = Db::name('person')
-            ->field('id,user_id,name,gender,avatar,school_type,age,work_age,images,job_type,desc,experience,reserve_c,province,city,district,degree')
+            ->field('id,user_id,name,gender,avatar,school_type,age,work_age,images,job_type,desc,experience,reserve_c,province,city,district,degree,reserve')
             ->where(['id' => $id,'status'=>1])->find();
 
 
@@ -273,6 +273,7 @@ class Person extends ApiBase
         $detail['gender'] = $detail['gender'] == 'female' ? '女' : '男';
         $detail['images'] = $detail['images']!='[]' ? 1 : 0;
         $detail['job_type'] = Category::getNameById($detail['job_type']) ?: '';
+        $detail['reserve'] = $detail['reserve'] == 1 ? 1 : 0;
 
         $this->ajaxReturn(['status' => 1, 'msg' => '获取成功', 'data' => $detail]);
     }

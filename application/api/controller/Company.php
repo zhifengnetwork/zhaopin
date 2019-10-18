@@ -620,8 +620,11 @@ class Company extends ApiBase
     {
         $this->getCompany();
         $id = input('id/d');
-        if(!($person = Db::name('person')->where(['id'=>$id])->field('id,reserve_c')->find())){
+        if(!($person = Db::name('person')->where(['id'=>$id])->field('id,reserve_c,reserve')->find())){
             $this->ajaxReturn(['status' => -2, 'msg' => '用户不存在']);
+        }
+        if ($person['reserve'] != 1){
+            $this->ajaxReturn(['status' => -2, 'msg' => '用户不允许被预约']);
         }
         if ($person['reserve_c'] == $this->_id)
             $this->ajaxReturn(['status' => -2, 'msg' => '您已预约该应聘者']);

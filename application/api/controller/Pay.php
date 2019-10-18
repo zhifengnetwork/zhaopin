@@ -208,6 +208,9 @@ class Pay extends ApiBase
         $where['id']=$recharge_id;
         $where['user_id']=$user_id;
         $member       = MemberModel::get($user_id);
+        if(!$member['openid']){
+            $this->ajaxReturn(['status' => 8 , 'msg'=>'微信授权','data'=>'']);
+        }
         $recharge=Db::name('recharge')->where($where)->find();
         if(!$recharge){
             $this->ajaxReturn(['status' => -2 , 'msg'=>'支付订单不存在','data'=>'']);

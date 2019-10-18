@@ -962,9 +962,9 @@ class User extends ApiBase
 
 
         $password = md5($data['salt'] . $password);
-//        if ($password != $data['password']) {
-//            $this->ajaxReturn(['status' => -2, 'msg' => '登录密码错误！']);
-//        }
+        if ($password != $data['password']) {
+            $this->ajaxReturn(['status' => -2, 'msg' => '登录密码错误！']);
+        }
 
         unset($data['password'], $data['salt']);
 

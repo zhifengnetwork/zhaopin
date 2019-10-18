@@ -436,6 +436,13 @@ return [
                         'hide'  => 1,
                     ],
                     [
+                        'id'    => 90114,
+                        'title' => '预定设置',
+                        'sort'  => 4,
+                        'url'   => 'company/reserve_set',
+                        'hide'  => 1,
+                    ],
+                    [
                         'id'    => 91004,
                         'title' => '公司审核详情',
                         'sort'  => 4,

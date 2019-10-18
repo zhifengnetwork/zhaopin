@@ -356,4 +356,25 @@ class Company extends Common
         Db::commit();
         $this->success('操作成功', url('company/person_pic'));
     }
+
+    public function reserve_set()
+    {
+        $money = Db::name('config')->where(['name'=>'reserve_money'])->value('value');
+        if (Request::instance()->isPost()) {
+            $money = input('money');
+            $money = bcadd($money,0,2);
+            if ($money < 0) {
+                $this->error('预定金额不能少于0',url('company/vip_set'));
+            }
+            $res = Db::name('config')->where(['name'=>'reserve_money'])->update(['value'=>$money]);
+            if ($res !== false) {
+                $this->success('编辑成功', url('company/reserve_set'));
+            }
+            $this->error('编辑失败');
+
+        }
+        $this->assign('money', $money);
+        $this->assign('meta_title', '预定设置');
+        return $this->fetch();
+    }
 }

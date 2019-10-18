@@ -275,6 +275,9 @@ class Person extends ApiBase
         $detail['job_type'] = Category::getNameById($detail['job_type']) ?: '';
         $detail['reserve'] = $detail['reserve'] == 1 ? 1 : 0;
 
+        // 预约所需金额
+        $detail['reserve_money'] = Db::name('config')->where(['name'=>'reserve_money'])->value('value');
+
         $this->ajaxReturn(['status' => 1, 'msg' => '获取成功', 'data' => $detail]);
     }
     public function address($code){

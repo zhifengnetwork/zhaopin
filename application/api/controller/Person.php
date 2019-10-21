@@ -395,47 +395,52 @@ class Person extends ApiBase
         $poundage=sprintf("%.2f",$money*$percent/100);;//手续费
         $order_money=$money-$poundage;
         if($pay_tpye==2){//微信
-            $this->ajaxReturn(['status' => -2, 'msg' => '微信支付暂时未开通，请等待','data'=>[]]);
-        }elseif($pay_tpye==4){//支付宝   后台审核
-            $alipay=input('alipay');
-            $alipay_name=input('alipay_name');
-            if(!$alipay||!$alipay_name){
-                $this->ajaxReturn(['status' => -2, 'msg' => '支付宝账户和名称不能为空','data'=>[]]);
+            if(!$member['openid']){
+                $this->ajaxReturn(['status' => 8, 'msg' => '授权微信登录','data'=>[]]);
             }
-            $data['alipay']=$alipay;
-            $data['alipay_name']=$alipay_name;
-            Db::table('member')->where('id',$user_id)->update($data);
-            $data=[];
-            Db::startTrans();
-            $data['user_id']=$user_id;
-            $data['money']=$money;
-            $data['rate']=$percent;
-            $data['taxfee']=$poundage;
-            $data['account']=$order_money;
-            $data['type']=$pay_tpye;
-            $data['status']=0;
-            $data['createtime']=time();
-            $wi_id=Db::name('member_withdrawal')->insertGetId($data);
-            if($wi_id){
-                Db::table('member')->where('id',$user_id)->setDec('balance',$money);
-                $data=[];
-                $data['user_id']=$user_id;
-                $data['money']=$money;
-                $data['old_balance']=$member['balance'];
-                $data['balance']=sprintf("%.2f",$member['balance']-$money);
-                $data['balance_type']='支付宝提现';
-                $data['source_type']=4;
-                $data['log_type']=0;
-                $data['source_id']=$wi_id;
-                $data['create_time']=time();
-                Db::name('member_balance_log')->insertGetId($data);
-                Db::commit();
-                $this->ajaxReturn(['status' => 1, 'msg' => '已提交后台审核！','data'=>$wi_id]);
-            }else{
-                Db::rollback();
-                $this->ajaxReturn(['status' => -2, 'msg' => '提现失败','data'=>[]]);
+        }elseif($pay_tpye==4) {//支付宝   后台审核
+            $alipay = input('alipay');
+            $alipay_name = input('alipay_name');
+            if (!$alipay || !$alipay_name) {
+                $this->ajaxReturn(['status' => -2, 'msg' => '支付宝账户和名称不能为空', 'data' => []]);
+            }
+            $data['alipay'] = $alipay;
+            $data['alipay_name'] = $alipay_name;
+            if (!Db::table('member')->where('id', $user_id)->update($data)) {
+                $this->ajaxReturn(['status' => -2, 'msg' => '更新支付宝信息失败', 'data' => []]);
             }
         }
+        $data=[];
+        Db::startTrans();
+        $data['user_id']=$user_id;
+        $data['money']=$money;
+        $data['rate']=$percent;
+        $data['taxfee']=$poundage;
+        $data['account']=$order_money;
+        $data['type']=$pay_tpye;
+        $data['status']=0;
+        $data['createtime']=time();
+        $wi_id=Db::name('member_withdrawal')->insertGetId($data);
+        if(!$wi_id||Db::table('member')->where('id',$user_id)->setDec('balance',$money)){
+            Db::rollback();
+            $this->ajaxReturn(['status' => -2, 'msg' => '提现失败','data'=>[]]);
+        }
+        $data=[];
+        $data['user_id']=$user_id;
+        $data['money']=$money;
+        $data['old_balance']=$member['balance'];
+        $data['balance']=sprintf("%.2f",$member['balance']-$money);
+        $data['balance_type']=($pay_tpye==2?'微信':'支付宝').'提现';
+        $data['source_type']=$pay_tpye;
+        $data['log_type']=0;
+        $data['source_id']=$wi_id;
+        $data['create_time']=time();
+        if(!Db::name('member_balance_log')->insertGetId($data)){
+            Db::rollback();
+            $this->ajaxReturn(['status' => -2, 'msg' => '提现失败','data'=>[]]);
+        }
+        Db::commit();
+        $this->ajaxReturn(['status' => 1, 'msg' => '已提交后台审核！','data'=>$wi_id]);
     }
     //提现
     public function withdrawal222(){

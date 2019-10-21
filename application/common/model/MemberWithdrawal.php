@@ -28,11 +28,6 @@ class MemberWithdrawal extends Model
         4 => '支付宝',
     ];
 
-    public function getTypeAttr($value)
-    {
-        return self::$type_list[$value];
-    }
-
     public static function getStatusTextBy($value)
     {
         return self::$status_list[$value];
@@ -72,6 +67,10 @@ class MemberWithdrawal extends Model
         } else {
             return Db::name('company')->where(['user_id' => $data['user_id']])->value('company_name');
         }
+    }
+
+    public function getDataArrAttr($value, $data){
+        return json_decode($data['data'],true);
     }
 
 

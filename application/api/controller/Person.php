@@ -4,6 +4,7 @@ namespace app\api\controller;
 
 use app\common\model\Category;
 use app\common\model\Company as CompanyModel;
+use app\common\model\MemberWithdrawal;
 use app\common\model\Person as PersonModel;
 use app\common\model\Sysset;
 use think\Db;
@@ -398,6 +399,7 @@ class Person extends ApiBase
             if(!$member['openid']){
                 $this->ajaxReturn(['status' => 8, 'msg' => '授权微信登录','data'=>[]]);
             }
+            $account['openid'] = $member['openid'];
         }elseif($pay_tpye==4) {//支付宝   后台审核
             $alipay = input('alipay');
             $alipay_name = input('alipay_name');
@@ -409,6 +411,7 @@ class Person extends ApiBase
             if (Db::table('member')->where('id', $user_id)->update($data)===false) {
                 $this->ajaxReturn(['status' => -2, 'msg' => '更新支付宝信息失败', 'data' => []]);
             }
+            $account = $data;
         }
         $data=[];
         Db::startTrans();
@@ -419,6 +422,7 @@ class Person extends ApiBase
         $data['account']=$order_money;
         $data['type']=$pay_tpye;
         $data['status']=0;
+        $data['data']=json_encode($account);
         $data['createtime']=time();
         $wi_id=Db::name('member_withdrawal')->insertGetId($data);
         if(!$wi_id||!Db::table('member')->where('id',$user_id)->setDec('balance',$money)){
@@ -442,6 +446,28 @@ class Person extends ApiBase
         Db::commit();
         $this->ajaxReturn(['status' => 1, 'msg' => '已提交后台审核！','data'=>$wi_id]);
     }
+
+    public function withdrawal_list(){
+        $user_id=$this->get_user_id();
+        if(!$user_id){
+            $this->ajaxReturn(['status' => -1 , 'msg'=>'用户不存在','data'=>'']);
+        }
+        $where = ['user_id'=>$user_id];
+        $list=Db::name('member_withdrawal')
+            ->where($where)
+            ->field('id,money,createtime,status')
+            ->paginate(20,false,['query' => $where]);
+        if(!$list){
+            $this->ajaxReturn(['status' => 1, 'msg' => '获取成功','data'=>[]]);
+        }
+        $list=$list->toArray();
+        foreach ($list['data'] as &$value){
+            $value['createtime']=date('Y-m-d', $value['createtime']);
+            $value['status']=MemberWithdrawal::getStatusTextBy($value['status']);
+        }
+        $this->ajaxReturn(['status' => 1, 'msg' => '获取成功','data'=>$list['data']]);
+    }
+
     //提现
     public function withdrawal222(){
         $user_id=$this->get_user_id();

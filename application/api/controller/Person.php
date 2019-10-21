@@ -406,7 +406,7 @@ class Person extends ApiBase
             }
             $data['alipay'] = $alipay;
             $data['alipay_name'] = $alipay_name;
-            if (!Db::table('member')->where('id', $user_id)->update($data)) {
+            if (Db::table('member')->where('id', $user_id)->update($data)===false) {
                 $this->ajaxReturn(['status' => -2, 'msg' => '更新支付宝信息失败', 'data' => []]);
             }
         }
@@ -421,7 +421,7 @@ class Person extends ApiBase
         $data['status']=0;
         $data['createtime']=time();
         $wi_id=Db::name('member_withdrawal')->insertGetId($data);
-        if(!$wi_id||Db::table('member')->where('id',$user_id)->setDec('balance',$money)){
+        if(!$wi_id||!Db::table('member')->where('id',$user_id)->setDec('balance',$money)){
             Db::rollback();
             $this->ajaxReturn(['status' => -2, 'msg' => '提现失败','data'=>[]]);
         }

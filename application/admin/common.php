@@ -674,3 +674,13 @@ function delDirAndFile($path, $delDir = false)
         return false;
     }
 }
+
+/**
+ * 平台支出记录
+ * @param $data
+ */
+function expenseLog($data){
+    $data['addtime'] = time();
+    $data['admin_id'] = session('admin_id');
+    M('expense_log')->add($data);
+}

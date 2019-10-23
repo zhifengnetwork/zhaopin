@@ -294,11 +294,61 @@ class Finance extends Common
                 Db::rollback();
                 $this->error('操作失败');
             }
+        }elseif($status==1){
+            // 文档  https://pay.weixin.qq.com/wiki/doc/api/tools/mch_pay.php?chapter=14_2
+            $withdrawal->type == 2&&$this->weixin($withdrawal);
+//            $withdrawal->type == 4&&$this->alipay($withdrawal);
         }
 
         Db::commit();
         $this->success('操作成功', url('finance/withdrawal_list'));
     }
 
+    /**
+     * 成功
+     */
+    private function weixin($falg){
+        //微信
+        $result = $this->withdrawals_weixin($falg['id']);
+        if(isset($result['status'])){
+
+            // 发送公众号消息给用户
+//            $wechat->sendMsg($user_find['openid'], 'text', '您提交的提现申请操作失败！');
+            $this->ajaxReturn(array('status' => 0, 'msg' => $result['msg']), 'JSON');
+            exit;
+        }else{
+            $result['payment_time'] = strtotime($result['payment_time']);
+            $result['money'] = $falg['money'];
+            $result['user_id'] = $falg['user_id'];
+            M('withdrawals_weixin')->insert($result);
+
+            // 发送公众号消息给用户
+//            $wechat->sendMsg($user_find['openid'], 'text', '提现申请（微信）已通过！请查收！');
+
+        }
+    }
+
+    //用户微信提现
+    private function withdrawals_weixin($id){
+        $falg = M('withdrawals')->where(['id'=>$id])->find();
+        $openid = M('users')->where('user_id', $falg['user_id'])->value('openid');
+        $data['openid'] = $openid;
+        $data['pay_code'] = $falg['id'].$falg['user_id'];
+        $data['desc'] = '提现ID'.$falg['id'];
+        if($falg['taxfee'] >= $falg['money']){
+            return array('status'=>1, 'msg'=>"提现额度必须大于手续费！" );
+        }else{
+            $data['money'] = bcsub($falg['money'], $falg['taxfee'], 2);
+        }
+        include_once __DIR__ . '/vendor/payment/weixin/weixin.class.php';
+        $weixin_obj = new \weixin();
+        $result = $weixin_obj->transfer($data);
+        // if($result){
+        //     $result['payment_time'] = strtotime($result['payment_time']);
+        //     $result['money'] = $falg['money'];
+        //     $result['user_id'] = $falg['user_id'];
+        // }
+        return $result;
+    }
 
 }

@@ -435,7 +435,7 @@ class Person extends ApiBase
         $data['old_balance']=$member['balance'];
         $data['balance']=sprintf("%.2f",$member['balance']-$money);
         $data['balance_type']=($pay_tpye==2?'微信':'支付宝').'提现';
-        $data['source_type']=$pay_tpye;
+        $data['source_type']=4;
         $data['log_type']=0;
         $data['source_id']=$wi_id;
         $data['create_time']=time();
@@ -456,6 +456,7 @@ class Person extends ApiBase
         $list=Db::name('member_withdrawal')
             ->where($where)
             ->field('id,money,createtime,status')
+            ->order('id desc')
             ->paginate(20,false,['query' => $where]);
         if(!$list){
             $this->ajaxReturn(['status' => 1, 'msg' => '获取成功','data'=>[]]);

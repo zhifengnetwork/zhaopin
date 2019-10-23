@@ -14,7 +14,6 @@ use think\Request;
 use think\Session;
 use think\captcha\Captcha;
 use app\common\util\jwt\JWT;
-use \think\Config;
 
 class Login extends ApiBase
 {
@@ -89,9 +88,10 @@ class Login extends ApiBase
             $this->ajaxReturn(['status' => -1 , 'msg'=>'code不能为空','data'=>'']);
         }
 
-        $wxConfig = Config::get('pay_weixin');
+        $appid = Db::name('config')->where(['name'=>'appid'])->value('value');
+        $appsecret = Db::name('config')->where(['name'=>'appsecret'])->value('value');
 
-        $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$wxConfig['app_id'].'&secret='.$wxConfig['app_secret'].'&js_code='.$code.'&grant_type=authorization_code' ;
+        $url = 'https://api.weixin.qq.com/sns/jscode2session?appid='.$appid.'&secret='.$appsecret.'&js_code='.$code.'&grant_type=authorization_code' ;
         $result = httpRequest($url, 'GET');
         $arr = json_decode($result, true);
         if(!isset($arr['openid'])){
